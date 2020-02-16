@@ -22,38 +22,38 @@ addpath ./shortSpeech
 disp('Setting up the room');
 % ---- Initialize Parameters for training ----
  
-c = 340;
-fs = 8000;
-roomSize = [6,6,3];    
-height = 2;
-width = 3;
-numRow = 3;
-numCol = 7;
-ref = roomSize/2;
-% sourceTrainL = sourceGrid(height, width, numRow, numCol, ref);
-sourceTrainL = [4,4,1; 2,2,1; 4,2,1; 2,4,1; 3,3,1];
-numArrays = 4;
-numMics = 2;
-nU = 50;
-radiusU = max(height,width);
-nL = size(sourceTrainL,1);
-micsPos = [3.025,5,1;2.975,5,1; 5,2.975,1;5,3.025,1; 3.025,1,1;2.975,1,1; 1,2.975,1;1,3.025,1];
-sourceTrainU = randSourcePos(nU, roomSize, radiusU, ref);
-sourceTrain = [sourceTrainL; sourceTrainU];
-nD = size(sourceTrain,1);
-
-% ---- generate RIRs and estimate RTFs ----
-totalMics = numMics*numArrays;
-rirLen = 1000;
-rtfLen = 500;
-T60 = 0.15;
-train_sp = randn(size(sourceTrain,1), 10*fs);
-x = randn(1,10*fs);
-% [x,fs_in] = audioread('f0001_us_f0001_00009.wav');
-% x = transpose(resample(x,fs,fs_in));
-disp('Generating the train set');
-RTF_train = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
-save('mat_trainParams/biMicCircle_5L50U')
+% c = 340;
+% fs = 8000;
+% roomSize = [6,6,3];    
+% height = 2;
+% width = 3;
+% numRow = 3;
+% numCol = 7;
+% ref = roomSize/2;
+% % sourceTrainL = sourceGrid(height, width, numRow, numCol, ref);
+% sourceTrainL = [4,4,1; 2,2,1; 4,2,1; 2,4,1; 3,3,1];
+% numArrays = 4;
+% numMics = 2;
+% nU = 50;
+% radiusU = max(height,width);
+% nL = size(sourceTrainL,1);
+% micsPos = [3.025,5,1;2.975,5,1; 5,2.975,1;5,3.025,1; 3.025,1,1;2.975,1,1; 1,2.975,1;1,3.025,1];
+% sourceTrainU = randSourcePos(nU, roomSize, radiusU, ref);
+% sourceTrain = [sourceTrainL; sourceTrainU];
+% nD = size(sourceTrain,1);
+% 
+% % ---- generate RIRs and estimate RTFs ----
+% totalMics = numMics*numArrays;
+% rirLen = 1000;
+% rtfLen = 500;
+% T60 = 0.15;
+% train_sp = randn(size(sourceTrain,1), 10*fs);
+% x = randn(1,10*fs);
+% % [x,fs_in] = audioread('f0001_us_f0001_00009.wav');
+% % x = transpose(resample(x,fs,fs_in));
+% disp('Generating the train set');
+% RTF_train = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
+% save('mat_trainParams/biMicCircle_5L50U')
 
 %---- load training data (check mat_trainParams for options)----
 load('mat_trainParams/biMicCircle_5L50U.mat')
@@ -85,11 +85,11 @@ for i = 1:size(p_hat_ts)
     [~,~, p_hat_ts(i,:)] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                 numMics, sourceTrain, sourceTests(i,:), nL, nU, roomSize, T60, c, fs, kern_typ, scales);
 end
-
-save('mat_outputs/monoTestSource_biMicCircle_5L50U')
+% 
+% save('mat_outputs/monoTestSource_biMicCircle_5L50U')
 % %  ---- load output data ---- 
-% load('mat_outputs/singleTestSource_biMicCircle_gridL100U')
+load('mat_outputs/monoTestSource_biMicCircle_5L50U')
 
 %---- plot ----
 plotRoom(roomSize, micsPos, sourceTrain, sourceTests, nL, p_hat_ts);
-title('training grid')
+title('Source Localization Based off Semi-Supervised Approach')

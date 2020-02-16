@@ -1,8 +1,8 @@
 function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetector(x, gammaL, numMics, numArrays, micsPos, t, p_fails, sub_p_hat_ts, scales, RTF_train, rirLen, rtfLen,sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ)
 
     %---- Initialize CRF params ----
-    posteriors = zeros(numArrays,2);
-    likes = zeros(numArrays,2);
+    posteriors = zeros(numArrays,3);
+    likes = zeros(numArrays,3);
     latents = [ones(numArrays,1), zeros(numArrays,1), zeros(numArrays,1)]+1;
     transMat = [.9 .05 0.05; .05 .9 0.05; 1/3 1/3 1/3];
     init_var = .2;
@@ -20,21 +20,19 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetector(x, gammaL, 
 
     %---- Set likelihoods (to be maximized during msg passing calc.) ----
     for k = 1:numArrays
-        for l = 1:2
-            theta2 = 2*normpdf(resids(k), 0, init_var);
-            theta1 = (lambda*exp(-lambda*resids(k)))/(1-exp(-lambda*eMax));
-%             theta3 = unifrnd(0,eMax);
-        end
-        likes(k,:) = [theta1 theta2];
+        theta2 = 2*normpdf(resids(k), 0, init_var);
+        theta1 = (lambda*exp(-lambda*resids(k)))/(1-exp(-lambda*eMax));
+        theta3 = unifrnd(0,eMax);
+        likes(k,:) = [theta1 theta2 theta3];
     end
 
     % ---- For each incoming sample, use CRF to determine prob of latents and detection failure ----
     %Assuming fully connected network, we begin by allowing each latent
     %variable to receive messages from its connected variables to
     %initialize marginal posteriors.
-    mu_alphas = zeros(numArrays,2);
+    mu_alphas = zeros(numArrays,3);
     for k1 = 1:numArrays
-        for l = 1:2
+        for l = 1:3
             for k2 = 1:numArrays
                 if k2 ~= k1
                     mu_alphas(k1,l) = transMat(latents(k2,l), latents(k1,l))*(likes(k2,l)); 
@@ -46,7 +44,7 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetector(x, gammaL, 
     end
 
     %Variables send further messages using arbitrary passing strategy.
-    mu_alpha_prev = zeros(1,2);
+    mu_alpha_prev = zeros(1,3);
     tol = 10e-3;
     err = inf;
     while err > tol
@@ -54,7 +52,7 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetector(x, gammaL, 
             prev_posts = zeros(size(posteriors));
         end
         for k = 1:numArrays
-            for l = 1:2
+            for l = 1:3
                 if k == 1
                     mu_alpha = transMat(latents(1,l), latents(2,l))*(likes(k,l));
                     mu_alpha_prev(l) = mu_alpha;
