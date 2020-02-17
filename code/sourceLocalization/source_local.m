@@ -92,4 +92,7 @@ load('mat_outputs/monoTestSource_biMicCircle_5L50U')
 
 %---- plot ----
 plotRoom(roomSize, micsPos, sourceTrain, sourceTests, nL, p_hat_ts);
-title('Source Localization Based off Semi-Supervised Approach')
+
+title('Source Localization Based Off Semi-Supervised Approach')
+ax = gca;
+ax.TitleFontSizeMultiplier  = 2;

@@ -70,6 +70,7 @@ rtf_str = zeros(budgetStr,rtfLen, numArrays);
 est_str = zeros(budgetStr,3);
 numStr = 1; upd = 0;
 labels = cell(1,4);
+iter = 1;
 
 %---- Initialize moving mic line params ----
 movingArray = 1;
@@ -124,10 +125,10 @@ for t = 1:numMovePoints
         %estimates. If movmement previously detected, we compare to
         %estimate from previous estimation.
         if mvFlag == 0
-            [self_sub_p_hat_ts(:,:,n), p_fails(n), posteriors(:,:,n)] = moveDetector(x, gammaL, numMics, numArrays, micsPosNew, t, p_fails(n), sub_p_hat_ts(:,:,n), scales, RTF_train,...
+            [self_sub_p_hat_ts(:,:,n), p_fails(n), posteriors(:,:,n)] = moveDetector(x, gammaL, numMics, numArrays, micsPosNew, iter, p_fails(n), sub_p_hat_ts(:,:,n), scales, RTF_train,...
             rirLen, rtfLen, sourceTrain, holderTest, nL, nU, roomSize, T60, c, fs, kern_typ);
         else
-            [self_sub_p_hat_ts(:,:,n), p_fails(n), posteriors(:,:,n)] = moveDetector(x, gammaL, numMics, numArrays, micsPosNew, t, p_fails(n), self_sub_p_hat_ts(:,:,n), scales, RTF_train,...
+            [self_sub_p_hat_ts(:,:,n), p_fails(n), posteriors(:,:,n)] = moveDetector(x, gammaL, numMics, numArrays, micsPosNew, iter, p_fails(n), self_sub_p_hat_ts(:,:,n), scales, RTF_train,...
             rirLen, rtfLen, sourceTrain, holderTest, nL, nU, roomSize, T60, c, fs, kern_typ);
         end
     end
@@ -190,6 +191,7 @@ for t = 1:numMovePoints
   
             end
         end
+            iter = 1;
             mvFlag = 0;
             upd = 1;
             numStr = 1;

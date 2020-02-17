@@ -55,9 +55,9 @@ else
     end
 end
 %configure plot
-title('room');
-xlabel('x');
-ylabel('y');
+% title('room');
+xlabel('x (meters)');
+ylabel('y (meters)');
 % zlabel('z');
 legend(p,L);
 % legend('Labelled Tr.', 'Unlabelled Tr.', 'Test', 'Mic')

@@ -48,8 +48,10 @@ ylim([0 max(pdfs(1,:))+.1])
 set(gca,'XTick',0:20)
 z ={ticks};
 set(gca,'XTickLabel',z)
-xlabel('Residual Error');
+xlabel('Residual Error [\times10^{3}]');
 ylabel('Probability Density');
+ax = gca;
+ax.TitleFontSizeMultiplier  = 2;
 
 
 figure(2)
@@ -61,6 +63,8 @@ set(gca,'XTick',0:20)
 set(gca,'XTickLabel',z)
 xlabel('Residual Error');
 ylabel('Probability Density');
+ax = gca;
+ax.TitleFontSizeMultiplier  = 2;
 % 
 % figure(3)
 % bar(pdfs(3,:))
