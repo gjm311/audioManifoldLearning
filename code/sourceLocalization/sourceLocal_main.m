@@ -34,7 +34,7 @@ disp('Setting up the room');
 % max_iters = 100;
 % init_scales = 1*ones(1,numArrays);
 % var_init = 0;
-% [sigma,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, init_scales);
+% [sigma,sigmaL,K] = trCovEstDemo(nL, nD, numArrays, RTF_train, kern_typ, init_scales);
 % gammaL = inv(sigmaL+rand*10e-3*eye(size(gammaL)));
 % p_sqL = gammaL*sourceTrainL;
 % 
@@ -43,6 +43,8 @@ disp('Setting up the room');
 % [~,I] = min(sum(costs));
 % vari = varis_set(I);
 % scales = scales_set(I,:);
+% RTF_test =  rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTest, roomSize, T60, rirLen, c, fs);
+% sigma_Lt = tstCovEst(nL, nD, numArrays, RTF_train, RTF_test, kern_typ, scales);
 % save('mat_outputs/monoTestSource_biMicCircle_5L50U.mat')
 
 
@@ -70,7 +72,7 @@ rtf_str = zeros(budgetStr,rtfLen, numArrays);
 est_str = zeros(budgetStr,3);
 numStr = 1; upd = 0;
 labels = cell(1,4);
-iter = 1;
+iter = 0;
 
 %---- Initialize moving mic line params ----
 movingArray = 1;
@@ -100,7 +102,8 @@ for t = 1:numMovePoints
     %movement), we store original precision matrix and only update if we
     %update our subnetwork position estimates; i.e. update when new RTF samples
     %taken.
-    Q_t = Q_t+rand*10e-3*eye(size(Q_t));
+    iter = iter+1;
+%     Q_t = Q_t+rand*10e-3*eye(size(Q_t));
     
     new_x1 = movingMicsPos(t,1)-.025;
     new_x2 = movingMicsPos(t,1)+.025;
@@ -191,14 +194,14 @@ for t = 1:numMovePoints
   
             end
         end
-            iter = 1;
-            mvFlag = 0;
-            upd = 1;
-            numStr = 1;
-            rtf_str = zeros(budgetStr,rtfLen,numArrays);
-            est_str = zeros(budgetStr,3);
+        iter = 1;
+        mvFlag = 0;
+        upd = 1;
+        numStr = 1;
+        rtf_str = zeros(budgetStr,rtfLen,numArrays);
+        est_str = zeros(budgetStr,3);
         [RTF_test, k_t_new, p_hat_t] = test(x, Q_t, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
-                numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
+            numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
             
     %If no movement detected, and  estimate position using all arrays and update
     %kernel using params dervied from full network.
@@ -206,15 +209,6 @@ for t = 1:numMovePoints
         upd = 0;
         [RTF_test, k_t_new, p_hat_t] = test(x, Q_t, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                 numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
-%         if numStr > budgetStr
-%             strIdx = randi(budgetStr,1);
-%             rtf_str(strIdx,:,:) = RTF_test;
-%             est_str(strIdx,:) = p_hat_t;
-%         else
-%             rtf_str(numStr,:,:) = RTF_test;
-%             est_str(numStr,:) = p_hat_t;
-%             numStr = numStr + 1;
-%         end
     end
 
     %Prune labelled points (if budgetL is maxed out). 
@@ -232,17 +226,18 @@ for t = 1:numMovePoints
         labels{1,p} = mat2str(round(posterior(p,:),2));
     end
     labelPos = [micsPosNew(1:2:end,1), micsPosNew(1:2:end,2)];
+    
     f = plotRoom(roomSize, micsPosNew, sourceTrain, sourceTest, nL, p_hat_t);
     title('Detecting Array Movement')
     binTxt = text(3.6,.5, sprintf('Movement Detection Probability: %s \n(t = %g)',num2str(round(p_fail,2)), t-1));
     prbTxt = text(labelPos(:,1),labelPos(:,2), labels, 'HorizontalAlignment', 'left', 'VerticalAlignment', 'bottom');
-
 %     %Uncomment below for pauses between iterations only continued by
 %     %clicking graph  
-    w = waitforbuttonpress;
+%     w = waitforbuttonpress;
     if t~=numMovePoints+init_pauses+end_pauses
         delete(binTxt);
         delete(prbTxt);
     end
+    clf
     
 end   

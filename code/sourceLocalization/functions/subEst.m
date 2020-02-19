@@ -13,7 +13,7 @@ function [sub_scales, num_static, RTF_test, p_hat_t, k_t_new] = subEst(gammaL, p
        sub_RTF_train = RTF_train; 
        sub_scales = scales; 
        num_static = 0;
-       [RTF_test,k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, size(sub_RTF_train,3),...
+       [RTF_test,k_t_new,p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, size(sub_RTF_train,3),...
                 numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, sub_scales); 
     else
         drop_idxs = zeros(1,numArrays);
