@@ -39,8 +39,8 @@ thresh = .5;
 %---- Iterate over all array movements and track probability of movement
 %and latent probabilities
 for t = 1:numMovePoints+init_pauses+end_pauses
-    new_x1 = movingMicsPos(t,1)-.005;
-    new_x2 = movingMicsPos(t,1)+.005;
+    new_x1 = movingMicsPos(t,1)-.025;
+    new_x2 = movingMicsPos(t,1)+.025;
     micsPosNew = [new_x1 movingMicsPos(t,2:3);new_x2 movingMicsPos(t,2:3); micsPos(1+numMics:end,:)];
 
 % ----Calculate new estimate based off movement for all subnets and resid. error from stationary time (turns off once estimates settle) ----

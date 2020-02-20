@@ -1,3 +1,6 @@
+%This program simulates rtfs for a specified training setup and potential
+%moving array.
+
 % ---- load training data ----
 load('mat_trainParams/biMicCircle_5L50U')
 addpath ./functions

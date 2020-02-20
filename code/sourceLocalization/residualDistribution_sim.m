@@ -1,15 +1,11 @@
 clear
 %{
-This program is able to detect movement of an array based off of a
-misalignment recognition algorithm. The algorithm utilizes MRFs with Fully
-Connected latent variables to predict misalignment from sensor
-measurements. Here the input is the residual error between an estimated
-position by subsets of the overall network and previous estimates. As one would expect, 
-if the probability of misalignment is high for all subnets but one, this is 
-likely the node that is being moved. More details can be found in
-"Misalignment Recognition Using MRFs with Fully connected Latent Variables
-for Detecting Localization Failures" by Naoki Akai, Luis Yoichi Morales et
-al.
+This program estimates the residual error for a series of different T60s
+and noise levels. This is done for both aligned arrays (i.e. in the same 
+position that was used when the ground truth was measured) and misaligned
+(random array moved to random position in room). In 
+residualDistribution_analysis one can see the distribution of the errors 
+for the different class types.
 %}
 
 addpath ./functions

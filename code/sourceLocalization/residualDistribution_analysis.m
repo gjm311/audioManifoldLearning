@@ -1,3 +1,12 @@
+%{
+This program displays the distribution of the residual errors 
+for the different latent class types in varying room envirnoment; i.e. 
+varying noise and T60s. Classes include aligned (implies arrays in same 
+position as when ground truth measured) and misaligned (random array moved
+to random position in room).
+%}
+
+
 addpath './mat_outputs'
 
 load('resEsts.mat')
