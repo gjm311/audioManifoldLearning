@@ -43,8 +43,7 @@ disp('Setting up the room');
 % [~,I] = min(sum(costs));
 % vari = varis_set(I);
 % scales = scales_set(I,:);
-% RTF_test =  rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTest, roomSize, T60, rirLen, c, fs);
-% sigma_Lt = tstCovEst(nL, nD, numArrays, RTF_train, RTF_test, kern_typ, scales);
+
 % save('mat_outputs/monoTestSource_biMicCircle_5L50U.mat')
 
 
@@ -52,21 +51,20 @@ disp('Setting up the room');
 load('mat_outputs/monoTestSource_biMicCircle_5L50U.mat')
 
 %---- Initialize storage parameters ----
-sourceTest = [3.3, 3, 1];
+sourceTest = [3.5, 3.5, 1];
 iters = 3;
-Q_t = inv(sigmaL+rand*10e-3*eye(size(sigmaL)));
-gammaL = Q_t;
+% Q_t = inv(sigmaL+rand*10e-3*eye(size(sigmaL)));
 %---- Initialize bayes parameters (via Van Vaerenbergh method) ----
-[mu, cov, ~] = bayesInit(nL, sourceTrainL, RTF_train, kern_typ, scales, numArrays, vari);
+[mu, cov, Q_t] = bayesInit(nL, sourceTrainL, RTF_train, kern_typ, scales, numArrays, vari);
 q_t_new = zeros(nL,1);
 h_t_new = zeros(nL,1);
 thresh = .4;
 budgetL = nL;
 budgetStr = ceil(nL*1.5);
-p_fails = zeros(1,nL);
-posteriors = zeros(numArrays, 3, nL);
-sub_p_hat_ts = zeros(numArrays, 3, nL); 
-self_sub_p_hat_ts = zeros(numArrays, 3, nL);
+p_fail = 0;
+posteriors = zeros(numArrays, 3);
+sub_p_hat_ts = zeros(numArrays, 3); 
+self_sub_p_hat_ts = zeros(numArrays, 3);
 mvFlag = 0;
 rtf_str = zeros(budgetStr,rtfLen, numArrays);
 est_str = zeros(budgetStr,3);
@@ -77,7 +75,7 @@ iter = 0;
 %---- Initialize moving mic line params ----
 movingArray = 1;
 init_pauses = 1;
-end_pauses = 8;
+end_pauses = 10;
 moving_iters = 4;
 numMovePoints = moving_iters + end_pauses + init_pauses;
 height = 1;
@@ -85,14 +83,14 @@ movingMicsPos = [micLine(micsPos(movingArray,:), [.5,5.5,1], moving_iters), heig
 movingMicsPos = [[3 5 1].*ones(init_pauses,3);movingMicsPos];
 movingMicsPos = [movingMicsPos; [.5,5.5,1].*ones(end_pauses,3)];
 
+
 %---- Initialize subnet estimates of training positions ----
-for n = 1:nL
-holderTest = sourceTrain(n,:);
-    for k = 1:numArrays
-        [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPos, RTF_train);
-        [~,~,sub_p_hat_ts(k,:, n)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
-            holderTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
-    end
+randL = randi(numArrays, 1);
+holderTest = sourceTrain(randL,:);
+for k = 1:numArrays
+    [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPos, RTF_train);
+    [~,~,sub_p_hat_ts(k,:)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
+        holderTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
 end
 
 
@@ -103,7 +101,7 @@ for t = 1:numMovePoints
     %update our subnetwork position estimates; i.e. update when new RTF samples
     %taken.
     iter = iter+1;
-%     Q_t = Q_t+rand*10e-3*eye(size(Q_t));
+    Q_t = Q_t+rand*10e-4*ones(size(Q_t));
     
     new_x1 = movingMicsPos(t,1)-.025;
     new_x2 = movingMicsPos(t,1)+.025;
@@ -111,32 +109,31 @@ for t = 1:numMovePoints
 
     %Estimate position for all labelled points for all subnetworks and take
     %average probability of movement for each labelled point.
-    for n = 1:nL
-        %Estimate training position for each subnetwork. Calculated when
-        %movement stops and new labelled RTF samples added. 
-        holderTest = sourceTrain(n,:);
-        if upd == 1
-            gammaL = Q_t;
-            for k = 1:numArrays
-                [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPosNew, RTF_train);
-                [~,~,sub_p_hat_ts(k,:, n)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
-                    holderTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
-            end
-        end
-        %Check if movement occured. If no movement detected, residual error
-        %of position estimate from subnets calculated from initial
-        %estimates. If movmement previously detected, we compare to
-        %estimate from previous estimation.
-        if mvFlag == 0
-            [self_sub_p_hat_ts(:,:,n), p_fails(n), posteriors(:,:,n)] = moveDetector(x, gammaL, numMics, numArrays, micsPosNew, iter, p_fails(n), sub_p_hat_ts(:,:,n), scales, RTF_train,...
-            rirLen, rtfLen, sourceTrain, holderTest, nL, nU, roomSize, T60, c, fs, kern_typ);
-        else
-            [self_sub_p_hat_ts(:,:,n), p_fails(n), posteriors(:,:,n)] = moveDetector(x, gammaL, numMics, numArrays, micsPosNew, iter, p_fails(n), self_sub_p_hat_ts(:,:,n), scales, RTF_train,...
-            rirLen, rtfLen, sourceTrain, holderTest, nL, nU, roomSize, T60, c, fs, kern_typ);
+    %Estimate training position for each subnetwork. Calculated when
+    %movement stops and new labelled RTF samples added. 
+    if upd == 1
+        randL = randi(numArrays,1);
+        holderTest = sourceTrain(randL,:);
+        gammaL = Q_t;
+        for k = 1:numArrays
+            [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPosNew, RTF_train);
+            [~,~,sub_p_hat_ts(k,:)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
+                holderTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
         end
     end
-    p_fail = mean(p_fails);
-    posterior = mean(posteriors, 3);
+    
+    %Check if movement occured. If no movement detected, residual error
+    %of position estimate from subnets calculated from initial
+    %estimates. If movmement previously detected, we compare to
+    %estimate from previous iteration.
+    if mvFlag == 0
+        [self_sub_p_hat_ts, p_fail, posteriors] = moveDetector(x, gammaL, numMics, numArrays, micsPosNew, iter, p_fail, sub_p_hat_ts, scales, RTF_train,...
+        rirLen, rtfLen, sourceTrain, holderTest, nL, nU, roomSize, T60, c, fs, kern_typ);
+    else
+        [self_sub_p_hat_ts, p_fail, posteriors] = moveDetector(x, gammaL, numMics, numArrays, micsPosNew, iter, p_fail, self_sub_p_hat_ts, scales, RTF_train,...
+        rirLen, rtfLen, sourceTrain, holderTest, nL, nU, roomSize, T60, c, fs, kern_typ);
+    end
+    latents = round(posteriors);
     
     %IF movement detected, estimate test position using subnet (w/o moving array).
     %Update parameters and covariance via Bayes with params derived from subnetwork.
@@ -145,28 +142,27 @@ for t = 1:numMovePoints
            mvFlag = 1;
         end
         upd = 0;
-        [sub_scales, num_static, RTF_test, p_hat_t, k_t_new] = subEst(Q_t, posterior, numMics, numArrays, micsPosNew, RTF_train, scales, x, rirLen, rtfLen,...
+        [sub_scales, num_static, RTF_test, p_hat_t, k_t_new] = subEst(Q_t, posteriors, numMics, numArrays, micsPosNew, RTF_train, scales, x, rirLen, rtfLen,...
             sourceTrain, sourceTest, nL, nU, T60, c, fs, kern_typ, roomSize);
         
-        if numStr > budgetStr
-            rtf_str(1,:,:) = RTF_test;
-            rtf_str = circshift(rtf_str, -1, 1);
-            est_str(1,:) = p_hat_t;
-            est_str = circshift(est_str, -1, 1);
-        else
-            rtf_str(numStr,:,:) = RTF_test;
-            est_str(numStr,:) = p_hat_t;
-            numStr = numStr + 1;
+        %KEY: we store positional estimates taken from sub-network of
+        %arrays and test RTF sample measured by ALL arrays (moving
+        %included). This way, during update phase, we are updating kernel
+        %based off accurate estimates of test position and test RTF sample
+        %describing new array network dynamic.
+        if latents ~= ones(numArrays, 1)
+            if numStr > budgetStr
+                rtf_str(1,:,:) = RTF_test;
+                rtf_str = circshift(rtf_str, -1, 1);
+                est_str(1,:) = p_hat_t;
+                est_str = circshift(est_str, -1, 1);
+            else
+                rtf_str(numStr,:,:) = RTF_test;
+                est_str(numStr,:) = p_hat_t;
+                numStr = numStr + 1;
+            end
         end
-        
-        %Update parameters to incorporate new labelled point.
-%         [mu,cov,Q_t] = bayesUpd(nL, num_static, RTF_test, sub_scales, p_hat_t, kern_typ, k_t_new, Q_t, mu, cov, vari);          
-%         sourceTrain = [p_hat_t;sourceTrain];
-%         RTF_train = cat(1, RTF_test,RTF_train);
-%         nL = nL+1;
-%         nD = nD+1; 
-%         p_fails(end+1) = 0;
-%         posteriors(:,:,end+1) = zeros(numArrays, 3);
+               
         
     %Right after movement is no longer detected (i.e. right after probability of
     %movement dips below threshold), update covariance matrix using saved
@@ -183,15 +179,11 @@ for t = 1:numMovePoints
                         k_t_new(i) = array_kern + kernel(RTF_train(i,:,j), RTF_test(:,:,j), kern_typ, scales(j));
                     end
                 end
-                
                 [mu,cov,Q_t] = bayesUpd(nL, numArrays, rtf_str(s,:,:), scales, est_str(s,:), kern_typ, k_t_new, Q_t, mu, cov, vari);          
                 sourceTrain = [est_str(s,:);sourceTrain];
                 RTF_train = cat(1, RTF_test, RTF_train);
                 nL = nL+1;
-                nD = nD+1; 
-                p_fails(end+1) = 0;
-                posteriors(:,:,end+1) = zeros(numArrays, 3);
-  
+                nD = nD+1;  
             end
         end
         iter = 1;
@@ -203,7 +195,7 @@ for t = 1:numMovePoints
         [RTF_test, k_t_new, p_hat_t] = test(x, Q_t, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
             numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
             
-    %If no movement detected, and  estimate position using all arrays and update
+    %If no movement detected, and estimate position using all arrays and update
     %kernel using params dervied from full network.
     else
         upd = 0;
@@ -215,26 +207,26 @@ for t = 1:numMovePoints
     while nL > budgetL
        [pr_idx, mu, cov, Q_t, sourceTrain] = prune(mu, cov, Q_t, sourceTrain, nL);
        nL = nL - 1;
-       p_fails(pr_idx) = [];
-       posteriors(:,:,pr_idx) = [];
        RTF_train(pr_idx,:,:) = [];
     end
     
     
 %   %Plot
     for p = 1:numArrays
-        labels{1,p} = mat2str(round(posterior(p,:),2));
+        labels{1,p} = mat2str(round(posteriors(p,:), 2));
     end
     labelPos = [micsPosNew(1:2:end,1), micsPosNew(1:2:end,2)];
+    mse = mean((sourceTest-p_hat_t).^2);
     
     f = plotRoom(roomSize, micsPosNew, sourceTrain, sourceTest, nL, p_hat_t);
     title('Detecting Array Movement')
     binTxt = text(3.6,.5, sprintf('Movement Detection Probability: %s \n(t = %g)',num2str(round(p_fail,2)), t-1));
     prbTxt = text(labelPos(:,1),labelPos(:,2), labels, 'HorizontalAlignment', 'left', 'VerticalAlignment', 'bottom');
+    mseTxt = text(.5,.55, sprintf('MSE (Test Position Estimate): %s(m)', num2str(round(mse,2))));
 %     %Uncomment below for pauses between iterations only continued by
 %     %clicking graph  
-%     w = waitforbuttonpress;
-    if t~=numMovePoints+init_pauses+end_pauses
+    w = waitforbuttonpress;
+    if t~=numMovePoints
         delete(binTxt);
         delete(prbTxt);
     end
