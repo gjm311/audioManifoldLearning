@@ -1,9 +1,4 @@
-movingMicsPos = zeros(18,3);
-cnt = 1;
-load('./mat_trainParams/rtfDatabase.mat', 'rtfDatabase');
-for i = 153:-1:145
-   currMics = rtfDatabase(i).micPos;
-   movingMicsPos(cnt:cnt+1,:) = currMics;
-   cnt = cnt +2;
-end
+A = [3 3 3 3; 4 4 4 4; 0 0 0 0 ; 0 0 0 0];
 
+idxs = find(~all(A==0,2));
+A = A(idxs,:);

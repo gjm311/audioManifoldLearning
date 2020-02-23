@@ -56,45 +56,48 @@ disp('Setting up the room');
 % RTF_train = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
 % save('mat_trainParams/biMicCircle_5L50U')
 
-%---- load training data (check mat_trainParams for options)----
+% %---- load training data (check mat_trainParams for options)----
 % load('mat_trainParams/biMicCircle_5L50U.mat')
-
+% 
 % %Initialize hyper-parameter estimates (gaussian kernel scalar
 % %value and noise variance estimate)
 % kern_typ = 'gaussian';
 % tol = 10e-3;
-% alpha = 10e-3;
-% max_iters = 100;
+% alpha = 10e-6;
+% max_iters = 200;
 % init_scales = 1*ones(1,numArrays);
 % var_init = 0;
-% [sigma,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, init_scales);
+% [~,sigmaL,K] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, init_scales);
 % 
 % %---- perform grad. descent to get optimal params ----
-% gammaL = inv(sigmaL + diag(ones(1,nL)*var_init));
-% p_sqL = gammaL*sourceTrainL;
-% 
-% [costs, ~, ~, varis_set, scales_set] = grad_descent(sourceTrainL, numArrays, RTF_train, sigmaL, init_scales, var_init, max_iters, tol, alpha, kern_typ);
-% [~,I] = min(sum(costs));
+% [costs, ~, ~, varis_set, scales_set] = grad_descent(sourceTrainL, numArrays, RTF_train, K, sigmaL, init_scales, var_init, max_iters, tol, alpha, kern_typ);
+% [~,I] = min(costs);
 % vari = varis_set(I);
 % scales = scales_set(I,:);
 
+% [~,sigmaL,~] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales);
+% gammaL = inv(sigmaL + eye(nL)*vari);
+% [mu, cov, gamma] = bayesInit(nD, sourceTrain, RTF_train, kern_typ, scales, numArrays, vari);
+% gammaL = gamma(1:nL,1:nL);
+% p_sqL = gammaL*sourceTrainL;
+% save('mat_outputs/monoTestSource_biMicCircle_5L50U')
 
 load('mat_outputs/monoTestSource_biMicCircle_5L50U')
 %---- with optimal params estimate test position ----
-sourceTests = [3.3, 3.3, 1];
-p_hat_ts = zeros(size(sourceTests));
-for i = 1:size(p_hat_ts)
-    sourceTest = sourceTests(i,:);
-    [~,~, p_hat_ts(i,:)] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
-                numMics, sourceTrain, sourceTests(i,:), nL, nU, roomSize, T60, c, fs, kern_typ, scales);
-end
-% 
+[mu, cov, gamma] = bayesInit(nD, sourceTrain, RTF_train, [], kern_typ, scales, numArrays, vari);
+gammaL = gamma(1:nL,1:nL);
+p_sqL = gammaL*sourceTrainL;
+sourceTest = [3.3, 3.3, 1];   
+[~,~,p_hat_ts] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
+                numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
+
+            
 % save('mat_outputs/monoTestSource_biMicCircle_5L50U')
 % %  ---- load output data ---- 
 % load('mat_outputs/monoTestSource_biMicCircle_5L50U')
 
 %---- plot ----
-plotRoom(roomSize, micsPos, sourceTrain, sourceTests, nL, p_hat_ts);
+plotRoom(roomSize, micsPos, sourceTrain, sourceTest, nL, p_hat_ts);
 
 title('Source Localization Based Off Semi-Supervised Approach')
 ax = gca;
