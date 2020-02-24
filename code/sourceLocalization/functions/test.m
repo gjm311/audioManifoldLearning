@@ -1,8 +1,14 @@
 function [RTF_test, k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays, numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales)
     %---- update estimate based off test ----
     %estimate test RTF
+    
     RTF_test =  rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTest, roomSize, T60, rirLen, c, fs);
-
+    
+    %In case of single node position estimation
+    if numArrays == 1
+        numArrays = numMics;
+    end
+    
     %estimate kernel array between labelled data and test
     k_t_new = zeros(1,nL);
     for i = 1:nL

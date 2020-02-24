@@ -1,4 +1,4 @@
-%{
+ %{
 This program iterates over time and at each iteration, determines if movement in the network 
 occurs by comparing stored sub-network position estimates of all labelled training position 
 with online estimates. Movement detection is done via a fully connected MRF utilizing residual 
@@ -53,9 +53,9 @@ load('mat_outputs/monoTestSource_biMicCircle_5L50U.mat')
 %---- Initialize storage parameters ----
 sourceTest = [3.5, 3.5, 1];
 iters = 3;
-% Q_t = inv(sigmaL+rand*10e-3*eye(size(sigmaL)));
+Q_t = inv(sigmaL+rand*10e-3*eye(size(sigmaL)));
 %---- Initialize bayes parameters (via Van Vaerenbergh method) ----
-[mu, cov, Q_t] = bayesInit(nL, sourceTrainL, RTF_train, kern_typ, scales, numArrays, vari);
+% [mu, cov, Q_t] = bayesInit(nL, sourceTrainL, RTF_train, kern_typ, scales, numArrays, vari);
 q_t_new = zeros(nL,1);
 h_t_new = zeros(nL,1);
 thresh = .4;
