@@ -33,6 +33,7 @@ load('mat_outputs/monoTestSource_biMicCircle_5L50U.mat')
 
 %---- Initialize general parameters ----
 sourceTest = [3.3, 3.3, 1];
+QD = gamma;
 QL = gammaL;
 % [mu, cov, Q_D] = bayesInit(nD, sourceTrain, RTF_train, kern_typ, scales, numArrays, vari);
 % Q_t = Q_D(1:nL,1:nL);
@@ -52,7 +53,8 @@ sub_sigma_Lts = zeros(numArrays, nL);
 mvFlag = 0;
 rtf_str = zeros(budgetStr,rtfLen, numArrays);
 est_str = zeros(budgetStr,3);
-numStr = 1; upd = 0;
+k_t_str = zeros(budgetStr,nL);
+numStr = 0; upd = 0;
 labels = cell(1,4);
 p_fail_count = 0;
 
@@ -74,7 +76,7 @@ randL = randi(numArrays, 1);
 holderTest = sourceTrain(randL,:);
 for k = 1:numArrays
     [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPos, RTF_train);
-    [~, sub_p_hat_ts(k,:)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
+    [~,~, sub_p_hat_ts(k,:)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
         holderTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
 end
 
@@ -99,10 +101,9 @@ for t = 1:numMovePoints
     if upd == 1
         randL = randi(numArrays,1);
         holderTest = sourceTrain(randL,:);
-        gammaL = QL;
         for k = 1:numArrays
             [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPosNew, RTF_train);
-            [~,sub_p_hat_ts(k,:)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
+            [~,~, sub_p_hat_ts(k,:)] = test(x, QL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
                 holderTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
         end
     end
@@ -112,10 +113,10 @@ for t = 1:numMovePoints
     %estimates. If movmement previously detected, we compare to
     %estimate from previous iteration.
     if mvFlag == 0
-        [self_sub_p_hat_ts, p_fail, posteriors] = moveDetector(x, gammaL, numMics, numArrays, micsPosNew, p_fail_count, p_fail, sub_p_hat_ts, scales, RTF_train,...
+        [self_sub_p_hat_ts, p_fail, posteriors] = moveDetector(x, QL, numMics, numArrays, micsPosNew, p_fail_count, p_fail, sub_p_hat_ts, scales, RTF_train,...
         rirLen, rtfLen, sourceTrain, holderTest, nL, nU, roomSize, T60, c, fs, kern_typ);
     else
-        [self_sub_p_hat_ts, p_fail, posteriors] = moveDetector(x, gammaL, numMics, numArrays, micsPosNew, p_fail_count, p_fail, self_sub_p_hat_ts, scales, RTF_train,...
+        [self_sub_p_hat_ts, p_fail, posteriors] = moveDetector(x, QL, numMics, numArrays, micsPosNew, p_fail_count, p_fail, self_sub_p_hat_ts, scales, RTF_train,...
         rirLen, rtfLen, sourceTrain, holderTest, nL, nU, roomSize, T60, c, fs, kern_typ);
     end
     latents = round(posteriors);
@@ -132,62 +133,85 @@ for t = 1:numMovePoints
         %once posterior probabilities favors alignment again which should
         %yield a worse estimate as we are utilizing RTFs of original
         %dynamic though test RTF sample reflects new array position.
-        [sub_scales, num_static, RTF_test, p_hat_t] = subEst(QL, posteriors, numMics, numArrays, micsPosNew, RTF_train, scales, x, rirLen, rtfLen,...
+        [sub_scales, num_static, RTF_test, k_t_new, p_hat_t] = subEst(QL, posteriors, numMics, numArrays, micsPosNew, RTF_train, scales, x, rirLen, rtfLen,...
             sourceTrain, sourceTest, nL, nU, T60, c, fs, kern_typ, roomSize);
+%         p_hat_t = p_hat_t + rand(size(p_hat_t))*10e-3;
         
-        p_hat_t = p_hat_t + rand(size(p_hat_t))*10e-3;
         %KEY: we store positional estimates taken from sub-network of
         %arrays and test RTF sample measured by ALL arrays (moving
         %included). This way, during update phase, we are updating kernel
         %based off accurate estimates of test position and test RTF sample
-        %describing new array network dynamic.
+        %describing new array network dynamic. 
+        %NOTE: remove latent condition once demonstration portion removed
+        %(i.e. once we remove condition of estimating postion based off
+        %incorrect dynamics only in place for illustrative purposes).
         if sum(latents(:,1)) ~= numArrays
             if numStr > budgetStr
                 rtf_str(1,:,:) = RTF_test;
                 rtf_str = circshift(rtf_str, -1, 1);
                 est_str(1,:) = p_hat_t;
                 est_str = circshift(est_str, -1, 1);
+                k_t_str(1,:) = k_t_new;
+                k_t_str = circshift(k_t_str, -1, 1);
             else
-                rtf_str(numStr,:,:) = RTF_test;
-                est_str(numStr,:) = p_hat_t;
+                rtf_str(numStr+1,:,:) = RTF_test;
+                est_str(numStr+1,:) = p_hat_t;
+                k_t_str(numStr+1,:) = k_t_new;
                 numStr = numStr + 1;
             end
         end
-               
-        
+                     
     %Right after movement is no longer detected (i.e. right after probability of
-    %movement dips below threshold), update covariance matrix using saved
-    %up test position estimates.
+    %movement dips below threshold), update inv. covariance (precision) matrix.
     elseif mvFlag == 1
-        nonZero_idxs = find(~all(est_str==0,2));      
-        sourceTrain = cat(1,sourceTrain, est_str(nonZero_idxs,:));
-        RTF_train = cat(1, RTF_train, rtf_str(nonZero_idxs,:,:));
-        nD = nD+size(est_str(nonZero_idxs,:),1);  
-        [mu, cov, QD] = bayesInit(nD, sourceTrain, RTF_train, kern_typ, scales, numArrays, vari);
-%                 [mu,cov,Q_t] = bayesUpd(nL, numArrays, rtf_str(s,:,:), scales, est_str(s,:), kern_typ, k_t_str(s,:), Q_t, mu, cov, vari);             
+        nonZero_idxs = find(~all(est_str==0,2));
+        rtf_str = rtf_str(nonZero_idxs,:,:);
+        est_str = est_str(nonZero_idxs,:);
+        k_t_str = k_t_str(nonZero_idxs,:);
         
-        
-        %Prune all RTF points (if budget is maxed out). 
-        while nD > budgetD
-           [pr_idx, mu, cov, QD, sourceTrain] = prune(mu, cov, QD, sourceTrain, nD);
-           nD = nD - 1;
-           RTF_train(pr_idx,:,:) = [];
+        %Update (full) precision matrix based off saved test RTF estimates (estimates 
+        %taken by all arrays), and test kernel (k_Lt in Goldshtein et al.)/position estimates 
+        %taken by static sub-arrays during movement.
+        if numStr > 0
+            %Prune unlabelled RTF points 
+            for u = 1:numStr
+               [pr_idx, mu, cov, QD] = prune(mu, cov, QD, nD, nL);
+               nD = nD - 1;
+               RTF_train(pr_idx,:,:) = [];
+               sourceTrain(pr_idx,:) = [];
+            end
+            
+            for u = 1:numStr
+                k_t_new = micKern(RTF_train, rtf_str(u,:,:), kern_typ, scales, nD, numArrays);
+                [mu,cov,QD] = bayesUpd(nD, numArrays, rtf_str(u,:,:), scales, k_t_new, est_str(u,:), kern_typ, QD, mu, cov, vari);                   
+                RTF_train = cat(1, RTF_train, rtf_str(u,:,:));
+                nD = nD+1;
+            end
+            sourceTrain = cat(1,sourceTrain, est_str);
+            QL = QD(1:nL,1:nL);
+
+            %Recalculate precision matrix (without pruned estimates).
+%             [mu, cov, QD] = bayesInit(nD, sourceTrain, RTF_train, kern_typ, scales, numArrays, vari);
+%             [~,QL] = trCovEst(nL, nD, numArrays, RTF_train, kernTyp, scales);
+
+%             QL = QD(1:nL,1:nL);
+%             gammaL = QL;
         end
-        QL = QD(1:nL,1:nL);        
         p_fail_count = 1;
         mvFlag = 0;
         upd = 1;
-        numStr = 1;
+        numStr = 0;
         rtf_str = zeros(budgetStr,rtfLen,numArrays);
         est_str = zeros(budgetStr,3);
-        [RTF_test, p_hat_t] = test(x, QL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
+        k_t_str = zeros(budgetStr,nL);
+        [~,~, p_hat_t] = test(x, QL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
             numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
             
     %If no movement detected, and estimate position using all arrays and update
     %kernel using params dervied from full network.
     else
         upd = 0;
-        [RTF_test, p_hat_t] = test(x, QL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
+        [~,~, p_hat_t] = test(x, QL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                 numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
     end    
     

@@ -67,31 +67,24 @@ disp('Setting up the room');
 % max_iters = 200;
 % init_scales = 1*ones(1,numArrays);
 % var_init = 0;
-% [~,sigmaL,K] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, init_scales);
+% [~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, init_scales);
 % 
 % %---- perform grad. descent to get optimal params ----
-% [costs, ~, ~, varis_set, scales_set] = grad_descent(sourceTrainL, numArrays, RTF_train, K, sigmaL, init_scales, var_init, max_iters, tol, alpha, kern_typ);
+% [costs, ~, ~, varis_set, scales_set] = grad_descent(sourceTrainL, numArrays, RTF_train, sigmaL, init_scales, var_init, max_iters, tol, alpha, kern_typ);
 % [~,I] = min(costs);
 % vari = varis_set(I);
 % scales = scales_set(I,:);
 
-% [~,sigmaL,~] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales);
-% gammaL = inv(sigmaL + eye(nL)*vari);
-% [mu, cov, gamma] = bayesInit(nD, sourceTrain, RTF_train, kern_typ, scales, numArrays, vari);
-% gammaL = gamma(1:nL,1:nL);
-% p_sqL = gammaL*sourceTrainL;
 % save('mat_outputs/monoTestSource_biMicCircle_5L50U')
-
 load('mat_outputs/monoTestSource_biMicCircle_5L50U')
 %---- with optimal params estimate test position ----
-[mu, cov, gamma] = bayesInit(nD, sourceTrain, RTF_train, [], kern_typ, scales, numArrays, vari);
-gammaL = gamma(1:nL,1:nL);
+[~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales);
+gammaL = inv(sigmaL + eye(nL)*vari);
 p_sqL = gammaL*sourceTrainL;
 sourceTest = [3.3, 3.3, 1];   
 [~,~,p_hat_ts] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                 numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
 
-            
 % save('mat_outputs/monoTestSource_biMicCircle_5L50U')
 % %  ---- load output data ---- 
 % load('mat_outputs/monoTestSource_biMicCircle_5L50U')

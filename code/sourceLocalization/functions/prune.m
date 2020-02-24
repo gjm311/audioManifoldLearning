@@ -1,8 +1,8 @@
-function [minIdx, mu, cov, min_Q_t, sourceTrain] = prune(mu, cov, Q_t, sourceTrain, nD)
+function [minIdx, mu, cov, min_Q_t] = prune(mu, cov, Q_t, nD, nL)
     minScore = inf;
     Qmu = Q_t*mu;
     
-    for n = 1:nD
+    for n = nL+1:nD
         currScore = norm((Qmu(n,:)/Q_t(n,n)).^2);
         if currScore < minScore
             minIdx = n;
@@ -21,5 +21,4 @@ function [minIdx, mu, cov, min_Q_t, sourceTrain] = prune(mu, cov, Q_t, sourceTra
     mu(minIdx,:) = [];
     cov(:,minIdx) = [];
     cov(minIdx,:) = [];
-    sourceTrain(minIdx,:) = [];
 end

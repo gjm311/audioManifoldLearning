@@ -14,7 +14,7 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetector(x, gammaL, 
     upd_sub_p_hat_ts = zeros(numArrays, 3);
     for k1 = 1:numArrays
         [subnet, subscales, trRTF] = subNet(k1, numArrays, numMics, scales, micsPos, RTF_train);
-        [~,upd_sub_p_hat_ts(k1,:)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);   
+        [~,~,upd_sub_p_hat_ts(k1,:)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);   
     end
     resids = mean(sub_p_hat_ts-upd_sub_p_hat_ts,2);
     

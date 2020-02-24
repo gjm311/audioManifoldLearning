@@ -1,4 +1,4 @@
-function [RTF_test, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays, numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales)
+function [RTF_test, k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays, numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales)
     %---- update estimate based off test ----
     RTF_test =  rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTest, roomSize, T60, rirLen, c, fs);
    
@@ -14,7 +14,7 @@ function [RTF_test, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLe
     %bayesUpd.m from Vaerenbergh's paper.
     nD = nL+nU;
     sourceTrainL = sourceTrain(1:nL,:);
-    gammaL_new = gammaL - ((gammaL*(k_t_new'*k_t_new)*gammaL)./(numArrays^2+k_t_new*gammaL*k_t_new'));
+%     gammaL_new = gammaL - ((gammaL*(k_t_new'*k_t_new)*gammaL)./(numArrays^2+k_t_new*gammaL*k_t_new'));
     gammaL_new = gammaL;
     p_sqL_new = gammaL_new*sourceTrainL;
 

@@ -13,14 +13,6 @@ function [mu, cov, Q_t] = bayesInit(nD, sourceTrain, RTF_train, kern_typ, scales
             end
         end
         
-        
-%         k_Lt = zeros(1,ii-1);
-%         for i = 1:ii-1
-%             array_kern = 0;
-%             for j = 1:numArrays
-%                 k_Lt(i) = array_kern + kernel(RTF_train(i,:,j), RTF_train(ii,:,j), kern_typ, scales(j));
-%             end
-%         end
-        [mu, cov, Q_t] = bayesUpd(ii-1, numArrays, RTF_train(ii,:,:), scales, sourceTrain(ii,:), kern_typ, k_Lt, Q_t, mu, cov, vari);
+        [mu, cov, Q_t] = bayesUpd(ii-1, numArrays, RTF_train(ii,:,:), scales, k_Lt, sourceTrain(ii,:), kern_typ, Q_t, mu, cov, vari);
     end
 end

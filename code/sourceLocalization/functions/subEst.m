@@ -1,4 +1,4 @@
-function [sub_scales, num_static,RTF_test,p_hat_t] = subEst(gammaL, posteriors, numMics, numArrays, micsPos, RTF_train, scales, x, rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, T60, c, fs, kern_typ, roomSize)
+function [sub_scales, num_static, RTF_test, k_t_new, p_hat_t] = subEst(gammaL, posteriors, numMics, numArrays, micsPos, RTF_train, scales, x, rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, T60, c, fs, kern_typ, roomSize)
     %This function finds probabilisitcally static arrays and if this is all
     %arrays (i.e. all arrays static), we compute new RTF sample (based off positioning of all arrays),
     %new test kernel vector (k_t_new) and test position estimate. IF one or
@@ -18,7 +18,7 @@ function [sub_scales, num_static,RTF_test,p_hat_t] = subEst(gammaL, posteriors, 
        sub_RTF_train = RTF_train; 
        sub_scales = scales; 
        num_static = 0;
-       [RTF_test,p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, size(sub_RTF_train,3),...
+       [RTF_test, k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, size(sub_RTF_train,3),...
                 numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, sub_scales); 
     else
         drop_idxs = zeros(1,numArrays);
@@ -29,7 +29,7 @@ function [sub_scales, num_static,RTF_test,p_hat_t] = subEst(gammaL, posteriors, 
         sub_micsPos = micsPos(~dropMic_idxs,:);
         sub_scales = scales(~drop_idxs);
         RTF_test = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTest, roomSize, T60, rirLen, c, fs);
-        [~, p_hat_t] = test(x, gammaL, sub_RTF_train, sub_micsPos, rirLen, rtfLen, size(sub_RTF_train,3),...
+        [~, k_t_new, p_hat_t] = test(x, gammaL, sub_RTF_train, sub_micsPos, rirLen, rtfLen, size(sub_RTF_train,3),...
                 numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, sub_scales);  
     end
 end
