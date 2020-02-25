@@ -38,5 +38,7 @@ function rtfs = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourcePos, roomSi
     end
     if numArrays >1
         rtfs = reshape(mean(rtfs), [numSources,rtfLen,numArrays]);
+    else
+        rtfs = reshape(rtfs, [numSources,rtfLen,numMics]);
     end
 end
