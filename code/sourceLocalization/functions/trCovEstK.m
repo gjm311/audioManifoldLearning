@@ -1,4 +1,4 @@
-function [cov,covL,K] = trCovEst(nL, nD, numArrays, rtfs, kernTyp, scales)
+function [cov,covL,K] = trCovEstK(nL, nD, numArrays, rtfs, kernTyp, scales)
     K = zeros(numArrays, nD, nD);
     
     for a = 1:numArrays

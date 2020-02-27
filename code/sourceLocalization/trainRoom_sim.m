@@ -56,31 +56,31 @@ disp('Setting up the room');
 % RTF_train = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
 % save('mat_trainParams/biMicCircle_5L50U')
 
-% %---- load training data (check mat_trainParams for options)----
-% load('mat_trainParams/biMicCircle_5L50U.mat')
-% 
-% %Initialize hyper-parameter estimates (gaussian kernel scalar
-% %value and noise variance estimate)
-% kern_typ = 'gaussian';
-% tol = 10e-3;
-% alpha = 10e-6;
-% max_iters = 200;
-% init_scales = 1*ones(1,numArrays);
-% var_init = 0;
-% [~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, init_scales);
-% 
-% %---- perform grad. descent to get optimal params ----
-% [costs, ~, ~, varis_set, scales_set] = grad_descent(sourceTrainL, numArrays, RTF_train, sigmaL, init_scales, var_init, max_iters, tol, alpha, kern_typ);
-% [~,I] = min(costs);
-% vari = varis_set(I);
-% scales = scales_set(I,:);
+%---- load training data (check mat_trainParams for options)----
+load('mat_trainParams/biMicCircle_5L50U.mat')
 
-% save('mat_outputs/monoTestSource_biMicCircle_5L50U')
-load('mat_outputs/monoTestSource_biMicCircle_5L50U')
+%Initialize hyper-parameter estimates (gaussian kernel scalar
+%value and noise variance estimate)
+kern_typ = 'gaussian';
+tol = 10e-3;
+alpha = 10e-6;
+max_iters = 200;
+init_scales = 1*ones(1,numArrays);
+var_init = 0;
+[~,sigmaL,~] = trCovEstK(nL, nD, numArrays, RTF_train, kern_typ, init_scales);
+
+%---- perform grad. descent to get optimal params ----
+[costs, ~, ~, varis_set, scales_set] = grad_descent(sourceTrainL, numArrays, RTF_train, sigmaL, init_scales, var_init, max_iters, tol, alpha, kern_typ);
+[~,I] = min(costs);
+vari = varis_set(I);
+scales = scales_set(I,:);
+
+% load('mat_outputs/monoTestSource_biMicCircle_5L50U')
 %---- with optimal params estimate test position ----
-[~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales);
+[sigma,sigmaL,K] = trCovEstK(nL, nD, numArrays, RTF_train, kern_typ, scales);
 gammaL = inv(sigmaL + eye(nL)*vari);
 p_sqL = gammaL*sourceTrainL;
+save('mat_outputs/monoTestSource_biMicCircle_5L50U_Kmthd')
 sourceTest = [3.3, 3.3, 1];   
 [~,~,p_hat_ts] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                 numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
