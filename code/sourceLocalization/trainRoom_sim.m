@@ -30,7 +30,7 @@ disp('Setting up the room');
 % width = 3;
 % numRow = 3;
 % numCol = 7;
-% ref = roomSize/2;
+% ref = [roomSize(1:2)./2 1];
 % % sourceTrainL = sourceGrid(height, width, numRow, numCol, ref);
 % sourceTrainL = [4,4,1; 2,2,1; 4,2,1; 2,4,1; 3,3,1];
 % numArrays = 4;
@@ -50,28 +50,23 @@ disp('Setting up the room');
 % T60 = 0.15;
 % train_sp = randn(size(sourceTrain,1), 10*fs);
 % x = randn(1,10*fs);
-% [x,fs_in] = audioread('f0001_us_f0001_00009.wav');
-% x = transpose(resample(x,fs,fs_in));
 % disp('Generating the train set');
-%
-%%---- Simulate RTFs between nodes ----
+% 
+% %---- Simulate RTFs between nodes ----
 % RTF_train = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
 % save('mat_trainParams/biMicCircle_5L50U')
-%
-%---- Simulate RTFs between microphones within each node ----
+% 
+% % ---- Simulate RTFs between microphones within each node ----
 % RTF_train = zeros(numArrays, nD, rtfLen, numMics);
 % for t = 1:numArrays
 %     curr_mics = micsPos((t-1)*numMics+1:t*numMics,:); 
 %     RTF_train(t,:,:,:) = rtfEst(x, curr_mics, rtfLen, 1, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
 % end
 % save('mat_trainParams/biMicCircle_5L50U_monoNode')
-
-
-
-
-%---- load training data (check mat_trainParams for options)----
+% 
+% % ---- load training data (check mat_trainParams for options)----
 % load('mat_trainParams/biMicCircle_5L50U.mat')
-
+% 
 % %Initialize hyper-parameter estimates (gaussian kernel scalar
 % %value and noise variance estimate)
 % kern_typ = 'gaussian';
@@ -80,7 +75,7 @@ disp('Setting up the room');
 % max_iters = 100;
 % init_scales = 1*ones(1,numArrays);
 % var_init = 0;
-% [sigma,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, init_scales);
+% [~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, init_scales);
 % 
 % %---- perform grad. descent to get optimal params ----
 % gammaL = inv(sigmaL + diag(ones(1,nL)*var_init));
@@ -90,11 +85,15 @@ disp('Setting up the room');
 % [~,I] = min(sum(costs));
 % vari = varis_set(I);
 % scales = scales_set(I,:);
+% [sigma,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales);
+% gamma = inv(sigma + diag(ones(1,nD)*vari));
+% gammaL = inv(sigmaL + diag(ones(1,nL)*vari));
+% p_sqL = gammaL*sourceTrainL;
 
 
 load('mat_outputs/monoTestSource_biMicCircle_5L50U')
 %---- with optimal params estimate test position ----
-sourceTests = [3.3, 3.3, 1];
+sourceTests = [5.3, 3.3, 1];
 p_hat_ts = zeros(size(sourceTests));
 for i = 1:size(p_hat_ts)
     sourceTest = sourceTests(i,:);

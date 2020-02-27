@@ -62,7 +62,7 @@ function dL_dScales = scale_grad(source_pos, rtfs, numArrays, gamma, kern_typ, s
     for k = 1:numArrays
         for i = 1:num_rtfs
             for j = 1:num_rtfs
-                Ks(k,:,:) = kernel(rtfs(i,:,k), rtfs(j,:,k), kern_typ, scales(k));
+                Ks(k,:,:) = Ks(k,:,:) + kernel(rtfs(i,:,k), rtfs(j,:,k), kern_typ, scales(k));
             end
         end
     end
