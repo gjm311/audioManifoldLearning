@@ -16,7 +16,8 @@ unlabelled training point estimates.
 %}
 
 %---- load training data (check mat_trainParams for options)----
-load('mat_outputs/monoTestSource_biMicCircle_5L50U_monoNode.mat')
+load('mat_outputs/monoTestSource_biMicCircle_5L50U.mat')
+load('mat_trainParams/biMicCircle_5L50U_monoNode.mat')
 gammaL = inv(sigmaL+rand*10e-3*eye(size(sigmaL)));
 
 %TRAINING
@@ -64,7 +65,7 @@ for iter = 1:num_iters
                 holderTest, nL, nU, roomSize, T60, c, fs, kern_typ, curr_scales);
             est_comp = squareform(pdist([unl_p_hat;lab_p_hats(:,:,k)]));
             unl_errs = est_comp(1,2:end);
-            unl_probs = dir_pro(distributions(k,:), unl_errs, nD, dir_alph(iter,k,:));
+            unl_probs = dir_pro(lab_errs(k,:), unl_errs, nD, dir_alph(iter,k,:));
             [~,maxProb_idx] = max(unl_probs);
             if groundTruth_idx == maxProb_idx
                 sim_count(iter) = sim_count(iter)+1;
@@ -72,7 +73,7 @@ for iter = 1:num_iters
         end
     end
 end
-% 
-% [~,opt_idx] = max(sim_count);
-% opt_dp_alphs = reshape(dir_alph(opt_idx,:,:), [numArrays,nL]);
-% save('mat_outputs/monoTestSource_biMicCircle_5L50U_monoNode.mat', 'opt_dp_alphs');
+
+[~,opt_idx] = max(sim_count);
+opt_dp_alphs = reshape(dir_alph(opt_idx,:,:), [numArrays,nL]);
+save('mat_trainParams/biMicCircle_5L50U_monoNode.mat');
