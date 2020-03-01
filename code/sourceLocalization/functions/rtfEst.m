@@ -17,7 +17,7 @@ function rtfs = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourcePos, roomSi
             for i = 1:numMics
                 for k = 1:numMics
                     if i ~= k
-                        curr = [currMics(i,:); currMics(k,:)];      
+                        curr = [currMics(i,:); currMics(k,:)];    
                         RIRs = rir_generator(c, fs, curr, sourcePos(t,:), roomSize,...
                             T60, rirLen);
 

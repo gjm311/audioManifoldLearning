@@ -1,10 +1,9 @@
-function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetectorOpt(x, transMat, init_var, lambda, eMax, gammaL, numMics, numArrays, micsPos, t, p_fails, sub_p_hat_ts, scales, RTF_train, rirLen, rtfLen,sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ)
+function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetectorOpt(x, transMat, init_var, lambda, eMax, thresh, gammaL, numMics, numArrays, micsPos, t, p_fails, sub_p_hat_ts, scales, RTF_train, rirLen, rtfLen,sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ)
 
     %---- Initialize CRF params ----
     posteriors = zeros(numArrays,3);
     likes = zeros(numArrays,3);
     latents = [ones(numArrays,1), zeros(numArrays,1), zeros(numArrays,1)]+1;
-    thresh = .5;
 
 % ----Calculate new estimate based off movement for all subnets and resid. error from stationary time (turns off once estimates settle) ----
     upd_sub_p_hat_ts = zeros(numArrays, 3);
