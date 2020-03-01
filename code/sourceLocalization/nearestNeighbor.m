@@ -108,7 +108,7 @@ for s_iter = snrs+1
     for r = 1:numPer
         sourceTest = randSourcePosition(1,roomSize,radiusU,ref);
         % ---- est. tst position using kern. cov. w/uniform array contribution ----
-        [~,~, p_hat_t] = test(unk_source, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
+        [~,~, p_hat_t] = test(unk_source, g ammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                         numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
         tRes = squareform(pdist([p_hat_t;mean(lab_p_hats,3)]));
         [~, min_tRes_idx] = min(tRes(1,2:end));

@@ -1,3 +1,7 @@
-A = [1 3 2 3];
+fried
+manning
+chavis
 
-A(A == max(A))
+wheeler
+lemahieu
+treinen
