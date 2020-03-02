@@ -17,7 +17,7 @@ function [RTF_test, k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirL
             if numArrays>1
                 k_t_new(i) = array_kern + kernel(RTF_train(i,:,j), RTF_test(:,:,j), kern_typ, scales(j));
             else
-                k_t_new(i) = array_kern + kernel(RTF_train(i,:), RTF_test, kern_typ, scales(j));
+                k_t_new(i) = array_kern + kernel(RTF_train(i,:), reshape(RTF_test,[rirLen,numArrays]), kern_typ, scales(j));
             end
         end
     end

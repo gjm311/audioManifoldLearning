@@ -15,7 +15,6 @@ load('mat_outputs/monoTestSource_biMicCircle_5L50U.mat')
 
 %---- Initialize storage parameters ----
 sourceTest = [3.5, 3.5, 1];
-T60 = .15;
 iters = 3;
 Q_t = inv(sigmaL+rand*10e-3*eye(size(sigmaL)));
 %---- Initialize bayes parameters (via Van Vaerenbergh method) ----
@@ -76,9 +75,10 @@ for itr = 1:num_iters
     moving_iters = move_opts(randi([1,size(move_opts,1)],1));
     end_pauses = pause_opts(randi(size(pause_opts,1),1));
     numMovePoints = moving_iters + init_pauses+end_pauses;
+    start_pts = [3 5 1; 5 3 1; 3 1 1; 1 3 1];
     end_pts = [.5,5.5,1; 5.5 5.5 1; 5.5 .5 1; .5 .5 1];
     movingMicsPos = [micLine(micsPos(movingArray,:), end_pts(movingArray,:), moving_iters), height*ones(moving_iters,1)];
-    movingMicsPos = [[3 5 1].*ones(init_pauses,3);movingMicsPos];
+    movingMicsPos = [start_pts(movingArray,:).*ones(init_pauses,3);movingMicsPos];
     movingMicsPos = [movingMicsPos; ones(end_pauses,3).*end_pts(movingArray,:)];
 
     %initialize ground truths. Note gt_pfail used to optimize threshold,
