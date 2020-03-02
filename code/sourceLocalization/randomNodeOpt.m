@@ -90,8 +90,8 @@ for itr = 1:num_iters
     gt_latents(:,:,init_pauses/samplerate+1:moving_iters/samplerate+init_pauses/samplerate) = repmat(mvmnt_truth, [1,1,moving_iters/samplerate]);
     gt_latents(:,:,init_pauses/samplerate+moving_iters/samplerate+1:end) = repmat(static_truth, [1,1,end_pauses/samplerate]);
     gt_pfail = [zeros(1,init_pauses/samplerate) ones(1,moving_iters/samplerate) zeros(1,init_pauses/samplerate)];
-    t_count = 0;
     
+    %init random mrf parameters
     net_threshs(itr) = rand*(netThresh_max-netThresh_min)*netThresh_min;
     vars(itr) = rand;
     eMaxs(itr) = rand;
@@ -104,8 +104,11 @@ for itr = 1:num_iters
     trans_al2 = (1-trans_mis2)*rand;
     trans_unk2 = 1 - trans_al2 - trans_mis2;
     trans_mats(:,:,itr) = [trans_al1 trans_mis1 trans_unk1; trans_al2 trans_mis2 trans_unk2; 1/3 1/3 1/3];
+    
+    acc_curr = struct([]);
+    t_count = 0;
+    
     for t = 1:numMovePoints
-        acc_curr = struct([]);
         if mod(t,samplerate) == 0
             t_count = t_count + 1;
             %At each iteration, add noise to vary position estimates for more
@@ -114,7 +117,6 @@ for itr = 1:num_iters
             %update our subnetwork position estimates; i.e. update when new RTF samples
             %taken
 
-            
             if movingArray == 1
                 new_x1 = movingMicsPos(t,1)-.025;
                 new_x2 = movingMicsPos(t,1)+.025;
@@ -132,7 +134,7 @@ for itr = 1:num_iters
                     new_x2 = movingMicsPos(t,1)+.025;
                 end
                 newMicsPos = [new_x1 movingMicsPos(t,2:3);new_x2 movingMicsPos(t,2:3)];
-                micsPosNew = [micsPos(1:(movingArray*numMics)-1,:); newMicsPos; micsPos((movingArray*numMics)+numMics:end,:)];
+                micsPosNew = [micsPos(1:(movingArray*numMics)-numMics,:); newMicsPos; micsPos((movingArray*numMics)+1:end,:)];
             end
                 
             %Estimate position for all labelled points for all subnetworks and take

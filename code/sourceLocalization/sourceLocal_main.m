@@ -101,7 +101,7 @@ for t = 1:numMovePoints
     %update our subnetwork position estimates; i.e. update when new RTF samples
     %taken.
     iter = iter+1;
-    Q_t = Q_t+rand*10e-4*ones(size(Q_t));
+%     Q_t = Q_t+rand*10e-4*ones(size(Q_t));
     
     new_x1 = movingMicsPos(t,1)-.025;
     new_x2 = movingMicsPos(t,1)+.025;
