@@ -16,10 +16,6 @@ load('mat_outputs/monoTestSource_biMicCircle_5L50U.mat')
 load('mat_outputs/movementOptParams')
 
 %---- Initialize subnet estimates of training positions ----
-samplerate = 3;
-% pause_opts = samplerate:samplerate:samplerate*3;
-% move_opts = samplerate*5:samplerate:10*samplerate;
-
 randL = randi(numArrays, 1);
 holderTest = sourceTrain(randL,:);
 for k = 1:numArrays
@@ -29,72 +25,44 @@ for k = 1:numArrays
 end
 
 %simulate different noise levels
-snrs = 0:4:40;
+radii = [0:.005:.03];
 iters_per = 10;
-noisy_micSignals = zeros(numMics,size(x,2));
-init_pauses = 9;
-moving_iters = 18;
-end_pauses = 12;
-
-for s = 1:size(snrs,1)
-    rec_time
-    off_time = zeros();
-    snr = snrs(s);
-    for n = 1:numMics
-        noisy_signal = awgn(x,snr);
+mic_ref = [3 5 1; 5 3 1; 3 1 1; 1 3 1];
+accs = struct([]);
+   
+for riter = 1:size(radii)
+    
+    sourceTest = randSourcePos(1, roomSize, radiusU, ref);
+    source = rand;
+    radius_mic = radii(riter);
+    movingArray = randi(numArrays,1);
+    %******
+    randMicsPos = randMicsPos(1, roomSize, radius_mic, mics_ref(movingArray,:));
+    rotation = rand*360;
+    new_x1 = randMicsPos(:,1)+.025*cos(rotation);
+    new_y1 = randMicsPos(:,2)+.025*sin(rotation);
+    new_x2 = randMicsPos(:,1)-.025*cos(rotation);
+    new_y2 = randMicsPos(:,2)-.025*sin(rotation);
+    if movingArray == 1
+        micsPosNew = [new_x1 new_y1 1;new_x2 new_y2 1; micsPos(1+numMics:end,:)];
+    elseif movingArray == numArrays
+        micsPosNew = [micsPos(1:end-numMics,:); new_x1 new_y1 1; new_x2 new_y2 1];
+    elseif movingArray == 2
+        micsPosNew = [micsPos(1:numMics,:); new_x1 new_y1 1; new_x2 new_y2 1; micsPos(2*numMics+1:end,:)];
+    else
+        micsPosNew = [micsPos(1:numMics*2,:); new_x1 new_y1 1; new_x2 new_y2 1; micsPos(3*numMics+1:end,:)];
     end
-    sourceTest = randSourcePos(1, roomSize, radiusU, ref); 
     
     for it = 1:iters_per
-        %---- Initialize moving mic line params ----
-        %random durations chosen for pausing in beginning/end and also number of
-        %discrete jumps per iteration. Moving array also random. 
-        movingArray = randi(numArrays,1);
-%         init_pauses = pause_opts(randi([1,size(pause_opts,1)],1));
-%         moving_iters = move_opts(randi([1,size(move_opts,1)],1));
-%         end_pauses = pause_opts(randi(size(pause_opts,1),1));
-        
-        numMovePoints = moving_iters + init_pauses+end_pauses;
-        start_pts = [3 5 1; 5 3 1; 3 1 1; 1 3 1];
-        end_pts = [.5,5.5,1; 5.5 5.5 1; 5.5 .5 1; .5 .5 1];
-        movingMicsPos = [micLine(micsPos(movingArray,:), end_pts(movingArray,:), moving_iters), height*ones(moving_iters,1)];
-        movingMicsPos = [start_pts(movingArray,:).*ones(init_pauses,3);movingMicsPos];
-        movingMicsPos = [movingMicsPos; ones(end_pauses,3).*end_pts(movingArray,:)];
-
         %initialize ground truths
-        mvmnt_truth = [1 0 0; 0 1 0; 0 1 0; 0 1 0];
-        static_truth = [ones(4,1) zeros(4,1) zeros(4,1)];
-        gt_latents = zeros(size(posteriors,1), size(posteriors,2), numMovePoints/samplerate);
-        gt_latents(:,:,1:init_pauses/samplerate) = repmat(static_truth, [1,1,init_pauses/samplerate]);
-        gt_latents(:,:,init_pauses/samplerate+1:moving_iters/samplerate+init_pauses/samplerate) = repmat(mvmnt_truth, [1,1,moving_iters/samplerate]);
-        gt_latents(:,:,init_pauses/samplerate+moving_iters/samplerate+1:end) = repmat(static_truth, [1,1,end_pauses/samplerate]);
-        gt_pfail = [zeros(1,init_pauses/samplerate) ones(1,moving_iters/samplerate) zeros(1,init_pauses/samplerate)];
-
+        
         acc_curr = struct([]);
         t_count = 0;
 
         for t = 1:numMovePoints
             if mod(t,samplerate) == 0
                 t_count = t_count + 1;
-                if movingArray == 1
-                    new_x1 = movingMicsPos(t,1)-.025;
-                    new_x2 = movingMicsPos(t,1)+.025;
-                    micsPosNew = [new_x1 movingMicsPos(t,2:3);new_x2 movingMicsPos(t,2:3); micsPos(1+numMics:end,:)];
-                elseif movingArray == numArrays
-                    new_x1 = movingMicsPos(t,2)-.025;
-                    new_x2 = movingMicsPos(t,2)+.025;
-                    micsPosNew = [micsPos(1:end-numMics,:); new_x1 movingMicsPos(t,2:3);new_x2 movingMicsPos(t,2:3)];
-                else
-                    if movingArray == 2
-                        new_x1 = movingMicsPos(t,2)-.025;
-                        new_x2 = movingMicsPos(t,2)+.025;
-                    else
-                        new_x1 = movingMicsPos(t,1)-.025;
-                        new_x2 = movingMicsPos(t,1)+.025;
-                    end
-                    newMicsPos = [new_x1 movingMicsPos(t,2:3);new_x2 movingMicsPos(t,2:3)];
-                    micsPosNew = [micsPos(1:(movingArray*numMics)-numMics,:); newMicsPos; micsPos((movingArray*numMics)+1:end,:)];
-                end
+               
 
                 %Estimate position for all labelled points for all subnetworks and take
                 %average probability of movement for each labelled point.

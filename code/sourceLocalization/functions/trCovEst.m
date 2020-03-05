@@ -1,7 +1,7 @@
 function [cov,covL] = trCovEst(nL, nD, numArrays, rtfs, kernTyp, scales)
     cov = zeros(nD,nD);
-    for r = 1:nD
-        for l = 1:nD
+    for r = 1:nL
+        for l = 1:nL
             kern = 0;
             for i = 1:nD        
                 for q = 1:numArrays

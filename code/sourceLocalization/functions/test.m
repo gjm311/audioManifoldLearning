@@ -17,7 +17,7 @@ function [RTF_test, k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirL
             if numArrays>1
                 k_t_new(i) = array_kern + kernel(RTF_train(i,:,j), RTF_test(:,:,j), kern_typ, scales(j));
             else
-                k_t_new(i) = array_kern + kernel(RTF_train(i,:), reshape(RTF_test,[rirLen,numArrays]), kern_typ, scales(j));
+                k_t_new(i) = array_kern + kernel(RTF_train(i,:), RTF_test(:,:,j), kern_typ, scales(j));
             end
         end
     end
@@ -33,13 +33,13 @@ function [RTF_test, k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirL
 
 %Uncomment for update method via Bracha's paper (vs. update done in
 %bayesUpd.m from Vaerenbergh's paper.
-%     gammaL_new = gammaL - ((gammaL*(k_Lt*k_Lt)'*gammaL)/(numArrays^2+k_Lt*gammaL*k_Lt'));
-    gammaL_new = gammaL;
+    gammaL_new = gammaL - ((gammaL*(k_t_new'*k_t_new)*gammaL)/(numArrays^2+k_t_new*gammaL*k_t_new'));
+%     gammaL_new = gammaL;
     p_sqL_new = gammaL_new*sourceTrainL;
 
     %estimate test covariance estimate
     sigma_Lt = tstCovEst(nL, nD, numArrays, RTF_train, RTF_test, kern_typ, scales);
-    sigmaLt_new = sigma_Lt + (1/numArrays)*k_t_new;
-    p_hat_t = sigmaLt_new*p_sqL_new;
+%     sigmaLt_new = sigma_Lt + (1/numArrays)*k_t_new;
+    p_hat_t = sigma_Lt*p_sqL_new;
 
 end
