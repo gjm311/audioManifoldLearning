@@ -49,7 +49,7 @@ disp('Setting up the room');
 
 %---- load training data (check mat_trainParams for options)----
 load('mat_outputs/monoTestSource_biMicCircle_5L50U.mat')
-
+vari = varis_set(I);
 %---- Initialize storage parameters ----
 sourceTest = [3.5, 3.5, 1];
 iters = 3;

@@ -12,7 +12,7 @@ disp('Setting up the room');
 % ---- Initialize Parameters for training ----
 
 %---- load training data (check mat_trainParams for options)----
-load('mat_outputs/monoTestSource_biMicCircle_5L100U.mat')
+load('mat_outputs/monoTestSource_biMicCircle_5L100U')
 % load('mat_outputs/movementOptParams')
 modelSd = .1;
 %---- Initialize subnet estimates of training positions ----
@@ -26,9 +26,9 @@ for k = 1:numArrays
 end
 
 %simulate different noise levels
-radii = [0 .001 .005 .01 .03];
+radii = [0 2];
 fs = 32000;
-iters_per = 5;
+iters_per = 1;
 mic_ref = [3 5 1; 5 3 1; 3 1 1; 1 3 1];
 accs = struct([]);
 wav_folder = dir('./shortSpeech/');
@@ -41,7 +41,8 @@ for riter = 1:size(radii,2)
         %randomize tst source, new position of random microphone (new
         %position is on circle based off radius_mic), random rotation to
         %microphones, and random sound file (max 4 seconds).
-        sourceTest = randSourcePos(1, roomSize, radiusU, ref);
+%         sourceTest = randSourcePos(1, roomSize, radiusU, ref);
+        sourceTest = [4 4 1];
         %FIX movingAray for Vis sake
         movingArray = 1;
         randMicPos = randMicsPos(1, roomSize, radius_mic, mic_ref(movingArray,:));
@@ -59,11 +60,12 @@ for riter = 1:size(radii,2)
         else
             micsPosNew = [micsPos(1:numMics*2,:); new_x1 new_y1 1; new_x2 new_y2 1; micsPos(3*numMics+1:end,:)];
         end
-        rand_wav = randi(numel(wav_folder));
-        file = wav_folder(rand_wav).name;
-        [x,fs_in] = audioread(file);
-        x = resample(x,fs_in,fs);
-        x = x';        
+%         rand_wav = randi(numel(wav_folder));
+%         file = wav_folder(rand_wav).name;
+%         [x,fs_in] = audioread(file);
+%         x = resample(x,fs_in,fs);
+%         x = x';
+%         
         
         %estimate p_fail and estimated positions for each sub_arry
         [self_sub_p_hat_ts, p_fail, posteriors] = moveDetector(x, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
@@ -79,21 +81,29 @@ for riter = 1:size(radii,2)
            naive_p_fail(p) = var(self_sub_p_hat_ts(p,:)-sub_p_hat_ts(p,:));
         end
         
-    [~,~, p_hat_t] = test(x, gammaL, RTF_train, micsPosNew, rirLen, rtfLen, numArrays,...
-                numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
+   load('mat_outputs/monoTestSource_biMicCircle_5L100U')
+
+%---- with optimal params estimate test position ----
+    sourceTests = [4 4 1];
+    p_hat_ts = zeros(size(sourceTests));
+    for i = 1:size(p_hat_ts)
+        sourceTest = sourceTests(i,:);
+        [~,~, p_hat_ts(i,:)] = test(x, gammaL, RTF_train, micsPosNew, rirLen, rtfLen, numArrays,...
+                    numMics, sourceTrain, sourceTests(i,:), nL, nU, roomSize, T60, c, fs, kern_typ, scales);
+    end
     
     %PLOT
-    f = plotRoom(roomSize, micsPosNew, sourceTrain, sourceTest, nL, p_hat_t);
+    f = plotRoom(roomSize, micsPosNew, sourceTrain, sourceTest, nL, p_hat_ts);
     title('Detecting Array Movement')
     if p_fail>.7
-        binTxt = text(3.6,.5, sprintf('Movement Detection Probability: %s (MOVEMENT)',num2str(round(p_fail,2))));
+        binTxt = text(3.6,.5, sprintf('Movement Detection Probability:\n %s (MOVEMENT)',num2str(round(p_fail,2))));
     else
-        binTxt = text(3.6,.5, sprintf('Movement Detection Probability: %s (NO MOVEMENT)',num2str(round(p_fail,2))));
+        binTxt = text(3.6,.5, sprintf('Movement Detection Probability:\n %s (NO MOVEMENT)',num2str(round(p_fail,2))));
     end
     if mean(naive_p_fail) > .8
-        naiveTxt = text(.6,.5, sprintf('Avg Subnet Postioional Estimate SD: %s (MOVEMENT)',num2str(round(mean(naive_p_fail),2))));
+        naiveTxt = text(.6,.5, sprintf('Avg Subnet Postioional Estimate SD:\n %s (MOVEMENT)',num2str(round(mean(naive_p_fail),2))));
     else
-        naiveTxt = text(.6,.5, sprintf('Avg Subnet Postioional Estimate SD: %s (NO MOVEMENT)',num2str(round(mean(naive_p_fail),2))));
+        naiveTxt = text(.6,.5, sprintf('Avg Subnet Postioional Estimate SD:\n %s (NO MOVEMENT)',num2str(round(mean(naive_p_fail),2))));
     end
     
 %     %Uncomment below for pauses between iterations only continued by

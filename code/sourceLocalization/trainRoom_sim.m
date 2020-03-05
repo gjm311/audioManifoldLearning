@@ -89,16 +89,17 @@ load('mat_trainParams/biMicCircle_5L100U.mat')
 % % vari = varis_set(I);
 % scales = scales_set(I,:);
 % vari = .05;
+load('mat_outputs/monoTestSource_biMicCircle_5L100U')
 
 [~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales);
 gammaL = inv(sigmaL + diag(ones(1,nL)*vari));
 p_sqL = gammaL*sourceTrainL;
 
-% save('mat_outputs/monoTestSource_biMicCircle_5L100U')
+save('mat_outputs/monoTestSource_biMicCircle_5L100U')
 load('mat_outputs/monoTestSource_biMicCircle_5L100U')
 
 %---- with optimal params estimate test position ----
-sourceTests = [2.3, 3.3, 1; 3.3, 2.3, 1; 2.3, 2.3, 1; 3.3, 3.3, 1; 4 4 1; 2 2 1];
+sourceTests = [4 4 1];
 p_hat_ts = zeros(size(sourceTests));
 for i = 1:size(p_hat_ts)
     sourceTest = sourceTests(i,:);
