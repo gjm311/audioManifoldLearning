@@ -11,13 +11,14 @@ function [RTF_test, k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirL
     
     %estimate kernel array between labelled data and test
     k_t_new = zeros(1,nL);
+    kscales = 1.1*scales;
     for i = 1:nL
         array_kern = 0;
         for j = 1:numArrays
             if numArrays>1
-                k_t_new(i) = array_kern + kernel(RTF_train(i,:,j), RTF_test(:,:,j), kern_typ, scales(j));
+                k_t_new(i) = array_kern + kernel(RTF_train(i,:,j), RTF_test(:,:,j), kern_typ, kscales(j));
             else
-                k_t_new(i) = array_kern + kernel(RTF_train(i,:), RTF_test(:,:,j), kern_typ, scales(j));
+                k_t_new(i) = array_kern + kernel(RTF_train(i,:), RTF_test(:,:,j), kern_typ, kscales(j));
             end
         end
     end
@@ -39,7 +40,7 @@ function [RTF_test, k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirL
 
     %estimate test covariance estimate
     sigma_Lt = tstCovEst(nL, nD, numArrays, RTF_train, RTF_test, kern_typ, scales);
-%     sigmaLt_new = sigma_Lt + (1/numArrays)*k_t_new;
+    sigma_Lt = sigma_Lt + (1/numArrays)*k_t_new;
     p_hat_t = sigma_Lt*p_sqL_new;
 
 end

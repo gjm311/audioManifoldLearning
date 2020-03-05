@@ -1,11 +1,14 @@
-means
-manning
-conforto
-chavis
-stroman
+clear
+addpath ./RIR-Generator-master
+addpath ./functions
+addpath ./stft
+addpath ./shortSpeech
 
-wheeler
-lemahieu
-treinen
-calhoun
-bohm
+% ---- TRAINING DATA ----
+% room setup
+disp('Setting up the room');
+% ---- Initialize Parameters for training ----
+
+folder = dir('./shortSpeech/');
+ridx = randi(numel(folder));
+file = folder(ridx).name;
