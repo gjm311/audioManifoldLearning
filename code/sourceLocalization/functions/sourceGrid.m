@@ -1,4 +1,6 @@
 function sources = sourceGrid(height, width, numRow, numCol, ref)
+    numRow = numRow-1;
+    numCol = numCol-1;
     start_x = ref(1) - width/2;
     start_y = ref(2) - height/2;
     end_x = ref(1) + width/2;

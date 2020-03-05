@@ -26,9 +26,9 @@ for k = 1:numArrays
 end
 
 %simulate different noise levels
-radii = [0 2];
+radii = [0 .25 .5];
 fs = 32000;
-iters_per = 1;
+iters_per = 3;
 mic_ref = [3 5 1; 5 3 1; 3 1 1; 1 3 1];
 accs = struct([]);
 wav_folder = dir('./shortSpeech/');
@@ -41,8 +41,8 @@ for riter = 1:size(radii,2)
         %randomize tst source, new position of random microphone (new
         %position is on circle based off radius_mic), random rotation to
         %microphones, and random sound file (max 4 seconds).
-%         sourceTest = randSourcePos(1, roomSize, radiusU, ref);
-        sourceTest = [4 4 1];
+        sourceTest = randSourcePos(1, roomSize, radiusU, ref);
+%         sourceTest = [4 4 1];
         %FIX movingAray for Vis sake
         movingArray = 1;
         randMicPos = randMicsPos(1, roomSize, radius_mic, mic_ref(movingArray,:));
@@ -84,12 +84,11 @@ for riter = 1:size(radii,2)
    load('mat_outputs/monoTestSource_biMicCircle_5L100U')
 
 %---- with optimal params estimate test position ----
-    sourceTests = [4 4 1];
-    p_hat_ts = zeros(size(sourceTests));
+
+    p_hat_ts = zeros(size(sourceTest));
     for i = 1:size(p_hat_ts)
-        sourceTest = sourceTests(i,:);
         [~,~, p_hat_ts(i,:)] = test(x, gammaL, RTF_train, micsPosNew, rirLen, rtfLen, numArrays,...
-                    numMics, sourceTrain, sourceTests(i,:), nL, nU, roomSize, T60, c, fs, kern_typ, scales);
+                    numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
     end
     
     %PLOT

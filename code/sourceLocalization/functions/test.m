@@ -39,6 +39,7 @@ function [RTF_test, k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirL
     p_sqL_new = gammaL_new*sourceTrainL;
 
     %estimate test covariance estimate
+    scales = scales;
     sigma_Lt = tstCovEst(nL, nD, numArrays, RTF_train, RTF_test, kern_typ, scales);
     sigma_Lt = sigma_Lt + (1/numArrays)*k_t_new;
     p_hat_t = sigma_Lt*p_sqL_new;
