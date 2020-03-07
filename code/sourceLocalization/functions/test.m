@@ -11,14 +11,13 @@ function [RTF_test, k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirL
     
     %estimate kernel array between labelled data and test
     k_t_new = zeros(1,nL);
-    kscales = 1.1*scales;
     for i = 1:nL
         array_kern = 0;
         for j = 1:numArrays
             if numArrays>1
-                k_t_new(i) = array_kern + kernel(RTF_train(i,:,j), RTF_test(:,:,j), kern_typ, kscales(j));
+                k_t_new(i) = array_kern + kernel(RTF_train(i,:,j), RTF_test(:,:,j), kern_typ, scales(j));
             else
-                k_t_new(i) = array_kern + kernel(RTF_train(i,:), RTF_test(:,:,j), kern_typ, kscales(j));
+                k_t_new(i) = array_kern + kernel(RTF_train(i,:), RTF_test(:,:,j), kern_typ, scales(j));
             end
         end
     end
@@ -28,8 +27,8 @@ function [RTF_test, k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirL
     nD = nL+nU;
     sourceTrainL = sourceTrain(1:nL,:);
 %     RTF_upd = [RTF_train; RTF_test];
-%     sigmaL = trC  ovEst(nL, nD, numArrays, RTF_train, kern_typ ,scales);
-%     sigmaL_upd = sigmaL + (1/numArrays^2)*k_Lt'*k_Lt;
+%     [~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_upd, kern_typ ,scales);
+%     sigmaL_upd = sigmaL + (1/numArrays^2).*(k_t_new'*k_t_new);
 %     gammaL_upd = inv(sigmaL_upd + diag(ones(1,nL)*vari));
 
 %Uncomment for update method via Bracha's paper (vs. update done in
@@ -39,7 +38,6 @@ function [RTF_test, k_t_new, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirL
     p_sqL_new = gammaL_new*sourceTrainL;
 
     %estimate test covariance estimate
-    scales = scales;
     sigma_Lt = tstCovEst(nL, nD, numArrays, RTF_train, RTF_test, kern_typ, scales);
     sigma_Lt = sigma_Lt + (1/numArrays)*k_t_new;
     p_hat_t = sigma_Lt*p_sqL_new;

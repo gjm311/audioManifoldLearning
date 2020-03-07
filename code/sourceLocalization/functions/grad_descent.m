@@ -10,11 +10,11 @@ function [tot_cost, vari, scales, varis_set, scales_set] = grad_descent(sourcePo
     %x1: cov, x2: varI, x3: pos_coord_vec
     f = @(x1,x2,x3) -.5*x3'*inv(x1+x2)*x3 - max(0,.5*log(det(x1+x2))) - .5*nL*log(2*pi);
     for i = 1:3
-        costs(i) = -f(cov_init, var_init*eye(nL), sourcePos(:,i));
+        costs(i) = -f(cov_init, var_init.*eye(nL), sourcePos(:,i));
     end
     
     tot_cost = zeros(1,max_iters);
-    varis_set = zeros(1,max_iters);
+    varis_set = zeros(max_iters,nL);
     scales_set = zeros(max_iters, numArrays);
     
     while and(sum(costs)>=tol, niter <= max_iters)
@@ -29,7 +29,7 @@ function [tot_cost, vari, scales, varis_set, scales_set] = grad_descent(sourcePo
         new_gamma = inv(new_cov + new_varI);
         
         dL_dScales = scale_grad(sourcePos, rtfs(1:nL,:,:), numArrays, new_gamma, kern_typ, new_scales);
-        dL_dVar = var_grad(sourcePos, new_gamma);
+        dL_dVar = var_grad( sourcePos, new_gamma);
         
         new_scales = new_scales - alpha*dL_dScales;
         new_vari = new_vari - alpha*dL_dVar;
@@ -43,7 +43,7 @@ function [tot_cost, vari, scales, varis_set, scales_set] = grad_descent(sourcePo
         
         niter = niter + 1;
         tot_cost(niter) = sum(costs);
-        varis_set(niter) = new_vari;
+        varis_set(niter,:) = new_vari;
         scales_set(niter,:) = new_scales; 
     end
     vari = new_vari;
