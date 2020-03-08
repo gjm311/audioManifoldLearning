@@ -86,15 +86,15 @@ disp('Setting up the room');
 % [~,I] = min(sum(costs));
 
 load('mat_outputs/monoTestSource_biMicCircle_5L300U')
-scales = scales_set(I,:);
+% scales = scales_set(I,:);
 vari = varis_set(I,:);
 % vari = .01;
 [~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales);
 gammaL = inv(sigmaL + diag(ones(1,nL).*vari));
 p_sqL = gammaL*sourceTrainL;
 
-save('mat_outputs/monoTestSource_biMicCircle_5L300U')
-load('mat_outputs/monoTestSource_biMicCircle_5L300U')
+% save('mat_outputs/monoTestSource_biMicCircle_5L300U')
+% load('mat_outputs/monoTestSource_biMicCircle_5L300U')
 
 %---- with optimal params estimate test position ----
 sourceTests = randSourcePos(2, roomSize, radiusU*.35, ref);

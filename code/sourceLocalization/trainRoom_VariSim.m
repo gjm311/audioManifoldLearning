@@ -23,7 +23,7 @@ addpath ./shortSpeech
 % room setup
 disp('Setting up the room');
 
-load('mat_outputs/monoTestSource_biMicCircle_5L100U')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U')
 
 %---- with optimal params estimate test position ----
 num_samples = 1000;
@@ -37,13 +37,12 @@ for n = 1:num_samples
     [~,~, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                 numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
     diffs(n) = norm(sourceTest-p_hat_t);
-    
     sigma_Lt = tstCovEst(nL, nD, numArrays, RTF_train, RTF_test, kern_typ, scales);
     sigma_Lt = sigma_Lt + (1/numArrays)*k_t_new;
     var_cond(n) = var(sourceTest)-sigma_Lt'*gammaL*sigma_Lt;
 end
 modelSd = sd(diffs);
 
-load('mat_outputs/monoTestSource_biMicCircle_5L100U.mat')
-save('mat_outputs/monoTestSource_biMicCircle_5L100U.mat')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U.mat')
+save('mat_outputs/monoTestSource_biMicCircle_5L300U.mat')
 

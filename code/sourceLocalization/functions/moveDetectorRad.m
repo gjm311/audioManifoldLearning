@@ -1,4 +1,4 @@
-function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetector(x, gammaL, numMics, numArrays, micsPos, t, p_fails, sub_p_hat_ts, scales, RTF_train, rirLen, rtfLen,sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ)
+function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetectorRad(x, gammaL, numMics, numArrays, micsPos, t, p_fails, sub_p_hat_ts, scales, RTF_train, rirLen, rtfLen,sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ)
 
     %---- Initialize CRF params ----
     posteriors = zeros(numArrays,3);

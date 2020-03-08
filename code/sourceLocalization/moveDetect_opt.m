@@ -11,7 +11,7 @@ addpath ./shortSpeech
 % room setup
 disp('Setting up the room');
 %---- load training data (check mat_trainParams for options)----
-load('mat_outputs/monoTestSource_biMicCircle_5L50U.mat')
+load('mat_outputs/monoTestSource_biMicCircle_5L3000U.mat')
 
 %---- Initialize storage parameters ----
 sourceTest = [3.5, 3.5, 1];

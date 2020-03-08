@@ -26,7 +26,7 @@ for k = 1:numArrays
 end
 
 %simulate different noise levels
-radii = [0:.005:.03];
+radii = [0:.05:.3];
 fs = 32000;
 iters_per = 10;
 mic_ref = [3 5 1; 5 3 1; 3 1 1; 1 3 1];

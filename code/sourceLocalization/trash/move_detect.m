@@ -1,7 +1,7 @@
 %{
 This program is able to detect movement of an array based off of a
 misalignment recognition algorithm. The algorithm utilizes MRFs with Fully
-Connected latent variables to predict misalignment frvbom sensor
+Connected latent variables to predict misalignment from sensor
 measurements. Here the input is the residual error between an estimated
 position by subsets of the overall network and previous estimates. As one would expect, 
 if the probability of misalignment is high for all subnets but one, this is 
@@ -11,14 +11,10 @@ for Detecting Localization Failures" by Naoki Akai, Luis Yoichi Morales et
 al.
 %}
 
-%NOTE: parameters have not been fine-tuned though the plot does still show
-%reasonable distinction between the array thats moving and those that are
-%static.
-
 clear
 addpath ./functions
 %Load train data
-load('mat_outputs/monoTestSource_biMicCircle_5L50U');
+load('mat_outputs/monoTestSource_biMicCircle_5L300U');
 
 % % Estimate sub-network test position before node movement
 sub_p_hat_ts = zeros(numArrays, 3);
