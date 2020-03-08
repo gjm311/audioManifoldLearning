@@ -36,9 +36,6 @@ for it = 1:num_iters
         gammaL = inv(sigmaL + diag(ones(1,nL).*vari));
         p_sqL = gammaL*sourceTrainL;
 
-        save('mat_outputs/monoTestSource_biMicCircle_5L300U')
-        load('mat_outputs/monoTestSource_biMicCircle_5L300U')
-
         %---- with optimal params estimate test position ----
         sourceTests = randSourcePos(1, roomSize, radiusU*.35, ref);
         % sourceTests = [2,2,1; 4 4 1];
