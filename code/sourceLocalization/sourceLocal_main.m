@@ -48,12 +48,14 @@ disp('Setting up the room');
 
 
 %---- load training data (check mat_trainParams for options)----
-load('mat_outputs/monoTestSource_biMicCircle_5L50U.mat')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U.mat')
 vari = varis_set(I);
 %---- Initialize storage parameters ----
-sourceTest = [3.5, 3.5, 1];
+sourceTest = [2.5, 2.5, 1];
 iters = 3;
-Q_t = inv(sigmaL+rand*10e-3*eye(size(sigmaL)));
+[~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales);
+Q_t = inv(sigmaL + diag(ones(1,nL).*vari));
+p_sqL = gammaL*sourceTrainL;
 %---- Initialize bayes parameters (via Van Vaerenbergh method) ----
 % [mu, cov, Q_t] = bayesInit(nL, sourceTrainL, RTF_train, kern_typ, scales, numArrays, vari);
 q_t_new = zeros(nL,1);
@@ -79,7 +81,7 @@ end_pauses = 10;
 moving_iters = 4;
 numMovePoints = moving_iters + end_pauses + init_pauses;
 height = 1;
-movingMicsPos = [micLine(micsPos(movingArray,:), [.5,5.5,1], moving_iters), height*ones(moving_iters,1)];
+movingMicsPos = [micLine(micsPos(movingArray,:), [.5,5.5,1], moving_iters), height.*ones(moving_iters,1)];
 movingMicsPos = [[3 5 1].*ones(init_pauses,3);movingMicsPos];
 movingMicsPos = [movingMicsPos; [.5,5.5,1].*ones(end_pauses,3)];
 
@@ -105,7 +107,7 @@ for t = 1:numMovePoints
     
     new_x1 = movingMicsPos(t,1)-.025;
     new_x2 = movingMicsPos(t,1)+.025;
-    micsPosNew = [new_x1 movingMicsPos(t,2:3);new_x2 movingMicsPos(t,2:3); micsPos(1+numMics:end,:)];
+    micsPosNew = [new_x2 movingMicsPos(t,2:3);new_x1 movingMicsPos(t,2:3); micsPos(1+numMics:end,:)];
 
     %Estimate position for all labelled points for all subnetworks and take
     %average probability of movement for each labelled point.

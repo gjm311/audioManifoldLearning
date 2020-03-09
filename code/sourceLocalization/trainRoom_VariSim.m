@@ -37,11 +37,24 @@ for n = 1:num_samples
     [~,~, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                 numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
     diffs(n) = norm(sourceTest-p_hat_t);
+    RTF_test = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTest, roomSize, T60, rirLen, c, fs);
     sigma_Lt = tstCovEst(nL, nD, numArrays, RTF_train, RTF_test, kern_typ, scales);
+    k_t_new = zeros(1,nL);
+    for i = 1:nL
+        array_kern = 0;
+        for j = 1:numArrays
+            if numArrays>1
+                k_t_new(i) = array_kern + kernel(RTF_train(i,:,j), RTF_test(:,:,j), kern_typ, scales(j));
+            else
+                k_t_new(i) = array_kern + kernel(RTF_train(i,:), RTF_test(:,:,j), kern_typ, scales(j));
+            end
+        end
+    end
     sigma_Lt = sigma_Lt + (1/numArrays)*k_t_new;
-    var_cond(n) = var(sourceTest)-sigma_Lt'*gammaL*sigma_Lt;
+    var_cond(n) = var(sourceTest)-sigma_Lt*gammaL*sigma_Lt';
 end
 modelSd = sd(diffs);
+condSd = mean(var_cond);
 
 load('mat_outputs/monoTestSource_biMicCircle_5L300U.mat')
 save('mat_outputs/monoTestSource_biMicCircle_5L300U.mat')

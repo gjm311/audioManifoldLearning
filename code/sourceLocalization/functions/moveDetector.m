@@ -4,9 +4,9 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetector(x, gammaL, 
     posteriors = zeros(numArrays,3);
     likes = zeros(numArrays,3);
     latents = [ones(numArrays,1), zeros(numArrays,1), zeros(numArrays,1)]+1;
-    transMat = [.9 0 0.05; 0 .9 0.05; 1/3 1/3 1/3];
-    init_var = .7;
-    lambda = 8;
+    transMat = [.75 .2 0.05; .2 .75 0.05; 1/3 1/3 1/3];
+    init_var = .2;
+    lambda = .2;
     eMax = .3;
     thresh = .5;
 
@@ -20,7 +20,7 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetector(x, gammaL, 
     
     %---- Set likelihoods (to be maximized during msg passing calc.) ----
     for k = 1:numArrays
-        theta1 = 2*normpdf(resids(k), 0, init_var);
+        theta1 = 2*normpdf(resids(k)*100, 0, init_var);
         theta2 = (lambda*exp(-lambda*resids(k)))/(1-exp(-lambda*eMax));
         theta3 = unifrnd(0,eMax);
         likes(k,:) = [theta1 theta2 theta3];
