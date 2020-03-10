@@ -37,7 +37,7 @@ for it = 1:num_iters
         p_sqL = gammaL*sourceTrainL;
 
         %---- with optimal params estimate test position ----
-        sourceTests = randSourcePos(1, roomSize, radiusU*.35, ref);
+        sourceTests = randSourcePos(1, roomSize, radiusU, ref);
         % sourceTests = [2,2,1; 4 4 1];
         p_hat_ts = zeros(size(sourceTests));
         for i = 1:size(p_hat_ts)

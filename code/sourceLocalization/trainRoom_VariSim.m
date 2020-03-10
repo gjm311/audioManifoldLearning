@@ -2,8 +2,7 @@
 This program simulates a room that can be specified in the initialization
 parameters with a set of noise sources and microphone nodes. RTFs are
 generated (RIRs produced via Emmanuel Habet's RIR generator)and used to
-localize sound sources based off a set of learned manifolds (see 
-Semi-Supervised Source Localization on Multiple Manifolds With Distributed
+=Semi-Supervised Source Localization on Multiple Manifolds With Distributed
 Microphones for more details). Gradient descent method used to initialize
 hyper-params.
 %}
@@ -23,7 +22,7 @@ addpath ./shortSpeech
 % room setup
 disp('Setting up the room');
 
-load('mat_outputs/monoTestSource_biMicCircle_5L300U')
+load('mat_outputs/monoTestSource_biMicCircle_49L400U')
 
 %---- with optimal params estimate test position ----
 num_samples = 1000;
@@ -53,9 +52,9 @@ for n = 1:num_samples
     sigma_Lt = sigma_Lt + (1/numArrays)*k_t_new;
     var_cond(n) = var(sourceTest)-sigma_Lt*gammaL*sigma_Lt';
 end
-modelSd = sd(diffs);
+modelSd = std(diffs);
 condSd = mean(var_cond);
 
-load('mat_outputs/monoTestSource_biMicCircle_5L300U.mat')
-save('mat_outputs/monoTestSource_biMicCircle_5L300U.mat')
+% load('mat_outputs/monoTestSource_biMicCircle_5L300U.mat')
+save('mat_outputs/monoTestSource_biMicCircle_49L400U.mat')
 
