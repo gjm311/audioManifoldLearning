@@ -4,11 +4,11 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetector(x, gammaL, 
     posteriors = zeros(numArrays,3);
     likes = zeros(numArrays,3);
     latents = [ones(numArrays,1), zeros(numArrays,1), zeros(numArrays,1)]+1;
-    transMat = [.75 .2 0.05; .2 .75 0.05; 1/3 1/3 1/3];
-    init_var = .2;
-    lambda = .2;
-    eMax = .3;
-    thresh = .5;
+    transMat = [.55 0.4 0.05; .2 .75 0.05; 1/3 1/3 1/3];
+    init_var = .21;
+    lambda = .28;
+    eMax = .31;
+    thresh = 1/numArrays;
 
 % ----Calculate new estimate based off movement for all subnets and resid. error from stationary time (turns off once estimates settle) ----
     upd_sub_p_hat_ts = zeros(numArrays, 3);
@@ -16,11 +16,14 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetector(x, gammaL, 
         [subnet, subscales, trRTF] = subNet(k1, numArrays, numMics, scales, micsPos, RTF_train);
         [~,~,upd_sub_p_hat_ts(k1,:)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);   
     end
+%     resids = zeros(1,numArrays);
+%     for na = 1:numArrays
+%         resids(na) = norm(sub_p_hat_ts(na,:)-upd_sub_p_hat_ts(na,:),2);
+%     end
     resids = mean(sub_p_hat_ts-upd_sub_p_hat_ts,2);
-    
     %---- Set likelihoods (to be maximized during msg passing calc.) ----
     for k = 1:numArrays
-        theta1 = 2*normpdf(resids(k)*100, 0, init_var);
+        theta1 = 2*normpdf(resids(k), 0, init_var);
         theta2 = (lambda*exp(-lambda*resids(k)))/(1-exp(-lambda*eMax));
         theta3 = unifrnd(0,eMax);
         likes(k,:) = [theta1 theta2 theta3];
@@ -81,5 +84,12 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetector(x, gammaL, 
     else
         p_fail = 0;
     end
-    prob_failure = (1/t)*(p_fails*(t-1)+p_fail);
+%     prob_failure = (1/t)*(p_fails*(t-1)+p_fail);
+    mis_probs = posteriors(:,2);
+    if sum(latents(:,2)) > 0
+        prob_failure = (1/t)*(p_fails*(t-1)+p_fail)*(mean(mis_probs(latents(:,2) == 1)));
+    else
+        prob_failure = (1/t)*(p_fails*(t-1)+p_fail);
+    end
+%     prob_failure = mean(posteriors(:,2));
 end

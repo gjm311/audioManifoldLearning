@@ -8,14 +8,14 @@ function [sub_scales, num_static, RTF_test, p_hat_t, k_t_new] = subEst(gammaL, p
     
     RTF_test = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTest, roomSize, T60, rirLen, c, fs);
 
-    aligned_idxs = find(round(posteriors(:,1)) == 1);
-    alignedMic_idxs = aligned_idxs;
+    misaligned_idxs = find(round(posteriors(:,1)) == 1);
+    misalignedMic_idxs = misaligned_idxs;
     for ms = 1:numMics-1
-        alignedMic_idxs = sort(vertcat(alignedMic_idxs*numMics,alignedMic_idxs*numMics-ms));
+        misalignedMic_idxs = sort(vertcat(misalignedMic_idxs*numMics,misalignedMic_idxs*numMics-ms));
     end
     
-    num_static = size(aligned_idxs,1);
-    if size(aligned_idxs,1) == numArrays
+    num_static = numArrays - size(misaligned_idxs,1);
+    if num_static == numArrays
        sub_RTF_train = RTF_train; 
        sub_scales = scales; 
        num_static = 0;
@@ -24,8 +24,8 @@ function [sub_scales, num_static, RTF_test, p_hat_t, k_t_new] = subEst(gammaL, p
     else
         drop_idxs = zeros(1,numArrays);
         dropMic_idxs = zeros(1,numArrays*numMics);
-        drop_idxs(aligned_idxs) = 1;
-        dropMic_idxs(alignedMic_idxs) = 1;
+        drop_idxs(misaligned_idxs) = 1;
+        dropMic_idxs(misalignedMic_idxs) = 1;
         sub_RTF_train = RTF_train(:,:,~drop_idxs);
         sub_micsPos = micsPos(~dropMic_idxs,:);
         sub_scales = scales(~drop_idxs);

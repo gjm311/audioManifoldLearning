@@ -70,7 +70,7 @@ for riter = 1:size(radii)
 
         %if p_fail based off MRF is greater than sd of static model we say
         %there is movement.
-        if modelSd < p_fail
+        if .9 < p_fail
             acc_curr(it).mrf = 1;
         else
             acc_curr(it).mrf = 0;
@@ -83,7 +83,7 @@ for riter = 1:size(radii)
         naive_p_fail = zeros(1,numArrays);
         for p = 1:numArrays
             %try sd and norm
-           naive_p_fail(p) = sd(self_sub_p_hat_ts(p,:)-sub_p_hat_ts(p,:));
+           naive_p_fail(p) = std(self_sub_p_hat_ts(p,:)-sub_p_hat_ts(p,:));
            if modelSd < naive_p_fail(p)
                 acc_curr(it).naive = 1;
                 break

@@ -1,5 +1,5 @@
 function vals = micLine(start, finish, points)
-    if start ~= finish
+    if and(start(1) ~= finish(1),start(2) ~= finish(2)) 
         start_x = start(1);
         start_y = start(2);
         finish_x = finish(1);

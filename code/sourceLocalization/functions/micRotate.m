@@ -1,4 +1,4 @@
-function micsPosNew = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics)
+function [rotation,micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics)
     randMicPos = randMicsPos(1, roomSize, radius_mic, mic_ref(movingArray,:));
     rotation = rand*360;
     new_x1 = randMicPos(:,1)+.025*cos(rotation);

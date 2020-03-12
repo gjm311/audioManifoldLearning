@@ -56,7 +56,7 @@ for s = 1:size(snrs,2)
             %of microphones, and random sound file
             sourceTest = randSourcePos(1, roomSize, radiusU, ref);
             movingArray = randi(4);
-            [~,micsPosNew] = micRotate(roomSize, arr_rad, mic_ref, movingArray, micsPos, numArrays, numMics);
+            micsPosNew = micRotate(roomSize, arr_rad, mic_ref, movingArray, micsPos, numArrays, numMics);
          
             %get random speech signal and add noise
             rand_wav = randi(numel(wav_folder));
@@ -129,6 +129,7 @@ for s = 1:size(snrs,2)
 %                 rad_acc_curr(1).mrf_res_tns = tns(1);
             elseif and(mean_errs > arr_rad, mrf_flag == 0)
                 fns(1) = fns(1) + 1;
+%                 rad_acc_curr(1).mrf_res_tns = tns(1);
             end
             
             
@@ -141,8 +142,6 @@ for s = 1:size(snrs,2)
             elseif and(mean_errs < arr_rad, naive_flag == 0)
                 tns(2) = tns(2) + 1;
 %                 rad_acc_curr.naive1_res_tns = tns(2);
-            elseif and(mean_errs > arr_rad, naive_flag == 0)
-                fns(2) = fns(2) + 1;
             end
             
             if and(mean_errs > arr_rad, naive2_flag == 1)
@@ -154,8 +153,6 @@ for s = 1:size(snrs,2)
             elseif and(mean_errs < arr_rad, naive2_flag == 0)
                 tns(3) = tns(3) + 1;
 %                 rad_acc_curr.naive2_res_tns = tns(3);
-            elseif and(mean_errs > arr_rad, naive2_flag == 0)
-                fns(3) = fns(3) + 1;
             end
         end
 %         mc_acc_curr.mrf_tps = mc_acc_curr.mrf_tps + tps(1);
@@ -171,7 +168,7 @@ for s = 1:size(snrs,2)
 %         mc_acc_curr.naive2_tns = mc_acc_curr.naive2_tns + tns(3);
     end
 %     accs(s).neg20pos30x5 = mc_acc_curr;
-    accs(s).neg20pos30x5 = [tps(1) fps(1) tns(1) fns(1); tps(2) fps(2) tns(2) fns(2); tps(3) fps(3) tns(3) fns(3)]./mc_iters; 
+    accs(s).neg20pos30x5 = [tps(1)/mc_iters fps(1)/mc_iters tns(1)/mc_iters; tps(2)/mc_iters fps(2)/mc_iters tns(2)/mc_iters; tps(3)/mc_iters fps(3)/mc_iters tns(3)/mc_iters];
 end
 
 save('mat_results/5L100U_neg20pos30x5', 'accs')

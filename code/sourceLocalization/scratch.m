@@ -1,14 +1,10 @@
-clear
-addpath ./RIR-Generator-master
-addpath ./functions
-addpath ./stft
-addpath ./shortSpeech
+a = 1;
+b = 0;
+c = 1;
+d = 2;
+e = 1;
 
-% ---- TRAINING DATA ----
-% room setup
-disp('Setting up the room');
-% ---- Initialize Parameters for training ----
 
-folder = dir('./shortSpeech/');
-ridx = randi(numel(folder));
-file = folder(ridx).name;
+if or(and(a == e, c == a), and(a == d, a == b))
+    d
+end
