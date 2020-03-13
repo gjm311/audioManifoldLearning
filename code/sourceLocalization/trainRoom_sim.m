@@ -31,19 +31,20 @@ disp('Setting up the room');
 % numRow = 7;
 % numCol = 7;
 % ref = [roomSize(1:2)./2 1];
-% sourceTrainL = sourceGrid(height, width, numRow, numCol, ref);
-% % sourceTrainL = [4,4,1; 2,2,1; 4,2,1; 2,4,1; 3 3 1];
+% % sourceTrainL = sourceGrid(height, width, numRow, numCol, ref);
+% sourceTrainL = [4,4,1; 2,2,1; 4,2,1; 2,4,1; 3 3 1];
 % numArrays = 4;
 % numMics = 2;
-% nU = 400;
-% radiusU = max(height*2,width*2);
+% nU = 300;
+% radiusU = 2;
 % nL = size(sourceTrainL,1);
-% micsPos = [3.025,5,1;2.975,5,1; 5,2.975,1;5,3.025,1; 3.025,1,1;2.975,1,1; 1,2.975,1;1,3.025,1];
+% micsPos = [3.025,5.75 1;2.975,5.75,1; 5.75,2.975,1;5.75,3.025,1; 3.025,.25,1;2.975,.25,1; .25,2.975,1;.25,3.025,1];
+% % micsPos = [3.025,5,1;2.975,5,1; 5,2.975,1;5,3.025,1; 3.025,1,1;2.975,1,1; 1,2.975,1;1,3.025,1];
 % sourceTrainU = randSourcePos(nU, roomSize, radiusU, ref);
 % sourceTrain = [sourceTrainL; sourceTrainU];
 % nD = size(sourceTrain,1);
-
-% ---- generate RIRs and estimate RTFs ----
+% 
+% % ---- generate RIRs and estimate RTFs ----
 % totalMics = numMics*numArrays;
 % rirLen = 1000;
 % rtfLen = 500;
@@ -51,12 +52,12 @@ disp('Setting up the room');
 % x = randn(1,10*fs);
 % [x_tst,fs_in] = audioread('f0001_us_f0001_00209.wav');
 % x_tst = x_tst';
-disp('Generating the train set');
-
-%---- Simulate RTFs between nodes ----
+% disp('Generating the train set');
+% 
+% % ---- Simulate RTFs between nodes ----
 % RTF_train = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
-% save('mat_trainParams/biMicCircle_49L400U')
-%
+% save('mat_trainParams/biMicCircle_5L300U')
+% 
 % % % % ---- Simulate RTFs between microphones within each node ----
 % % % RTF_train = zeros(numArrays, nD, rtfLen, numMics);
 % % % for t = 1:numArrays
@@ -64,10 +65,9 @@ disp('Generating the train set');
 % % %     RTF_train(t,:,:,:) = rtfEst(x, curr_mics, rtfLen, 1, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
 % % % end
 % % % save('mat_trainParams/biMicCircle_5L50U_monoNode')
-
-% ---- load training data (check mat_trainParams for options)----
-% load('mat_trainParams/biMicCircle_5L300U.mat')
-
+% 
+% % ---- load training data (check mat_trainParams for options)----
+% 
 % %Initialize hyper-parameter estimates (gaussian kernel scalar
 % %value and noise variance estimate)
 % kern_typ = 'gaussian';
@@ -84,31 +84,33 @@ disp('Generating the train set');
 % 
 % [costs, ~, ~, varis_set, scales_set] = grad_descent(sourceTrainL, numArrays, RTF_train, sigmaL, init_scales, var_init, max_iters, tol, alpha, kern_typ);
 % [~,I] = min(sum(costs));
-
-load('mat_outputs/monoTestSource_biMicCircle_49L400U')
-scales = scales_set(I,:);
-vari = varis_set(I,:);
-% vari = .01;
-[~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales);
-gammaL = inv(sigmaL + diag(ones(1,nL).*vari));
-% p_sqL = gammaL*sourceTrainL;
-
-% save('mat_outputs/monoTestSource_biMicCircle_49L400U')
-% load('mat_outputs/monoTestSource_biMicCircle_49L400U')
+% 
+% % load('mat_outputs/monoTestSource_biMicCircle_5L100U')
+% scales = scales_set(I,:);
+% vari = varis_set(I,:);
+% % vari = .01;
+% [~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales);
+% gammaL = inv(sigmaL + diag(ones(1,nL).*vari));
+% % p_sqL = gammaL*sourceTrainL;
+% 
+% % save('mat_outputs/monoTestSource_biMicCircle_5L300U')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U')
 
 %---- with optimal params estimate test position ----
-% sourceTests = randSourcePos(2, roomSize, radiusU*.35, ref);
-sourceTests = [3 3 1];
+sourceTests = randSourcePos(3, roomSize, radiusU*.6, ref);
+% sourceTests = [3 3 1];
 p_hat_ts = zeros(size(sourceTests));
 for i = 1:size(p_hat_ts)
     sourceTest = sourceTests(i,:);
     [~,~, p_hat_ts(i,:)] = test(x_tst, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                 numMics, sourceTrain, sourceTests(i,:), nL, nU, roomSize, T60, c, fs, kern_typ, scales);
 end
+mse = mean(mean(((sourceTests-p_hat_ts).^2)));
 
 %---- plot ----
 plotRoom(roomSize, micsPos, sourceTrain, sourceTests, nL, p_hat_ts);
 
 title('Source Localization Based Off Semi-Supervised Approach')
+mseTxt = text(.5,.55, sprintf('MSE (Test Position Estimate): %s(m)', num2str(round(mse,3))));
 ax = gca;
 ax.TitleFontSizeMultiplier  = 2;

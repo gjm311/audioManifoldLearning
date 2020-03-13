@@ -1,7 +1,7 @@
 function rtfs = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourcePos, roomSize, T60, rirLen, c, fs)
     numSources = size(sourcePos,1);
     rtfs = zeros(numSources, rtfLen, numArrays);
-    maxDelay = ceil(max(pdist(micsPos))/c*fs);
+    maxDelay = ceil(norm(micsPos(1,:)-micsPos(2,:))/c*fs);
     for j = 1:numArrays
         for t = 1:numSources
             currMics = micsPos((j-1)*numMics+1:j*numMics,:);
