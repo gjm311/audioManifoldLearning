@@ -73,8 +73,10 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetectorOpt(x, trans
     MIS = sum(latents(:,2))/(numArrays - sum(latents(:,3))+10e-6);
     if MIS > thresh
         p_fail = 1;
+        prob_failure = (1/t)*(p_fails*(t-1)+p_fail);
     else
         p_fail = 0;
+        prob_failure = 0;
     end
-    prob_failure = (1/t)*(p_fails*(t-1)+p_fail);
+%     prob_failure = (1/t)*(p_fails*(t-1)+p_fail);
 end

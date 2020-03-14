@@ -14,19 +14,12 @@ disp('Setting up the room');
 %---- load training data (check mat_trainParams for options)----
 load('mat_outputs/monoTestSource_biMicCircle_5L100U')
 % load('mat_outputs/movementOptParams')
-vari = varis_set(I,:);
-% scales = scales_set(I,:);
-% vari = .01;
-[~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales);
-gammaL = inv(sigmaL + diag(ones(1,nL).*vari));
-% p_sqL = gammaL*sourceTrainL;
 
 % modelSd = .1;
 
 %simulate different noise levels
 radii = [0 .025 .05 .075 .1 .3]; 
 its_per = 2;
-N = 5;
 mic_ref = [3 5 1; 5 3 1; 3 1 1; 1 3 1];
 accs = struct([]);
 wav_folder = dir('./shortSpeech/');
