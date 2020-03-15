@@ -97,7 +97,7 @@ disp('Setting up the room');
 load('mat_outputs/monoTestSource_biMicCircle_5L300U')
 
 %---- with optimal params estimate test position ----
-sourceTests = randSourcePos(3, roomSize, radiusU*.6, ref);
+sourceTests = randSourcePos(3, roomSize, radiusU*.35, ref);
 % sourceTests = [3 3 1];
 p_hat_ts = zeros(size(sourceTests));
 for i = 1:size(p_hat_ts)
@@ -106,11 +106,13 @@ for i = 1:size(p_hat_ts)
                 numMics, sourceTrain, sourceTests(i,:), nL, nU, roomSize, T60, c, fs, kern_typ, scales);
 end
 mse = mean(mean(((sourceTests-p_hat_ts).^2)));
+nrm = norm(sourceTests-p_hat_ts);
 
 %---- plot ----
+figure(3)
 plotRoom(roomSize, micsPos, sourceTrain, sourceTests, nL, p_hat_ts);
 
 title('Source Localization Based Off Semi-Supervised Approach')
-mseTxt = text(.5,.55, sprintf('MSE (Test Position Estimate): %s(m)', num2str(round(mse,3))));
+% mseTxt = text(.5,.55, sprintf('MSE (Test Position Estimate): %s(m)', num2str(round(nrm,3))));
 ax = gca;
-ax.TitleFontSizeMultiplier  = 2;
+% ax.TitleFontSizeMultiplier  = 2;

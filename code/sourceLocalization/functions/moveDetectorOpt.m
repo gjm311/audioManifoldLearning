@@ -15,7 +15,7 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetectorOpt(x, trans
     
     %---- Set likelihoods (to be maximized during msg passing calc.) ----
     for k = 1:numArrays
-        theta1 = 2*normpdf(resids(k)*100, 0, init_var);
+        theta1 = 2*normpdf(resids(k)*5, 0, init_var);
         theta2 = (lambda*exp(-lambda*resids(k)))/(1-exp(-lambda*eMax));
         theta3 = unifrnd(0,eMax);
         likes(k,:) = [theta1 theta2 theta3];
@@ -68,15 +68,18 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetectorOpt(x, trans
         prev_posts = posteriors;
     end
 
-    %Calculate probability of misalignment for all subnets (should see higher probabilities of misalignment for subnets with moving array).    
     latents = round(posteriors);
     MIS = sum(latents(:,2))/(numArrays - sum(latents(:,3))+10e-6);
     if MIS > thresh
         p_fail = 1;
-        prob_failure = (1/t)*(p_fails*(t-1)+p_fail);
     else
         p_fail = 0;
-        prob_failure = 0;
     end
-%     prob_failure = (1/t)*(p_fails*(t-1)+p_fail);
+    
+    mis_probs = posteriors(:,2);
+    if sum(latents(:,2)) > 0
+        prob_failure = (1/t)*(p_fails*(t-1)+p_fail)*(mean(mis_probs(latents(:,2) == 1)));
+    else
+        prob_failure = (1/t)*(p_fails*(t-1)+p_fail);
+    end
 end

@@ -31,25 +31,27 @@ gammaL = inv(sigmaL + diag(ones(1,nL).*vari));
 % modelSd = .1;
 
 %simulate different noise levels
-radii = 0:.02:.2;
+radii = 0:.05:.5;
 num_radii = size(radii,2);
 its_per = 2;
 N = 5;
-mic_ref = [3 5 1; 5 3 1; 3 1 1; 1 3 1];
+mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 accs = struct([]);
 wav_folder = dir('./shortSpeech/');
 wav_folder = wav_folder(3:27);
 
 %---- Set MRF params ----
-transMat = [.55 0.4 0.05; .2 .75 0.05; 1/3 1/3 1/3];
-init_var = .21;
-lambda = .28;
-eMax = .31;
+transMat = [.75 0.2 0.05; .2 .75 0.05; 1/3 1/3 1/3];
+init_var = .2;
+lambda = .3;
+eMax = .3;
+thresh = .3;
 threshes = 0:.01:1;
 num_threshes = size(threshes,2);
 
 local_fails = zeros(num_radii, num_threshes);
 p_fails = zeros(num_radii, num_threshes);
+thresh_check = zeros(1,num_threshes);
 
 for riter = 1:num_radii
     radius_mic = radii(riter);
@@ -62,7 +64,7 @@ for riter = 1:num_radii
         %microphones, and random sound file (max 4 seconds).
         sourceTest = randSourcePos(1, roomSize, radiusU*.35, ref);
         movingArray = randi(numArrays);
-        [~, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+        [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
         rand_wav = randi(numel(wav_folder));
         file = wav_folder(rand_wav).name;
         [x_tst,fs_in] = audioread(file);
@@ -86,6 +88,9 @@ for riter = 1:num_radii
         
         local_fails(riter, thr) = mean(mean(((sourceTest-p_hat_t).^2)));
         p_fails(riter, thr) = p_fail;
+        if p_fail > thresh
+            thresh_check(thr) = thresh_check(thr) + 1;
+        end
     end
    
 end
