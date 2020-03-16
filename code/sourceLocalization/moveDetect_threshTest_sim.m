@@ -31,19 +31,16 @@ gammaL = inv(sigmaL + diag(ones(1,nL).*vari));
 % modelSd = .1;
 
 %simulate different noise levels
-radii = 0:.05:.5;
+radii = 0:.1:1;
 num_radii = size(radii,2);
-its_per = 2;
-N = 5;
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
-accs = struct([]);
 wav_folder = dir('./shortSpeech/');
 wav_folder = wav_folder(3:27);
 
 %---- Set MRF params ----
-transMat = [.75 0.2 0.05; .2 .75 0.05; 1/3 1/3 1/3];
+transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
 init_var = .2;
-lambda = .3;
+lambda = .2;
 eMax = .3;
 thresh = .3;
 threshes = 0:.01:1;
@@ -95,4 +92,4 @@ for riter = 1:num_radii
    
 end
 
-save('./mat_results/threshTestResults')
+save('./mat_results/threshTestResults2')
