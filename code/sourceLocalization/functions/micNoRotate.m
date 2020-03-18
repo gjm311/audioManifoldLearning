@@ -1,10 +1,7 @@
 function [rotation,micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics)
     randMicPos = randMicsPos(1, roomSize, radius_mic, mic_ref(movingArray,:));
     rotation = rand*360;
-%     new_x1 = randMicPos(:,1)+.025*cos(rotation);
-%     new_y1 = randMicPos(:,2)+.025*sin(rotation);
-%     new_x2 = randMicPos(:,1)-.025*cos(rotation);
-%     new_y2 = randMicPos(:,2)-.025*sin(rotation);
+    
     if randMicPos == micsPos
         micsPosNew = micsPos;
     elseif movingArray == 1

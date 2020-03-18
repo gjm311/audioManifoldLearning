@@ -60,8 +60,15 @@ for riter = 1:num_radii
         %position is on circle based off radius_mic), random rotation to
         %microphones, and random sound file (max 4 seconds).
         sourceTest = randSourcePos(1, roomSize, radiusU*.35, ref);
-        movingArray = randi(numArrays);
-        [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+%         movingArray = randi(numArrays);
+%         [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+        randMicPos = mic_ref(1,:)+[0 radius_mic 0];
+        new_x1 = randMicPos(:,1)+.025;
+        new_y1 = randMicPos(:,2);
+        new_x2 = randMicPos(:,1)-.025;
+        new_y2 = randMicPos(:,2);
+        micsPosNew = [new_x1 new_y1 1;new_x2 new_y2 1; micsPos(1+numMics:end,:)];
+        
         rand_wav = randi(numel(wav_folder));
         file = wav_folder(rand_wav).name;
         [x_tst,fs_in] = audioread(file);

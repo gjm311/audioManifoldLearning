@@ -1,6 +1,4 @@
-function micPos = randMicsPos(numRand, roomSize, radius, reference)
-    rand_angle = rand*360;
-    
+function micPos = randMicsPos(numRand, roomSize, radius, reference)    
     x1 = reference(1);
     y1 = reference(2);
     z1 = reference(3);

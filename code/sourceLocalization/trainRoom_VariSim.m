@@ -75,7 +75,7 @@ for t = 1:num_ts
         var_cond(n) = var(sourceTest)-sigma_Lt*gammaL*sigma_Lt';
         
     end
-    modelMeans = mean(diffs);
+    modelMeans(t) = mean(diffs);
     modelSds(t) = std(diffs);
     condSds(t) = mean(var_cond);
 end
