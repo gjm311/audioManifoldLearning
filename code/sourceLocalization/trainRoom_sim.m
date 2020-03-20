@@ -58,14 +58,14 @@ disp('Setting up the room');
 % RTF_train = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
 % save('mat_trainParams/biMicCircle_5L300U')
 % 
-% % % % ---- Simulate RTFs between microphones within each node ----
-% % % RTF_train = zeros(numArrays, nD, rtfLen, numMics);
-% % % for t = 1:numArrays
-% % %     curr_mics = micsPos((t-1)*numMics+1:t*numMics,:); 
-% % %     RTF_train(t,:,:,:) = rtfEst(x, curr_mics, rtfLen, 1, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
-% % % end
-% % % save('mat_trainParams/biMicCircle_5L50U_monoNode')
-% 
+% ---- Simulate RTFs between microphones within each node ----
+RTF_train = zeros(numArrays, nD, rtfLen, numMics);
+for t = 1:numArrays
+    curr_mics = micsPos((t-1)*numMics+1:t*numMics,:); 
+    RTF_train(t,:,:,:) = rtfEst(x, curr_mics, rtfLen, 1, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
+end
+save('mat_trainParams/biMicCircle_5L300U_monoNode')
+
 % % ---- load training data (check mat_trainParams for options)----
 % 
 % %Initialize hyper-parameter estimates (gaussian kernel scalar
@@ -97,7 +97,7 @@ disp('Setting up the room');
 load('mat_outputs/monoTestSource_biMicCircle_5L300U')
 
 %---- with optimal params estimate test position ----
-sourceTests = randSourcePos(3, roomSize, radiusU*.35, ref);
+sourceTests = randSourcePos(1, roomSize, radiusU*.35, ref);
 % sourceTests = [3 3 1];
 p_hat_ts = zeros(size(sourceTests));
 for i = 1:size(p_hat_ts)
@@ -112,7 +112,7 @@ nrm = norm(sourceTests-p_hat_ts);
 figure(3)
 plotRoom(roomSize, micsPos, sourceTrain, sourceTests, nL, p_hat_ts);
 
-title('Source Localization Based Off Semi-Supervised Approach')
+% title('Source Localization Based Off Semi-Supervised Approach')
 % mseTxt = text(.5,.55, sprintf('MSE (Test Position Estimate): %s(m)', num2str(round(nrm,3))));
 ax = gca;
 % ax.TitleFontSizeMultiplier  = 2;

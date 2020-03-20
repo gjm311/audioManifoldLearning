@@ -1,10 +1,3 @@
-a = 1;
-b = 0;
-c = 1;
-d = 2;
-e = 1;
 
-
-if or(and(a == e, c == a), and(a == d, a == b))
-    d
-end
+load('mat_results/vari_t60_data.mat')
+save('mat_results/vari_t60_data.mat', 'T60s', 'modelMeans', 'modelSds', 'RTF_trains', 'scales_t', 'gammaLs')

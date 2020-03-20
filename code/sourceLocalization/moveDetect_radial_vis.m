@@ -11,15 +11,19 @@ addpath ./shortSpeech
 disp('Setting up the room');
 % ---- Initialize Parameters for training ----
 
+% load('mat_outputs/biMicCircle_5L300U_monoNode')
+% micRTF_train = RTF_train;
+% micScales = scales;
+% micVaris = varis;
 %---- load training data (check mat_trainParams for options)----
-load('mat_outputs/monoTestSource_biMicCircle_5L100U')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U')
 % load('mat_outputs/movementOptParams')
 
 % modelSd = .1;
 
 %simulate different noise levels
-radii = 0:0.1:.7; 
-its_per = 2;
+radii = 0:.2:1.4; 
+its_per = 1;
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 accs = struct([]);
 wav_folder = dir('./shortSpeech/');
@@ -28,7 +32,7 @@ inits = 1;
 rotation = 0;
 
 transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
-init_var = .2;
+init_var = .1;
 lambda = .2;
 eMax = .3;
 thresh = .3;
@@ -48,7 +52,14 @@ for riter = 1:size(radii,2)
         sourceTest = randSourcePos(1, roomSize, radiusU*.35, ref);
         if inits > 1
             movingArray = randi(numArrays);
-            [rotation, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+            [rotation, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+%             randMicPos = mic_ref(1,:)+[0 radius_mic 0];
+%             new_x1 = randMicPos(:,1)+.025;
+%             new_y1 = randMicPos(:,2);
+%             new_x2 = randMicPos(:,1)-.025;
+%             new_y2 = randMicPos(:,2);
+%             micsPosNew = [new_x1 new_y1 1;new_x2 new_y2 1; micsPos(1+numMics:end,:)];
+        
         else
             movingArray = randi(numArrays);
             micsPosNew = micsPos;
@@ -80,6 +91,31 @@ for riter = 1:size(radii,2)
         [~,~, p_hat_t] = test(x_tst, gammaL, RTF_train, micsPosNew, rirLen, rtfLen, numArrays,...
                         numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
         
+%         mean_naives = zeros(numArrays,1);
+%         sub_naives = zeros(numArrays,1);
+%         naive_p_hat_ts = zeros(numArrays,3);
+%         for k = 1:numArrays
+% %                 [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPos, RTF_train);
+%             subnet = micsPos((k-1)*numMics+1:k*numMics,:);
+%             subscales = micScales(k,:);
+%             gammaL = reshape(gammaLs(k,:,:),[nL,nL]);
+%             trRTF = reshape(micRTF_train(k,:,:,:), [nD, rtfLen, numMics]);
+%             [~,~,naive_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, 1, numMics, sourceTrain,...
+%                 sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
+%             sub_naives(k) = mean((naive_p_hat_ts(k,:)-sub_p_hat_ts(k,:)).^2);
+%         end
+%         
+%         mean_naives(1) = mean(pdist(naive_p_hat_ts(2:4,:)));
+%         mean_naives(2) = mean(pdist([naive_p_hat_ts(1,:); naive_p_hat_ts(3:4,:)]));
+%         mean_naives(3) = mean(pdist([naive_p_hat_ts(1:2,:); naive_p_hat_ts(4,:)]));
+%         mean_naives(4) = mean(pdist(naive_p_hat_ts(1:3,:)));
+%         
+%         %Here we compare single node estimates to that of the sub-net
+%         %without the single node.
+%         sub_naives
+%         mean_naive
+%         naive_p_hat_ts
+                   
         %naive estimate calculated based off variance of new
         %positional estimates and ones taken in training. If estimate sd greater than
         %standard deviation of error of static model then we predict
