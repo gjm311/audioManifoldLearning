@@ -10,6 +10,7 @@ addpath ./shortSpeech
 load('./mat_results/t60results.mat')
 
 tp_check = reshape(tp_check, [1,num_threshes]);
+fp_check = reshape(fp_check, [1,num_threshes]);
 
 
 
