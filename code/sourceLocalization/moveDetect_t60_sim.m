@@ -25,8 +25,8 @@ micScales = scales;
 micVaris = varis;
 micGammaLs = gammaLs;
 
-load('mat_outputs/monoTestSource_biMicCircle_5L300U')
-load('mat_results/vari_t60_data.mat')
+% load('mat_outputs/monoTestSource_biMicCircle_5L300U')
+% load('mat_results/vari_t60_data.mat')
 % load('mat_outputs/movementOptParams')
 % vari = varis_set(I,:);
 % scales = scales_set(I,:);
@@ -34,46 +34,50 @@ load('mat_results/vari_t60_data.mat')
 % gammaL = inv(sigmaL + diag(ones(1,nL).*vari));
 
 %simulate different noise levels
-radii = 0:.2:1.2;
-num_radii = size(radii,2);
-mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
-wavs = dir('./shortSpeech/');
+% radii = 0:.2:1.2;
+% num_radii = size(radii,2);
+% mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
+% wavs = dir('./shortSpeech/');
+% 
+% %---- Set MRF params ----
+% transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
+% init_var = .1;
+% lambda = .2;
+% eMax = .3;
+% threshes = 0:.02:1;
+% naive_threshes = .5:.05:5.5;
+% num_threshes = size(threshes,2);
+% num_iters = 10;
+% num_ts = size(T60s,2);
+% 
+% tp_check = zeros(num_ts,num_threshes);
+% fp_check = zeros(num_ts,num_threshes);
+% tn_check = zeros(num_ts,num_threshes);
+% fn_check = zeros(num_ts,num_threshes);
+% 
+% subNai_tp_check = zeros(num_ts,num_threshes);
+% subNai_fp_check = zeros(num_ts,num_threshes);
+% subNai_tn_check = zeros(num_ts,num_threshes);
+% subNai_fn_check = zeros(num_ts,num_threshes);
+% 
+% nai_tp_check = zeros(num_ts,num_threshes);
+% nai_fp_check = zeros(num_ts,num_threshes);
+% nai_tn_check = zeros(num_ts,num_threshes);
+% nai_fn_check = zeros(num_ts,num_threshes);
+% 
+% mrf_micIDs_corr = zeros(num_ts,num_threshes);
+% subNai_micIDs_corr = zeros(num_ts,num_threshes);
+% nai_micIDs_corr = zeros(num_ts,num_threshes);
+% mrf_micIDs_uncr = zeros(num_ts,num_threshes);
+% subNai_micIDs_uncr = zeros(num_ts,num_threshes);
+% nai_micIDs_uncr = zeros(num_ts,num_threshes);
 
-%---- Set MRF params ----
-transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
-init_var = .1;
-lambda = .2;
-eMax = .3;
-threshes = 0:.02:1;
-naive_threshes = .5:.05:5.5;
-num_threshes = size(threshes,2);
-num_iters = 10;
-num_ts = size(T60s,2);
+load('mat_results/t60results.mat')
 
-tp_check = zeros(num_ts,num_threshes);
-fp_check = zeros(num_ts,num_threshes);
-tn_check = zeros(num_ts,num_threshes);
-fn_check = zeros(num_ts,num_threshes);
-
-subNai_tp_check = zeros(num_ts,num_threshes);
-subNai_fp_check = zeros(num_ts,num_threshes);
-subNai_tn_check = zeros(num_ts,num_threshes);
-subNai_fn_check = zeros(num_ts,num_threshes);
-
-nai_tp_check = zeros(num_ts,num_threshes);
-nai_fp_check = zeros(num_ts,num_threshes);
-nai_tn_check = zeros(num_ts,num_threshes);
-nai_fn_check = zeros(num_ts,num_threshes);
-
-mrf_micIDs_corr = zeros(num_ts,num_threshes);
-subNai_micIDs_corr = zeros(num_ts,num_threshes);
-nai_micIDs_corr = zeros(num_ts,num_threshes);
-mrf_micIDs_uncr = zeros(num_ts,num_threshes);
-subNai_micIDs_uncr = zeros(num_ts,num_threshes);
-nai_micIDs_uncr = zeros(num_ts,num_threshes);
-
-
-for t = 1:num_ts
+for t = 1:num_ts-2
+    if t == 1 || t == 2
+        continue
+    end
     T60 = T60s(t);
     modelMean = modelMeans(t);
     modelSd = modelSds(t);
@@ -113,9 +117,7 @@ for t = 1:num_ts
     end
 
     save('mat_results/t60results')    
-    a 
-    break
 end
 
-save('mat_results/thresh_res')
+% save('mat_results/thresh_res')
 
