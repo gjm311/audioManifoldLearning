@@ -1,8 +1,7 @@
-function [opt_tps, opt_fps, opt_tns, opt_fns, max_auc] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
+function [tps, fps, tns, fns] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
 
     num_radii = size(radii, 2);
     num_threshes = size(threshes, 2);
-    
     opt_tps = 0;
     opt_fps = 0;
     opt_tns = 0;
@@ -56,36 +55,28 @@ function [opt_tps, opt_fps, opt_tns, opt_fns, max_auc] = paramOpt(sourceTrain, w
                 if local_fail > modelMean+modelSd        
                     if p_fail > thresh
                         tp_ch_curr = tp_ch_curr + 1;
+                        tps = tps+1;
                     else
                         fn_ch_curr = fn_ch_curr + 1;
+                        fns = fns+1;
                     end                                                       
                 end
 
                 if local_fail < modelMean+modelSd
                     if p_fail > thresh
                         fp_ch_curr = fp_ch_curr + 1;
+                        fps = fps+1;
                     else
                         tn_ch_curr = tn_ch_curr + 1;
+                        tns = tns+1;
                     end
                 end
             end
+            tpr = tp_ch_curr/(tp_ch_curr+fn_ch_curr);
+            fpr = fp_ch_curr/(fp_ch_curr+tn_ch_curr);
+            auc = trapz(fpr,tpr);
+            
+            
         end
-        tps = tp_ch_curr/(num_iters*num_num_radii);
-        fps = fp_ch_curr/(num_iters*num_num_radii);
-        tns = tn_ch_curr/(num_iters*num_num_radii);
-        fns = fn_ch_curr/(num_iters*num_num_radii);
-        
-        tpr = tps/(tps+fns);
-        fpr = fps/(fps+tns);
-        auc_curr = trapz(fpr,tpr);
-        
-        if auc_curr>max_auc
-           opt_tps = tp_ch_curr;
-           opt_fps = fp_ch_curr;
-           opt_tns = tn_ch_curr;
-           opt_fns = fn_ch_curr;
-           max_auc = auc_curr;
-        end
-        
     end
 end

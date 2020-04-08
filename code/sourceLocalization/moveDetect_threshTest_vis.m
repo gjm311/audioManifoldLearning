@@ -47,6 +47,8 @@ legend([mrf, sub, base], 'MRF-Based Detector', 'Naive Detector (Single Mic vs Le
 xlim([0 1.05])
 % ylim([0 1.05])
 
+figure(2)
+heatmap([sum(tp_check) tn_check; fp_check fn_check]);
 
 figure(2)
 bar(threshes, tp_check)
