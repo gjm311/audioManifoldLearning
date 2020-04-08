@@ -64,6 +64,7 @@ init_scales = 1*ones(1,numMics);
 var_init = rand(1,nL)*.1-.05;
 RTF_train = zeros(num_ts, numArrays, nD, rtfLen, numMics);
 scales = zeros(num_ts, numArrays,numMics);
+varis = zeros(num_ts, numArrays, numMics);
 gammaLs = zeros(num_ts, numArrays, nL, nL);
 
 for t6 = 1:num_ts
@@ -73,7 +74,7 @@ for t6 = 1:num_ts
 
         %Initialize hyper-parameter estimates (gaussian kernel scalar
         %value and noise variance estimate)
-        RTF_curr = reshape(RTF_train(t6,t,:,:,:), [nD, rtfLen, numMics]);
+        RTF_curr = reshape(RTF_train(t,:,:,:), [nD, rtfLen, numMics]);
         [~,sigmaL] = trCovEst(nL, nD, numMics, RTF_curr, kern_typ, init_scales);
 
         %---- perform grad. descent to get optimal params ----
@@ -83,12 +84,11 @@ for t6 = 1:num_ts
         [costs, ~, ~, varis_set, scales_set] = grad_descent(sourceTrainL, numMics, RTF_curr, sigmaL, init_scales, var_init, max_iters, tol, alpha, kern_typ);
         [~,I] = min(sum(costs));
 
-        scales(t6,t,:) = scales_set(I,:);
-        v_curr = varis_set(I,:);
-        [~,sigmaL] = trCovEst(nL, nD, numMics, RTF_curr, kern_typ, scales(t6,t,:));
-        gammaLs(t6,t,:,:) = inv(sigmaL + diag(ones(1,nL).*v_curr));
+        scales(t,:) = scales_set(I,:);
+        vari(t,:) = varis_set(I,:);
+        [~,sigmaL] = trCovEst(nL, nD, numMics, RTF_curr, kern_typ, scales(t,:));
+        gammaLs(t,:,:) = inv(sigmaL + diag(ones(1,nL).*vari(t,:)));
     end
 end
-
-save('mat_outputs/biMicCircle_5L300U_monoNode', 'RTF_train', 'scales', 'gammaLs')
+save('mat_outputs/biMicCircle_5L300U_monoNode')
 
