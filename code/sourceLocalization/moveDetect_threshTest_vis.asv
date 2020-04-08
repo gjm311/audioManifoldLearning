@@ -7,7 +7,7 @@ addpath ./stft
 addpath ./shortSpeech
 
 % load('./mat_results/threshTestResults4')
-load('./mat_results/thresh_res.mat')
+load('./mat_results/t60results.mat')
 t = 1;
 tp_check = reshape(tp_check(t,:), [1,num_threshes]);
 fp_check = reshape(fp_check(t,:), [1,num_threshes]);
@@ -19,7 +19,7 @@ subNai_fp_check = reshape(subNai_fp_check(t,:), [1,num_threshes]);
 subNai_tn_check = reshape(subNai_tn_check(t,:), [1,num_threshes]);
 subNai_fn_check = reshape(subNai_fn_check(t,:), [1,num_threshes]);
 
-%--- Interpolate data and plot ROC curve for naive and mrf detectors ---
+%--- Interpolate data and plot ROC curve for naive and mrf detecto
 xq = 1.5:.05:51;
 mrf_tp_check = interp1(tp_check,xq);
 mrf_fp_check = interp1(fp_check,xq);
@@ -36,20 +36,20 @@ sub_tpr = sort(sub_tp_check./(sub_tp_check+sub_fn_check));
 sub_fpr = sort(sub_fp_check./(sub_fp_check+sub_tn_check));
 
 figure(1)
-mrf = plot(mrf_fpr, mrf_tpr, '-.g');
-hold on
+mrf = plot(mrf_fpr,mrf_tpr, '-.g');
 sub = plot(sub_fpr, sub_tpr, '--b');
 base = plot(threshes,threshes, 'r');
 title(sprintf('ROC Curve: Array Movement Detection (T60 = .15s) \n (70 Trials per Threshold Simulated w/Varying Array Shifts)\n[Shifts: 0 - 1.2m by 10cm increments]'))
 xlabel('FPR')
 ylabel('TPR')
-legend([mrf, sub, base], 'MRF-Based Detector', 'Naive Detector (Single Mic vs Leave One Out SubNet estimate)', 'Baseline', 'Location','southeast')
-xlim([0 1.05])
-% ylim([0 1.05])
+legend([mrf,sub,base], 'MRF-Based Detector', 'Naive Detector', 'Baseline')
+ylim([0 max(tp_check)+5])
 
 
 figure(2)
 bar(threshes, tp_check)
+hold on 
+plot(threshes, f, 'LineWidth',2)
 title(sprintf('True Positive Movement Detections For Different Probability Thresholds\n (70 Trials per Threshold Simulated w/Varying Array Shifts)\n[Shifts: 0 - 0.5m by 5cm increments]'))
 xlabel('Probability Threshold')
 ylabel('Frequency of Flags')
@@ -57,6 +57,8 @@ ylim([0 max(tp_check)+5])
 
 figure(3)
 bar(threshes, fp_check)
+hold on 
+plot(threshes, f, 'LineWidth',2)
 title(sprintf('False Positive Movement Detections For Different Probability Thresholds\n (110 Trials per Threshold Simulated w/Varying Array Shifts)\n[Shifts: 0 - 0.5m by 5cm increments]'))
 xlabel('Probability Threshold')
 ylabel('Frequency of Flags')
