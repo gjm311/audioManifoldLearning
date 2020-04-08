@@ -71,7 +71,7 @@ for t = 1:size(ts,2)
     scales = scales_t(t_curr,:);
     gammaL = reshape(gammaLs(t_curr,:,:), [nL, nL]);
     micRTF_train = reshape(micRTF_trains(t_curr,:,:,:), [numArrays, nD, rtfLen, numMics]);
-    micScale = reshape(micScales(t_curr,:,:), [numMics, numArrays]);
+    micScale = reshape(micScales(t_curr,:,:), [numArrays,numMics]);
     micGammaL = reshape(micGammaLs(t_curr,:,:,:), [numArrays,nL,nL]);
 
     for thr = 1:num_threshes
