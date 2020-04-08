@@ -70,10 +70,10 @@ function [opt_tps, opt_fps, opt_tns, opt_fns, max_auc] = paramOpt(sourceTrain, w
                 end
             end
         end
-        tps = tp_ch_curr/(num_iters*num_num_radii);
-        fps = fp_ch_curr/(num_iters*num_num_radii);
-        tns = tn_ch_curr/(num_iters*num_num_radii);
-        fns = fn_ch_curr/(num_iters*num_num_radii);
+        tps = tp_ch_curr/(num_iters*num_radii);
+        fps = fp_ch_curr/(num_iters*num_radii);
+        tns = tn_ch_curr/(num_iters*num_radii);
+        fns = fn_ch_curr/(num_iters*num_radii);
         
         tpr = tps/(tps+fns);
         fpr = fps/(fps+tns);

@@ -19,10 +19,6 @@ disp('Setting up the room');
 % ---- Initialize Parameters for training ----
 
 %---- load training data (check mat_trainParams for options)----
-load('mat_outputs/biMicCircle_5L300U_monoNode')
-micRTF_train = RTF_train;
-micScales = scales;
-micVaris = varis;
 load('mat_results/vari_t60_data')
 load('mat_outputs/monoTestSource_biMicCircle_5L300U')
 
@@ -37,14 +33,7 @@ radii = 0:.1:.6;
 % num_radii = size(radii,2);
 num_radii = 3;
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
-T60s = [T60s(1) T60s(3) T60s(6)];
-gammas = zeros(3,nL,nL);
-gammas(1,:,:) = reshape(gammaLs(1,:,:),[nL, nL]);
-gammas(2,:,:) = reshape(gammaLs(3,:,:),[nL, nL]);
-gammas(3,:,:) = reshape(gammaLs(6,:,:),[nL, nL]);
-gammaLs = gammas;
-modelMeans = [modelMeans(1) modelMeans(3) modelMeans(6)];
-modelSds = [modelSds(1) modelSds(3) modelSds(6)];
+
 %---- Set MRF params ----
 transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
 init_vars = .05:.1:1.05;
@@ -87,12 +76,12 @@ for lam = 1:numLams
         for t = 1:num_ts    
             t_currs = [1 3 6];
             t_curr = t_currs(t);
-            T60 = T60s(t);
-            modelMean = modelMeans(t);
-            modelSd = modelSds(t);
+            T60 = T60s(t_curr);
+            modelMean = modelMeans(t_curr);
+            modelSd = modelSds(t_curr);
             RTF_train = reshape(RTF_trains(t_curr,:,:,:), [nD, rtfLen, numArrays]);    
             scales = scales_t(t_curr,:);
-            gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
+            gammaL = reshape(gammaLs(t_curr,:,:), [nL, nL]);            
             radii = [0 modelMean (modelMean+modelSd)*1.5];
 
             [tp_out, fp_out, tn_out, fn_out, auc_out] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
