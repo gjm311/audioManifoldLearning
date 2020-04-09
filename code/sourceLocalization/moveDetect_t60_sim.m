@@ -43,53 +43,41 @@ transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
 init_var = .1;
 lambda = .2;
 eMax = .3;
-threshes = 0:.02:1;
-naive_threshes = .5:.02:1.5;
+threshes = 0:.04:1;
+naive_threshes = .1:.02:6;
+sub_threshes = 0;
 num_threshes = size(threshes,2);
 num_iters = 10;
 num_ts = size(T60s,2);
 
-% tp_check = zeros(num_ts,num_threshes);
-% fp_check = zeros(num_ts,num_threshes);
-% tn_check = zeros(num_ts,num_threshes);
-% fn_check = zeros(num_ts,num_threshes);
-% 
-% subNai_tp_check = zeros(num_ts,num_threshes);
-% subNai_fp_check = zeros(num_ts,num_threshes);
-% subNai_tn_check = zeros(num_ts,num_threshes);
-% subNai_fn_check = zeros(num_ts,num_threshes);
-
-t_str = struct([]);
-ts = [1 2 3 4 5 6];
-
-for t = 1:size(ts,2)
-    t_curr = ts(t);
-    T60 = T60s(t_curr);
-    modelMean = modelMeans(t_curr);
-    modelSd = modelSds(t_curr);
-    RTF_train = reshape(RTF_trains(t_curr,:,:,:), [nD, rtfLen, numArrays]);    
-    scales = scales_t(t_curr,:);
-    gammaL = reshape(gammaLs(t_curr,:,:), [nL, nL]);
-    micRTF_train = reshape(micRTF_trains(t_curr,:,:,:), [numArrays, nD, rtfLen, numMics]);
-    micScale = reshape(micScales(t_curr,:,:), [numArrays,numMics]);
-    micGammaL = reshape(micGammaLs(t_curr,:,:,:), [numArrays,nL,nL]);
+for t = 1:num_ts
+    T60 = T60s(t);
+    modelMean = modelMeans(t);
+    modelSd = modelSds(t);
+    RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
+    scales = scales_t(t,:);
+    gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
+    micRTF_train = reshape(micRTF_trains(t,:,:,:), [numArrays, nD, rtfLen, numMics]);
+    micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
+    micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
 
     for thr = 1:num_threshes
         
         thresh = threshes(thr);
         naive_thresh = naive_threshes(thr);
+        sub_thresh = sub_threshes(thr);
         
-        [mrf_res, sub_res] = t60Opt(nD, thresh, naive_thresh, micScale, micGammaL, micRTF_train, sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
+        [mrf_res, nai_res, sub_res] = t60Opt(nD, thresh, naive_thresh, sub_thresh, micScale, micGammaL, micRTF_train, sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
         
         t_str(t,thr).tp_check = mrf_res(1);
         t_str(t,thr).fp_check = mrf_res(2);
         t_str(t,thr).tn_check = mrf_res(3);
         t_str(t,thr).fn_check = mrf_res(4);
         
-        t_str(t,thr).subNai_tp_check = sub_res(1);
-        t_str(t,thr).subNai_fp_check = sub_res(2);
-        t_str(t,thr).subNai_tn_check = sub_res(3);
-        t_str(t,thr).subNai_fn_check = sub_res(4);
+        t_str(t,thr).nai_tp_check = nai_res(1);
+        t_str(t,thr).nai_fp_check = nai_res(2);
+        t_str(t,thr).nai_tn_check = nai_res(3);
+        t_str(t,thr).nai_fn_check = nai_res(4);
 
         t_str(t,thr).subNai_tp_check = sub_res(1);
         t_str(t,thr).subNai_fp_check = sub_res(2);
@@ -98,7 +86,7 @@ for t = 1:size(ts,2)
         
     end
 
-    save('mat_results/t60results2', 't_str', 'threshes', 'naive_threshes')    
+    save('mat_results/t60results2', 't_str', 'threshes', 'naive_threshes', 'sub_threshes')    
 end
 
 % save('mat_results/thresh_res')
