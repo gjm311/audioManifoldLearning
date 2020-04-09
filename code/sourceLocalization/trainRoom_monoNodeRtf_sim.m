@@ -64,6 +64,7 @@ micScales = zeros(num_ts, numArrays,numMics);
 micGammaLs = zeros(num_ts, numArrays, nL, nL);
 
 for t6 = 1:num_ts
+    T60 = T60s(t6);
     for t = 1:numArrays
         curr_mics = micsPos((t-1)*numMics+1:t*numMics,:); 
         micRTF_trains(t6,t,:,:,:) = rtfEst(x, curr_mics, rtfLen, 1, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
