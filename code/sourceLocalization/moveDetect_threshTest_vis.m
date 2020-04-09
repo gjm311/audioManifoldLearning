@@ -30,10 +30,10 @@ sub_fp_check = interp1(subNai_fp_check,xq);
 sub_tn_check = interp1(subNai_tn_check,xq);
 sub_fn_check = interp1(subNai_fn_check,xq);
 
-mrf_tpr = sort(mrf_tp_check./(mrf_tp_check+mrf_fn_check));
-mrf_fpr = sort(mrf_fp_check./(mrf_fp_check+mrf_tn_check));
-sub_tpr = sort(sub_tp_check./(sub_tp_check+sub_fn_check));
-sub_fpr = sort(sub_fp_check./(sub_fp_check+sub_tn_check));
+mrf_tpr = sort(mrf_tp_check./(mrf_tp_check+mrf_fn_check+10e-6));
+mrf_fpr = sort(mrf_fp_check./(mrf_fp_check+mrf_tn_check+10e-6));
+sub_tpr = sort(sub_tp_check./(sub_tp_check+sub_fn_check+10e-6));
+sub_fpr = sort(sub_fp_check./(sub_fp_check+sub_tn_check+10e-6));
 
 figure(1)
 mrf = plot(mrf_fpr, mrf_tpr, '-.g');

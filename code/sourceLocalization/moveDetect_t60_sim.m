@@ -85,6 +85,11 @@ for t = 1:size(ts,2)
         t_str(t,thr).fp_check = mrf_res(2);
         t_str(t,thr).tn_check = mrf_res(3);
         t_str(t,thr).fn_check = mrf_res(4);
+        
+        t_str(t,thr).subNai_tp_check = sub_res(1);
+        t_str(t,thr).subNai_fp_check = sub_res(2);
+        t_str(t,thr).subNai_tn_check = sub_res(3);
+        t_str(t,thr).subNai_fn_check = sub_res(4);
 
         t_str(t,thr).subNai_tp_check = sub_res(1);
         t_str(t,thr).subNai_fp_check = sub_res(2);

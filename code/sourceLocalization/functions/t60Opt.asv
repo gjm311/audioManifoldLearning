@@ -1,8 +1,5 @@
-function [mrf_res, nai_res, sub_res, mrfID_res, naiID_res, subID_res] = t60Opt(naive_thresh, micScales, micGammaLs, micRTF_train, sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
+function [mrf_res, nai_res, sub_res] = t60Opt(nD, thresh, naive_thresh, sub_thresh, micScales, micGammaLs, micRTF_train, sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
     num_radii = size(radii, 2);
-    num_threshes = size(threshes, 2);    
-    local_fails = zeros(num_radii, num_threshes);
-    p_fails = zeros(num_radii, num_threshes);
     
     tp_ch_curr = 0;
     fp_ch_curr = 0;
@@ -13,18 +10,6 @@ function [mrf_res, nai_res, sub_res, mrfID_res, naiID_res, subID_res] = t60Opt(n
     sub_fp_ch_curr = 0;
     sub_tn_ch_curr = 0;
     sub_fn_ch_curr = 0;
-
-    mean_tp_ch_curr = 0;
-    mean_fp_ch_curr = 0;
-    mean_tn_ch_curr = 0;
-    mean_fn_ch_curr = 0;
-
-    mrfID_corr = 0;
-    naiID_corr = 0;
-    subNaiID_corr = 0;
-    mrfID_uncr = 0;
-    naiID_uncr = 0;
-    subNaiID_uncr = 0;
 
     for riter = 1:num_radii
         radius_mic = radii(riter);
@@ -55,7 +40,7 @@ function [mrf_res, nai_res, sub_res, mrfID_res, naiID_res, subID_res] = t60Opt(n
                 [~,~,sub_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
                     sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
             end
-            [~, p_fail, posteriors] = moveDetectorOpt(x_tst, transMat, init_var, lambda, eMax, thresh, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
+            [~, p_fail, ~] = moveDetectorOpt(x_tst, transMat, init_var, lambda, eMax, thresh, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
                     rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ);
 
         %     %---- estimate test positions after movement ----
@@ -83,49 +68,27 @@ function [mrf_res, nai_res, sub_res, mrfID_res, naiID_res, subID_res] = t60Opt(n
 
             local_fail = mean(mean(((sourceTest-p_hat_t).^2)));
 
-            local_fails(riter, thr) = local_fails(t,riter, thr)+local_fail;
-            p_fails(riter, thr) = p_fails(t,riter, thr)+p_fail;
-
-            mrfMovingArray = find(round(posteriors(:,2),1));
-
-            if local_fail > modelMean+modelSd              
-                if movingArray == mrfMovingArray
-                    mrfID_corr = mrfID_corr+1;
-                else
-                    mrfID_uncr = mrfID_uncr+1;
-                end
-
+            if local_fail >= modelMean+modelSd              
                 if p_fail > thresh
                     tp_ch_curr = tp_ch_curr + 1;
                 else
                     fn_ch_curr = fn_ch_curr + 1;
                 end
                 for k = 1:numArrays
-                    if sub_naives(k) > naive_thresh
+                    if sub_naives(k) >= naive_thresh
                         sub_tp_ch_curr = sub_tp_ch_curr+1;
                         break
                     elseif k == 4
                        sub_fn_ch_curr = sub_fn_ch_curr+1;
                     end
                 end
-                if k == movingArray
-                   subNaiID_corr = subNaiID_corr + 1;
-                else
-                   subNaiID_uncr = subNaiID_uncr + 1;
-                end
-
                 for k = 1:numArrays
-                    if mean_naives(k) > naive_thresh
+                    if mean_naives(k) >= naive_thresh
                         mean_tp_ch_curr = mean_tp_ch_curr+1;
                         break
                     elseif k == 4
-                        mean_fn_ch_curr = mean_fn_ch_curr+1;
+                       mean_fn_ch_curr = mean_fn_ch_curr+1;
                     end
-                end
-                if k == movingArray
-                    naiID_corr = naiID_corr+1;
-                else 
-                    naiID_uncr =  naiID_uncr+1;
                 end
             end
 
@@ -136,29 +99,20 @@ function [mrf_res, nai_res, sub_res, mrfID_res, naiID_res, subID_res] = t60Opt(n
                     tn_ch_curr = tn_ch_curr + 1;
                 end
                 for k = 1:numArrays
-                    if sub_naives(k) > naive_thresh
+                    if sub_naives(k) > sub_thresh
                         sub_fp_ch_curr = sub_fp_ch_curr+1;
                         break
                     elseif k == 4
                         sub_tn_ch_curr = sub_tn_ch_curr+1;
                     end
                 end
-                for k = 1:numArrays
-                    if mean_naives(k) > naive_thresh
-                        mean_fp_ch_curr = mean_fp_ch_curr+1;
-                        break
-                    elseif k == 4
-                        mean_tn_ch_curr = mean_tn_ch_curr+1;
-                    end
-                end
+                
+                
             end
         end
     end
-    mrf_res = [tp_ch_curr fp_ch_curr tn_ch_curr fn_ch_curr];
-    nai_res = [sub_tp_ch_curr sub_fp_ch_curr sub_tn_ch_currsub_fn_ch_curr];
-    sub_res = [mean_tp_ch_curr mean_fp_ch_curr mean_tn_ch_curr mean_fn_ch_curr];
-    mrfID_res = [mrfID_corr mrfID_uncr];
-    naiID_res = [naiID_corr naiID_uncr];
-    subID_res = [subNaiID_corr subNaiID_uncr];
-
+    mrf_res = [tp_ch_curr fp_ch_curr tn_ch_curr fn_ch_curr]./num_iters*num_radii;
+    nai_res = [mean_tp_ch_curr mean_fp_ch_curr mean_tn_ch_curr mean_fn_ch_curr]./num_iters*num_radii;
+    sub_res = [sub_tp_ch_curr sub_fp_ch_curr sub_tn_ch_curr sub_fn_ch_curr]./num_iters*num_radii;
+    
 end

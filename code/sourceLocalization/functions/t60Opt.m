@@ -1,4 +1,4 @@
-function [mrf_res, sub_res] = t60Opt(nD, thresh, naive_thresh, micScales, micGammaLs, micRTF_train, sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
+function [mrf_res, nai_res, sub_res] = t60Opt(nD, thresh, naive_thresh, sub_thresh, micScales, micGammaLs, micRTF_train, sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
     num_radii = size(radii, 2);
     
     tp_ch_curr = 0;
@@ -40,13 +40,14 @@ function [mrf_res, sub_res] = t60Opt(nD, thresh, naive_thresh, micScales, micGam
                 [~,~,sub_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
                     sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
             end
-            [~, p_fail, posteriors] = moveDetectorOpt(x_tst, transMat, init_var, lambda, eMax, thresh, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
+            [~, p_fail, ~] = moveDetectorOpt(x_tst, transMat, init_var, lambda, eMax, thresh, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
                     rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ);
 
         %     %---- estimate test positions after movement ----
             [~,~, p_hat_t] = test(x_tst, gammaL, RTF_train, micsPosNew, rirLen, rtfLen, numArrays,...
                             numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
 
+            mean_naives = zeros(numArrays,1);
             sub_naives = zeros(numArrays,1);
             naive_p_hat_ts = zeros(numArrays,3);
             for k = 1:numArrays
@@ -60,16 +61,29 @@ function [mrf_res, sub_res] = t60Opt(nD, thresh, naive_thresh, micScales, micGam
                 sub_naives(k) = mean((naive_p_hat_ts(k,:)-sub_p_hat_ts(k,:)).^2);
             end
 
+            mean_naives(1) = mean(pdist(naive_p_hat_ts(2:4,:)));
+            mean_naives(2) = mean(pdist([naive_p_hat_ts(1,:); naive_p_hat_ts(3:4,:)]));
+            mean_naives(3) = mean(pdist([naive_p_hat_ts(1:2,:); naive_p_hat_ts(4,:)]));
+            mean_naives(4) = mean(pdist(naive_p_hat_ts(1:3,:)));
+
             local_fail = mean(mean(((sourceTest-p_hat_t).^2)));
 
             if local_fail > modelMean+modelSd              
-                if p_fail > thresh
+                if p_fail >= thresh
                     tp_ch_curr = tp_ch_curr + 1;
                 else
                     fn_ch_curr = fn_ch_curr + 1;
                 end
                 for k = 1:numArrays
-                    if sub_naives(k) > naive_thresh
+                    if mean_naives(k) >= naive_thresh
+                        mean_tp_ch_curr = mean_tp_ch_curr+1;
+                        break
+                    elseif k == 4
+                       mean_fn_ch_curr = mean_fn_ch_curr+1;
+                    end
+                end
+                for k = 1:numArrays
+                    if sub_naives(k) >= sub_thresh
                         sub_tp_ch_curr = sub_tp_ch_curr+1;
                         break
                     elseif k == 4
@@ -85,17 +99,27 @@ function [mrf_res, sub_res] = t60Opt(nD, thresh, naive_thresh, micScales, micGam
                     tn_ch_curr = tn_ch_curr + 1;
                 end
                 for k = 1:numArrays
-                    if sub_naives(k) > naive_thresh
+                    if mean_naives(k) > naive_thresh
+                        mean_fp_ch_curr = mean_fp_ch_curr+1;
+                        break
+                    elseif k == 4
+                        mean_tn_ch_curr = mean_tn_ch_curr+1;
+                    end
+                end
+                for k = 1:numArrays
+                    if sub_naives(k) > sub_thresh
                         sub_fp_ch_curr = sub_fp_ch_curr+1;
                         break
                     elseif k == 4
                         sub_tn_ch_curr = sub_tn_ch_curr+1;
                     end
                 end
-                
+                                
             end
         end
     end
     mrf_res = [tp_ch_curr fp_ch_curr tn_ch_curr fn_ch_curr]./num_iters*num_radii;
-    sub_res = [mean_tp_ch_curr mean_fp_ch_curr mean_tn_ch_curr mean_fn_ch_curr]./num_iters*num_radii;
+    nai_res = [mean_tp_ch_curr mean_fp_ch_curr mean_tn_ch_curr mean_fn_ch_curr]./num_iters*num_radii;
+    sub_res = [sub_tp_ch_curr sub_fp_ch_curr sub_tn_ch_curr sub_fn_ch_curr]./num_iters*num_radii;
+    
 end
