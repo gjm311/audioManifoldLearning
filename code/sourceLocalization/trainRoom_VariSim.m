@@ -87,8 +87,8 @@ for t = 1:num_ts
         mean_naives(3) = mean_naives(3)+ mean(pdist([naive_p_hat_ts(1:2,:); naive_p_hat_ts(4,:)]));
         mean_naives(4) = mean_naives(4)+ mean(pdist(naive_p_hat_ts(1:3,:)));
     end
-    mean_naives = mean_naives./num_iters;
-    sub_naives = sub_naives./num_iters;
+    mean_naives = mean_naives./num_samples;
+    sub_naives = sub_naives./num_samples;
     
     modelMeans(t) = mean(diffs);
     modelSds(t) = std(diffs);
