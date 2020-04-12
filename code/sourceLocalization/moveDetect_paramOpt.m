@@ -55,8 +55,8 @@ numLams = size(lambdas,2);
 % fn_check = zeros(1,num_threshes);
 wavs = dir('./shortSpeech/');
 
-tprs = zeros(numLams, numVaris);
-fprs = zeros(numLams, numVaris);
+tprs = zeros(num_threshes, numLams, numVaris);
+fprs = zeros(num_threshes, numLams, numVaris);
 aucs = zeros(numLams, numVaris);
 
 for lam = 1:numLams
@@ -66,8 +66,8 @@ for lam = 1:numLams
         
         init_var = init_vars(v);
         
-        tprs_ch_curr = zeros(1,num_ts);
-        fprs_ch_curr = zeros(1,num_ts);
+        tpr_ch_curr = zeros(1,num_ts);
+        fpr_ch_curr = zeros(1,num_ts);
             
         for t = 1:num_ts    
             t_currs = [1 3 8];
@@ -84,8 +84,8 @@ for lam = 1:numLams
             tpr_ch_curr = tpr_ch_curr + tpr_out;
             fpr_ch_curr = fpr_ch_curr + fpr_out;
         end
-        tprs(lam,v) = tpr_ch_curr./(num_ts);
-        fprs(lam,v) = fpr_ch_curr./(num_ts);
+        tprs(:,lam,v) = tpr_ch_curr./(num_ts);
+        fprs(:,lam,v) = fpr_ch_curr./(num_ts);
         aucs(lam,v) = trapz(fprs,tprs);
 
     end

@@ -61,7 +61,7 @@ for t = 1:num_ts
         sourceTest = randSourcePos(1, roomSize, radiusU*.35, ref);
         [~,~, p_hat_t] = test(x_tst, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                     numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
-        diffs(n) = mean(mean(((sourceTest-p_hat_ts).^2)));
+        diffs(n) = mean(mean(((sourceTest-p_hat_t).^2)));
         
         %Naive Estimates
         %Sub-network Estimates
