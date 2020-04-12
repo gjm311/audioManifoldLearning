@@ -16,7 +16,6 @@ addpath ./shortSpeech
 % ---- TRAINING DATA ----
 % room setup
 disp('Setting up the room');
-
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 load('mat_outputs/biMicCircle_5L300U_monoNode_2')
 
@@ -34,9 +33,13 @@ subNaiSds = zeros(1,num_ts);
 for t = 1:num_ts
     
     T60 = T60s(t);
-    RTF_train = reshape(RTF_trains(t,:,:,:),[nD,rtfLen,numArrays]);
+%     RTF_train = reshape(RTF_trains(t,:,:,:),[nD,rtfLen,numArrays]);
+    RTF_train = rtfEst(x, micsPos, rtfLen, numArrays, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);  
     scales = scales_t(t,:);
-    gammaL = reshape(gammaLs(t,:,:), [nL,nL]);
+%     gammaL = reshape(gammaLs(t,:,:), [nL,nL]);
+    [~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales_t(t,:));
+    gammaL = inv(sigmaL + diag(ones(1,nL).*vari));
+    gammaLs(t,:,:) = gammaL;
     micRTF_train = reshape(micRTF_trains(t,:,:,:,:),[numArrays,nD,rtfLen,numMics]);
     micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
     micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
