@@ -23,7 +23,8 @@ addpath ./shortSpeech
 disp('Setting up the room');
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 
-T60 = .2;
+%Chosse T60 from .2, .5. or .8
+T60 = .5;
 t = find(T60s==T60);
 RTF_train = reshape(RTF_trains(t,:,:,:),[nD,rtfLen,numArrays]);
 scales = scales_t(t,:);

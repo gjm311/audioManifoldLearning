@@ -1,12 +1,8 @@
-function [opt_tps, opt_fps, opt_tns, opt_fns, max_auc] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
+function [tpr, fpr] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
 
     num_radii = size(radii, 2);
     num_threshes = size(threshes, 2);
    
-    tps = zeros(1,num_threshes);
-    fps = zeros(1,num_threshes);
-    tns = zeros(1,num_threshes);
-    fns = zeros(1,num_threshes);
     tprs = zeros(1,num_threshes);
     fprs = zeros(1,num_threshes);
     
@@ -71,28 +67,13 @@ function [opt_tps, opt_fps, opt_tns, opt_fns, max_auc] = paramOpt(sourceTrain, w
                 end
             end
         end
-        tps(t) = tp_ch_curr/(num_iters*num_radii);
-        fps(t) = fp_ch_curr/(num_iters*num_radii);
-        tns(t) = tn_ch_curr/(num_iters*num_radii);
-        fns(t) = fn_ch_curr/(num_iters*num_radii);
+        tps = tp_ch_curr/(num_iters*num_radii);
+        fps = fp_ch_curr/(num_iters*num_radii);
+        tns = tn_ch_curr/(num_iters*num_radii);
+        fns = fn_ch_curr/(num_iters*num_radii);
         
-        tprs(t) = tps(t)/(tps(t)+fns(t));
-        fprs(t) = fps(t)/(fps(t)+tns(t));        
+        tprs(thr) = tps(thr)/(tps(thr)+fns(thr));
+        fprs(thr) = fps(thr)/(fps(thr)+tns(thr));        
     end
     
-    opt_tps = 0;
-    opt_fps = 0;
-    opt_tns = 0;
-    opt_fns = 0;   
-    max_auc = 0;    
-    for th = 1:num_threshes
-        auc_curr = trapz(fprs(t),tprs(t));
-        if auc_curr>max_auc
-           opt_tps = tps(th);
-           opt_fps = fps(th);
-           opt_tns = tns(th);
-           opt_fns = fns(th);
-           max_auc = auc_curr;
-        end
-    end
 end

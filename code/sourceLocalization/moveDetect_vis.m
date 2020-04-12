@@ -7,7 +7,10 @@ addpath ./stft
 addpath ./shortSpeech
 
 % load('./mat_results/threshTestResults4')
-load('./mat_results/thresh_res.mat')
+load('./mat_results/t60results2.mat')
+for 
+
+
 t = 1;
 tp_check = reshape(tp_check(t,:), [1,num_threshes]);
 fp_check = reshape(fp_check(t,:), [1,num_threshes]);
@@ -47,19 +50,19 @@ legend([mrf, sub, base], 'MRF-Based Detector', 'Naive Detector (Single Mic vs Le
 xlim([0 1.05])
 % ylim([0 1.05])
 
-figure(2)
-heatmap([sum(tp_check) tn_check; fp_check fn_check]);
-
-figure(2)
-bar(threshes, tp_check)
-title(sprintf('True Positive Movement Detections For Different Probability Thresholds\n (70 Trials per Threshold Simulated w/Varying Array Shifts)\n[Shifts: 0 - 0.5m by 5cm increments]'))
-xlabel('Probability Threshold')
-ylabel('Frequency of Flags')
-ylim([0 max(tp_check)+5])
-
-figure(3)
-bar(threshes, fp_check)
-title(sprintf('False Positive Movement Detections For Different Probability Thresholds\n (110 Trials per Threshold Simulated w/Varying Array Shifts)\n[Shifts: 0 - 0.5m by 5cm increments]'))
-xlabel('Probability Threshold')
-ylabel('Frequency of Flags')
-ylim([0 max(fp_check)+5])
+% figure(2)
+% heatmap([sum(tp_check) tn_check; fp_check fn_check]);
+% 
+% figure(2)
+% bar(threshes, tp_check)
+% title(sprintf('True Positive Movement Detections For Different Probability Thresholds\n (70 Trials per Threshold Simulated w/Varying Array Shifts)\n[Shifts: 0 - 0.5m by 5cm increments]'))
+% xlabel('Probability Threshold')
+% ylabel('Frequency of Flags')
+% ylim([0 max(tp_check)+5])
+% 
+% figure(3)
+% bar(threshes, fp_check)
+% title(sprintf('False Positive Movement Detections For Different Probability Thresholds\n (110 Trials per Threshold Simulated w/Varying Array Shifts)\n[Shifts: 0 - 0.5m by 5cm increments]'))
+% xlabel('Probability Threshold')
+% ylabel('Frequency of Flags')
+% ylim([0 max(fp_check)+5])

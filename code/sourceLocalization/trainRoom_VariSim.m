@@ -68,7 +68,7 @@ for t = 1:num_ts
         sub_p_hat_ts = zeros(numArrays, 3); 
         for k = 1:numArrays
             [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPos, RTF_train);
-            [~,~,sub_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
+            [~,~,sub_p_hat_ts(k,:)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
                 sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
         end
         
@@ -78,7 +78,7 @@ for t = 1:num_ts
             subscales = micScale(k,:);
             gammaL = reshape(micGammaL(k,:,:),[nL,nL]);
             trRTF = reshape(micRTF_train(k,:,:,:), [nD, rtfLen, numMics]);
-            [~,~,naive_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, 1, numMics, sourceTrain,...
+            [~,~,naive_p_hat_ts(k,:)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, 1, numMics, sourceTrain,...
                 sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
             sub_naives(k) = sub_naives(k) + mean((naive_p_hat_ts(k,:)-sub_p_hat_ts(k,:)).^2);
         end

@@ -39,7 +39,7 @@ transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
 init_vars = .05:.1:1.05;
 lambdas = .05:.1:.75;
 eMax = .3;
-threshes = 0.3:.1:0.6;
+threshes = 0:.02:1;
 num_threshes = size(threshes,2);
 num_iters = 3;
 num_ts = size(T60s,2);
@@ -55,9 +55,8 @@ numLams = size(lambdas,2);
 % fn_check = zeros(1,num_threshes);
 wavs = dir('./shortSpeech/');
 
-accs = zeros(numLams, numVaris);
-sens = zeros(numLams, numVaris);
-specs = zeros(numLams, numVaris);
+tprs = zeros(numLams, numVaris);
+fprs = zeros(numLams, numVaris);
 aucs = zeros(numLams, numVaris);
 
 for lam = 1:numLams
@@ -67,14 +66,11 @@ for lam = 1:numLams
         
         init_var = init_vars(v);
         
-        tp_ch_curr = 0;
-        fp_ch_curr = 0;
-        tn_ch_curr = 0;
-        fn_ch_curr = 0;
-        auc_ch_curr = 0;
+        tprs_ch_curr = zeros(1,num_ts);
+        fprs_ch_curr = zeros(1,num_ts);
             
         for t = 1:num_ts    
-            t_currs = [1 3 6];
+            t_currs = [1 3 8];
             t_curr = t_currs(t);
             T60 = T60s(t_curr);
             modelMean = modelMeans(t_curr);
@@ -84,23 +80,15 @@ for lam = 1:numLams
             gammaL = reshape(gammaLs(t_curr,:,:), [nL, nL]);            
             radii = [0 modelMean (modelMean+modelSd)*1.5];
 
-            [tp_out, fp_out, tn_out, fn_out, auc_out] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
-            tp_ch_curr = tp_ch_curr + tp_out;
-            fp_ch_curr = fp_ch_curr + fp_out;
-            tn_ch_curr = tn_ch_curr + tn_out;
-            fn_ch_curr = fn_ch_curr + fn_out;
-            auc_ch_curr = auc_ch_curr + auc_out;
+            [tpr_out, fpr_out] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
+            tpr_ch_curr = tpr_ch_curr + tpr_out;
+            fpr_ch_curr = fpr_ch_curr + fpr_out;
         end
-        tps = tp_ch_curr./(num_ts);
-        fps = fp_ch_curr./(num_ts);
-        tns = tn_ch_curr./(num_ts);
-        fns = fn_ch_curr./(num_ts);
-        aucs(lam,v) = auc_ch_curr/num_ts;
+        tprs(lam,v) = tpr_ch_curr./(num_ts);
+        fprs(lam,v) = fpr_ch_curr./(num_ts);
+        aucs(lam,v) = trapz(fprs,tprs);
 
-        accs(lam,v) = (tps+tns)/(tps+tns+fns+fps);
-        sens(lam,v) = tps/(tps+fns);
-        specs(lam,v) = tns/(tns+fps);
     end
-    save('paramOpt_results', 'accs', 'sens', 'specs', 'aucs');   
+    save('paramOpt_results', 'tprs', 'fprs', 'aucs');   
 end
 
