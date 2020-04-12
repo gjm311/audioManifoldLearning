@@ -31,10 +31,6 @@ naiSds = zeros(1,num_ts);
 subNaiMeans = zeros(1,num_ts);
 subNaiSds = zeros(1,num_ts);
 
-mean_naives = zeros(numArrays,1);
-sub_naives = zeros(numArrays,1);
-naive_p_hat_ts = zeros(numArrays,3);
-
 for t = 1:num_ts
     
     T60 = T60s(t);
@@ -44,6 +40,10 @@ for t = 1:num_ts
     micRTF_train = reshape(micRTF_trains(t,:,:,:,:),[numArrays,nD,rtfLen,numMics]);
     micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
     micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
+    
+    mean_naives = zeros(numArrays,1);
+    sub_naives = zeros(numArrays,1);
+    naive_p_hat_ts = zeros(numArrays,3);
     
     for n = 1:num_samples
         try
@@ -59,9 +59,9 @@ for t = 1:num_ts
         end
         
         sourceTest = randSourcePos(1, roomSize, radiusU*.35, ref);
-        [~,~, p_hat_t] = test(x, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
+        [~,~, p_hat_t] = test(x_tst, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                     numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
-        diffs(n) = norm(sourceTest-p_hat_t);
+        diffs(n) = mean(mean(((sourceTest-p_hat_ts).^2)));
         
         %Naive Estimates
         %Sub-network Estimates

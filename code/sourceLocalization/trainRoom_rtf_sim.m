@@ -78,7 +78,6 @@ for t = 1:num_ts
     [costs, ~, ~, varis_set, scales_set] = grad_descent(sourceTrainL, numArrays, RTF_train_curr, sigmaL, init_scales, var_init, max_iters, tol, alpha, kern_typ);
     [~,I] = min(sum(costs));
 
-    % load('mat_outputs/monoTestSource_biMicCircle_5L100U')
     scales_t(t,:) = scales_set(I,:);
     vari = varis_set(I,:);
     % vari = .01;

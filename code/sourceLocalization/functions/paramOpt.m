@@ -1,4 +1,4 @@
-function [tpr, fpr] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
+function [tprs, fprs] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
 
     num_radii = size(radii, 2);
     num_threshes = size(threshes, 2);
@@ -72,8 +72,8 @@ function [tpr, fpr] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelS
         tns = tn_ch_curr/(num_iters*num_radii);
         fns = fn_ch_curr/(num_iters*num_radii);
         
-        tprs(thr) = tps(thr)/(tps(thr)+fns(thr));
-        fprs(thr) = fps(thr)/(fps(thr)+tns(thr));        
+        tprs(thr) = tps/(tps+fns);
+        fprs(thr) = fps/(fps+tns);        
     end
     
 end
