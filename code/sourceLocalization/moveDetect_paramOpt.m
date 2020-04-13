@@ -42,8 +42,7 @@ eMax = .3;
 threshes = 0:.02:1;
 num_threshes = size(threshes,2);
 num_iters = 3;
-num_ts = size(T60s,2);
-
+num_ts = 3;
 numVaris = size(init_vars,2);
 numLams = size(lambdas,2);
 
@@ -86,7 +85,7 @@ for lam = 1:numLams
         end
         tprs(:,lam,v) = tpr_ch_curr./(num_ts);
         fprs(:,lam,v) = fpr_ch_curr./(num_ts);
-        aucs(lam,v) = trapz(fprs,tprs);
+        aucs(lam,v) = trapz(fprs(:,lam,v),tprs(:,lam,v));
 
     end
     save('paramOpt_results', 'tprs', 'fprs', 'aucs');   
