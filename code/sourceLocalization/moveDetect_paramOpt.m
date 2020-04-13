@@ -66,8 +66,8 @@ for lam = 1:numLams
         
         init_var = init_vars(v);
         
-        tpr_ch_curr = zeros(1,num_ts);
-        fpr_ch_curr = zeros(1,num_ts);
+        tpr_ch_curr = zeros(1,num_threshes);
+        fpr_ch_curr = zeros(1,num_threshes);
             
         for t = 1:num_ts    
             t_currs = [1 3 8];
