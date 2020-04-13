@@ -42,7 +42,7 @@ nD = size(sourceTrain,1);
 totalMics = numMics*numArrays;
 rirLen = 1000;
 rtfLen = 500;
-T60s = [.15 .35 .55];
+T60s = [.15 .3 .5];
 num_ts = size(T60s,2);
 %grad descent params
 x = randn(1,10*fs);
@@ -104,7 +104,8 @@ for t = 1:num_ts
         sourceTest = randSourcePos(1, roomSize, radiusU*.35, ref);
         [~,~, p_hat_t] = test(x_tst, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                     numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
-        diffs(n) = mean(mean(((sourceTest-p_hat_t).^2)));
+%         diffs(n) = mean(mean(((sourceTest-p_hat_t).^2)));
+        diffs(n) = norm(sourceTest-p_hat_t);
         
 %         %Naive Estimates
 %         %Sub-network Estimates
@@ -141,4 +142,4 @@ for t = 1:num_ts
 %     subNaiSds(t) = std(sub_naives);
 end
 
-save('mat_outputs/monoTestSource_biMicCircle_5L300U_2.mat')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U_2.mat')
