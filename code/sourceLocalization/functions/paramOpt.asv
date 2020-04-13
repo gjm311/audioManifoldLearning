@@ -72,9 +72,9 @@ function [tprs, fprs] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, mode
             end
         end
         tps = tp_ch_curr/case_ones;
-        fps = fp_ch_curr/case_twos;
-        tns = tn_ch_curr/case_twos;
-        fns = fn_ch_curr/case_ones;
+        fps = fp_ch_curr/case_ones;
+        tns = tn_ch_curr/(num_iters*num_radii);
+        fns = fn_ch_curr/(num_iters*num_radii);
         
         tprs(thr) = tps/(tps+fns);
         fprs(thr) = fps/(fps+tns);        

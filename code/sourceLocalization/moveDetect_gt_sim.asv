@@ -47,6 +47,7 @@ num_ts = size(T60s,2);
 t_str = ([]);
 gts = 0:.05:.2;
 num_gts = size(gts,2);
+load('mat_results/t60results2', 't_str') 
 
 for t = 1:num_ts
     t_curr = ts(t);
@@ -60,8 +61,8 @@ for t = 1:num_ts
     
     for g = 1:num_gts
 %     gt = gts(g);
-        for thr = 1:num_threshes 
-            thresh = threshes(num_threshes);
+    for thr = 1:num_threshes 
+        thresh = threshes(num_threshes);
 %             naive_thresh = naive_threshes(thr);
 %             sub_thresh = sub_threshes(thr);
 
@@ -73,7 +74,7 @@ for t = 1:num_ts
     %             t_str(t,thr).fn_check = mrf_res(4);
 
             t_str(t,g,thr).tpr = mrf_res(1)/(mrf_res(1)+mrf_res(4)+10e-6);
-            t_str(t,g,thr).fpr = mrf_res(2)/(mrf_res(2)+mrf_res(3)+10e-6);
+            t_str(t,g,thr).fpr = mrf_res(2)/(mrf_res(2)+mrf_res(3));
 
     %         t_str(t,thr).nai_tp_check = nai_res(1);
     %         t_str(t,thr).nai_fp_check = nai_res(2);
@@ -85,10 +86,10 @@ for t = 1:num_ts
     %         t_str(t,thr).subNai_tn_check = sub_res(3);
     %         t_str(t,thr).subNai_fn_check = sub_res(4);
     
-        end
-        save('mat_results/gt_results', 't_str') 
-    end   
-end
+    end
+save('mat_results/gt_results', 't_str') 
+end   
+% end
 
 % save('mat_results/thresh_res')
 
