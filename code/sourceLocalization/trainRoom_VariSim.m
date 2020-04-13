@@ -42,7 +42,7 @@ nD = size(sourceTrain,1);
 totalMics = numMics*numArrays;
 rirLen = 1000;
 rtfLen = 500;
-T60s = [.2 .5 .8];
+T60s = [.15 .35 .55];
 num_ts = size(T60s,2);
 %grad descent params
 x = randn(1,10*fs);
@@ -141,4 +141,4 @@ for t = 1:num_ts
 %     subNaiSds(t) = std(sub_naives);
 end
 
-save('mat_results/vari_per_t60.mat')
+save('mat_outputs/monoTestSource_biMicCircle_5L300U_2.mat')
