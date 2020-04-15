@@ -77,7 +77,7 @@ function [mrf_res, nai_res, sub_res] =  nodeID(noise,micScales, micGammaLs, micR
                 mrf_f = mrf_f+1;
             end
             
-            [~,mean_comp_arr] = max(mean_naives);
+            [~,mean_comp_arr] = min(mean_naives);
             if mean_comp_arr == movingArray
                 mean_t = mean_t+1;
             else

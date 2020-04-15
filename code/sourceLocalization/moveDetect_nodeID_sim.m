@@ -19,11 +19,11 @@ disp('Setting up the room');
 % ---- Initialize Parameters for training ----
 
 %---- load training data (check mat_trainParams for options)----
-load('mat_outputs/biMicCircle_5L300U_monoNode')
+load('mat_outputs/biMicCircle_5L300U_monoNode_2')
 micRTF_trains = RTF_train;
 micScales = scales;
 micGammaLs = gammaLs;
-load('mat_outputs/monoTestSource_biMicCircle_5L300U')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 load('mat_results/vari_t60_data.mat')
 % load('mat_outputs/movementOptParams')
 
