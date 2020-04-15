@@ -42,7 +42,7 @@ lambda = .3;
 eMax = .3;
 threshes = 0:.1:1;
 num_threshes = size(threshes,2);
-num_iters = 1;
+num_iters = 10;
 num_ts = size(T60s,2);
 t_str = ([]);
 gts = 0:.15:.6;
@@ -62,7 +62,7 @@ gammaL = reshape(gammaLs(t_curr,:,:), [nL, nL]);
 for g = 1:num_gts
     gt = radii(g);
     for thr = 1:num_threshes 
-        thresh = threshes(num_threshes);
+        thresh = threshes(thr);
 %             naive_thresh = naive_threshes(thr);
 %             sub_thresh = sub_threshes(thr);
 
@@ -90,7 +90,6 @@ for g = 1:num_gts
 %         t_str(t,thr).subNai_fn_check = sub_res(4);
 
     end
-    break
     save('mat_results/gt_results', 't_str') 
 end   
 % end
