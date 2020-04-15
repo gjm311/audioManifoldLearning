@@ -28,12 +28,16 @@ function [tprs, fprs] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, mode
                 [~, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
            
     %             wav_folder = wavs(3:27);
-                rand_wav = randi(25);
-                file = wavs(rand_wav+2).name;
-                [x_tst,fs_in] = audioread(file);
-                [numer, denom] = rat(fs/fs_in);
-                x_tst = resample(x_tst,numer,denom);
-                x_tst = x_tst';  
+                try
+                    rand_wav = randi(25);
+                    file = wavs(rand_wav+2).name;
+                    [x_tst,fs_in] = audioread(file);
+                    [numer, denom] = rat(fs/fs_in);
+                    x_tst = resample(x_tst,numer,denom);
+                    x_tst = x_tst';  
+                catch
+                    continue
+                end
 
 
               %---- Initialize subnet estimates of training positions ----

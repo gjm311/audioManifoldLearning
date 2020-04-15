@@ -142,4 +142,4 @@ for t = 1:num_ts
 %     subNaiSds(t) = std(sub_naives);
 end
 
-load('mat_outputs/monoTestSource_biMicCircle_5L300U_2.mat')
+save('mat_outputs/monoTestSource_biMicCircle_5L300U_2.mat')

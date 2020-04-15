@@ -1,8 +1,8 @@
 clear
 addpath ./RIR-Generator-master
 addpath ./functions
-mex -setup c++
-mex RIR-Generator-master/rir_generator.cpp;
+% mex -setup c++
+% mex RIR-Generator-master/rir_generator.cpp;
 addpath ./stft
 addpath ./shortSpeech
 
@@ -42,9 +42,9 @@ eMax = .3;
 threshes = 0:.02:1;
 num_threshes = size(threshes,2);
 num_iters = 3;
-num_ts = 3;
 numVaris = size(init_vars,2);
 numLams = size(lambdas,2);
+num_ts = size(T60s,2);
 
 % local_fails = zeros(num_ts, num_radii, num_threshes);
 % p_fails = zeros(num_ts, num_radii, num_threshes);
@@ -69,15 +69,14 @@ for lam = 1:numLams
         fpr_ch_curr = zeros(1,num_threshes);
             
         for t = 1:num_ts    
-            t_currs = [1 3 8];
-            t_curr = t_currs(t);
-            T60 = T60s(t_curr);
-            modelMean = modelMeans(t_curr);
-            modelSd = modelSds(t_curr);
-            RTF_train = reshape(RTF_trains(t_curr,:,:,:), [nD, rtfLen, numArrays]);    
-            scales = scales_t(t_curr,:);
-            gammaL = reshape(gammaLs(t_curr,:,:), [nL, nL]);            
-            radii = [0 modelMean (modelMean+modelSd)*1.5];
+            
+            T60 = T60s(t);
+            modelMean = modelMeans(t);
+            modelSd = modelSds(t);
+            RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
+            scales = scales_t(t,:);
+            gammaL = reshape(gammaLs(t,:,:), [nL, nL]);            
+            radii = [0 .25 1];
 
             [tpr_out, fpr_out] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
             tpr_ch_curr = tpr_ch_curr + tpr_out;

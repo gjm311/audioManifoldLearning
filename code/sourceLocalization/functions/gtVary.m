@@ -5,9 +5,6 @@ function [mrf_res] = gtVary(thresh, sourceTrain, wavs, gammaL, T60, gt, init_var
     fp_ch_curr = 0;
     tn_ch_curr = 0;
     fn_ch_curr = 0;
-    
-    case_one = 0;
-    case_two = 0;
  
 %     sub_tp_ch_curr = 0;
 %     sub_fp_ch_curr = 0;
@@ -93,7 +90,6 @@ function [mrf_res] = gtVary(thresh, sourceTrain, wavs, gammaL, T60, gt, init_var
 %                        sub_fn_ch_curr = sub_fn_ch_curr+1;
 %                     end
 %                 end
-                case_one = case_one+1;
             end
 
             if local_fail < gt
@@ -117,12 +113,11 @@ function [mrf_res] = gtVary(thresh, sourceTrain, wavs, gammaL, T60, gt, init_var
 %                     elseif k == 4
 %                         sub_tn_ch_curr = sub_tn_ch_curr+1;
 %                     end
-%                 end
-                case_two = case_two+1;                    
+%                 end                  
             end
         end
     end
-    mrf_res = [tp_ch_curr./case_one fp_ch_curr./case_two tn_ch_curr./case_one fn_ch_curr./case_two];
+    mrf_res = [tp_ch_curr fp_ch_curr tn_ch_curr fn_ch_curr];
 %     nai_res = [mean_tp_ch_curr mean_fp_ch_curr mean_tn_ch_curr mean_fn_ch_curr]./num_iters*num_radii;
 %     sub_res = [sub_tp_ch_curr sub_fp_ch_curr sub_tn_ch_curr sub_fn_ch_curr]./num_iters*num_radii;
     
