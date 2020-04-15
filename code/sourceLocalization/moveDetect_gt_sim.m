@@ -24,28 +24,28 @@ disp('Setting up the room');
 % micScales = scales;
 % micGammaLs = gammaLs;
 
-load('mat_outputs/monoTestSource_biMicCircle_5L300U')
-load('mat_results/vari_t60_data.mat')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
+% load('mat_results/vari_t60_data.mat')
 % load('mat_outputs/movementOptParams')
 ts = [1 4 8];
 
 % simulate different noise levels
-radii = 0:.1:.6;
+radii = 0:.03:.13;
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 wavs = dir('./shortSpeech/');
 
 %---- Set MRF params ----
 transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
-init_var = .1;
-lambda = .2;
+init_var = .2;
+lambda = .3;
 eMax = .3;
-threshes = 0:.04:1;
+threshes = 0:.1:1;
 num_threshes = size(threshes,2);
-num_iters = 10;
+num_iters = 1;
 num_ts = size(T60s,2);
 t_str = ([]);
-gts = 0.1:.2:.9;
+gts = 0:.15:.6;
 num_gts = size(gts,2);
 
 % for t = 1:num_ts
@@ -60,7 +60,7 @@ gammaL = reshape(gammaLs(t_curr,:,:), [nL, nL]);
 %     micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
 
 for g = 1:num_gts
-    gt = gts(g);
+    gt = radii(g);
     for thr = 1:num_threshes 
         thresh = threshes(num_threshes);
 %             naive_thresh = naive_threshes(thr);
@@ -72,10 +72,13 @@ for g = 1:num_gts
 %             t_str(t,thr).fp_check = mrf_res(2);
 %             t_str(t,thr).tn_check = mrf_res(3);
 %             t_str(t,thr).fn_check = mrf_res(4);
-
-        t_str(t,g,thr).tpr = mrf_res(1)/(mrf_res(1)+mrf_res(4)+10e-6);
-        t_str(t,g,thr).fpr = mrf_res(2)/(mrf_res(2)+mrf_res(3)+10e-6);
-
+        t_str(g,thr).tp = mrf_res(1);
+        t_str(g,thr).fp = mrf_res(2);
+        t_str(g,thr).tn = mrf_res(3);
+        t_str(g,thr).fn = mrf_res(4);
+        t_str(g,thr).tpr = mrf_res(1)/(mrf_res(1)+mrf_res(4)+10e-6);
+        t_str(g,thr).fpr = mrf_res(2)/(mrf_res(2)+mrf_res(3)+10e-6);
+      
 %         t_str(t,thr).nai_tp_check = nai_res(1);
 %         t_str(t,thr).nai_fp_check = nai_res(2);
 %         t_str(t,thr).nai_tn_check = nai_res(3);
@@ -87,6 +90,7 @@ for g = 1:num_gts
 %         t_str(t,thr).subNai_fn_check = sub_res(4);
 
     end
+    break
     save('mat_results/gt_results', 't_str') 
 end   
 % end

@@ -66,9 +66,10 @@ function [mrf_res] = gtVary(thresh, sourceTrain, wavs, gammaL, T60, gt, init_var
 %             mean_naives(3) = mean(pdist([naive_p_hat_ts(1:2,:); naive_p_hat_ts(4,:)]));
 %             mean_naives(4) = mean(pdist(naive_p_hat_ts(1:3,:)));
 
-            local_fail = mean(mean(((sourceTest-p_hat_t).^2)));
-
-            if local_fail > gt             
+%             local_fail = mean(mean(((sourceTest-p_hat_t).^2)));
+            local_fail = norm(sourceTest-p_hat_t);
+            
+            if radius_mic >= gt             
                 if p_fail >= thresh
                     tp_ch_curr = tp_ch_curr + 1;
                 else
@@ -91,8 +92,7 @@ function [mrf_res] = gtVary(thresh, sourceTrain, wavs, gammaL, T60, gt, init_var
 %                     end
 %                 end
             end
-
-            if local_fail < gt
+            if radius_mic <= gt   
                 if p_fail > thresh
                     fp_ch_curr = fp_ch_curr + 1;
                 else

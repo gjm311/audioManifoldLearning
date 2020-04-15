@@ -16,13 +16,14 @@ disp('Setting up the room');
 % micScales = scales;
 % micVaris = varis;
 %---- load training data (check mat_trainParams for options)----
-load('mat_outputs/monoTestSource_biMicCircle_5L300U')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
+% load('mat_results/vari_t60_data.mat')
 % load('mat_outputs/movementOptParams')
 
 % modelSd = .1;
 
 %simulate different noise levels
-radii = 0:.2:1.4; 
+radii = 0:.5:2; 
 its_per = 1;
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 accs = struct([]);
@@ -32,10 +33,19 @@ inits = 1;
 rotation = 0;
 
 transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
-init_var = .1;
-lambda = .2;
+init_var = .2;
+lambda = .3;
 eMax = .3;
 thresh = .3;
+
+t = 1;
+ts = [1 4 8];
+T60s = [.15 .3 .5];
+t_curr = ts(t);
+T60 = T60s(t);
+RTF_train = reshape(RTF_trains(t_curr,:,:,:), [nD, rtfLen, numArrays]);    
+scales = scales_t(t_curr,:);
+gammaL = reshape(gammaLs(t_curr,:,:), [nL, nL]);
 
 for riter = 1:size(radii,2)
     acc_curr = struct([]);
@@ -49,17 +59,28 @@ for riter = 1:size(radii,2)
         %randomize tst source, new position of random microphone (new
         %position is on circle based off radius_mic), random rotation to
         %microphones, and random sound file (max 4 seconds).
-        sourceTest = randSourcePos(1, roomSize, radiusU*.35, ref);
+        sourceTest = randSourcePos(1, roomSize, radiusU, ref);
         if inits > 1
             movingArray = randi(numArrays);
             [rotation, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
-%             randMicPos = mic_ref(1,:)+[0 radius_mic 0];
-%             new_x1 = randMicPos(:,1)+.025;
-%             new_y1 = randMicPos(:,2);
-%             new_x2 = randMicPos(:,1)-.025;
-%             new_y2 = randMicPos(:,2);
-%             micsPosNew = [new_x1 new_y1 1;new_x2 new_y2 1; micsPos(1+numMics:end,:)];
-        
+%             if radius_mic == 0
+%                 micsPosNew = micsPos;
+%             elseif movingArray == 1
+%                 micsPosNew = [micsPos(1:2,:)+[0 radius_mic 0]; micsPos(1+numMics:end,:)];
+%             elseif movingArray == numArrays
+%                 micsPosNew = [micsPos(1:end-numMics,:); micsPos(7:8,:)+[radius_mic 0 0]];
+%             elseif movingArray == 2
+%                 micsPosNew = [micsPos(1:numMics,:); micsPos(3:4,:)+[radius_mic 0 0]; micsPos(2*numMics+1:end,:)];
+%             else
+%                 micsPosNew = [micsPos(1:numMics*2,:); micsPos(5:6,:)+[0 radius_mic 0]; micsPos(3*numMics+1:end,:)];
+%             end
+                % randMicPos = mic_ref(1,:)+[0 radius_mic 0];
+    %             new_x1 = randMicPos(:,1)+.025;
+    %             new_y1 = randMicPos(:,2);
+    %             new_x2 = randMicPos(:,1)-.025;
+    %             new_y2 = randMicPos(:,2);
+    %             micsPosNew = [new_x1 new_y1 1;new_x2 new_y2 1; micsPos(1+numMics:end,:)];
+
         else
             movingArray = randi(numArrays);
             micsPosNew = micsPos;

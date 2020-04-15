@@ -56,7 +56,7 @@ function [tprs, fprs] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, mode
 
                 local_fail = mean(mean(((sourceTest-p_hat_t).^2)));
 
-                if local_fail > modelMean+modelSd        
+                if radiusMic >= .075        
                     if p_fail > thresh
                         tp_ch_curr = tp_ch_curr + 1;
                     else
@@ -65,7 +65,8 @@ function [tprs, fprs] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, mode
                     case_ones = case_ones+1;
                 end
 
-                if local_fail < modelMean+modelSd
+%                 if local_fail < modelMean+modelSd
+                if radiusMic <= .075 
                     if p_fail > thresh
                         fp_ch_curr = fp_ch_curr + 1;
                     else

@@ -20,7 +20,7 @@ disp('Setting up the room');
 
 %---- load training data (check mat_trainParams for options)----
 load('mat_results/vari_t60_data')
-load('mat_outputs/monoTestSource_biMicCircle_5L300U')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 
 % load('mat_outputs/movementOptParams')
 % vari = varis_set(I,:);
@@ -29,9 +29,9 @@ load('mat_outputs/monoTestSource_biMicCircle_5L300U')
 gammaL = inv(sigmaL + diag(ones(1,nL).*vari));
 
 %simulate different noise levels
-radii = 0:.1:.6;
+radii = 0:.03:.13;
 % num_radii = size(radii,2);
-num_radii = 3;
+num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 
 %---- Set MRF params ----
@@ -39,9 +39,9 @@ transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
 init_vars = .05:.1:1.05;
 lambdas = .05:.1:.75;
 eMax = .3;
-threshes = 0:.02:1;
+threshes = 0:.1:1;
 num_threshes = size(threshes,2);
-num_iters = 3;
+num_iters = 1;
 numVaris = size(init_vars,2);
 numLams = size(lambdas,2);
 num_ts = size(T60s,2);
@@ -76,7 +76,6 @@ for lam = 1:numLams
             RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
             scales = scales_t(t,:);
             gammaL = reshape(gammaLs(t,:,:), [nL, nL]);            
-            radii = [0 .25 1];
 
             [tpr_out, fpr_out] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
             tpr_ch_curr = tpr_ch_curr + tpr_out;
