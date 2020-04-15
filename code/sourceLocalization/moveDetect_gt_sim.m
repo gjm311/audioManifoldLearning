@@ -90,7 +90,6 @@ for g = 1:num_gts
 %         t_str(t,thr).subNai_fn_check = sub_res(4);
 
     end
-    break
     save('mat_results/gt_results', 't_str') 
 end   
 % end
