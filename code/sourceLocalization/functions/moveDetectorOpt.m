@@ -7,7 +7,7 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetectorOpt(x, trans
 
 % ----Calculate new estimate based off movement for all subnets and resid. error from stationary time (turns off once estimates settle) ----
     upd_sub_p_hat_ts = zeros(numArrays, 3);
-    for k1 = 1:numArrays
+   for k1 = 1:numArrays
         [subnet, subscales, trRTF] = subNet(k1, numArrays, numMics, scales, micsPos, RTF_train);
         [~,~,upd_sub_p_hat_ts(k1,:)] = test(x, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);   
     end

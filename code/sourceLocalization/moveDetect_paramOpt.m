@@ -19,14 +19,9 @@ disp('Setting up the room');
 % ---- Initialize Parameters for training ----
 
 %---- load training data (check mat_trainParams for options)----
-load('mat_results/vari_t60_data')
+% load('mat_results/vari_t60_data')
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 
-% load('mat_outputs/movementOptParams')
-% vari = varis_set(I,:);
-% scales = scales_set(I,:);
-[~,sigmaL] = trCovEst(nL, nD, numArrays, RTF_train, kern_typ, scales);
-gammaL = inv(sigmaL + diag(ones(1,nL).*vari));
 
 %simulate different noise levels
 radii = 0:.03:.13;
@@ -46,12 +41,6 @@ numVaris = size(init_vars,2);
 numLams = size(lambdas,2);
 num_ts = size(T60s,2);
 
-% local_fails = zeros(num_ts, num_radii, num_threshes);
-% p_fails = zeros(num_ts, num_radii, num_threshes);
-% tp_check = zeros(1,num_threshes);
-% fp_check = zeros(1,num_threshes);
-% tn_check = zeros(1,num_threshes);
-% fn_check = zeros(1,num_threshes);
 wavs = dir('./shortSpeech/');
 
 tprs = zeros(num_threshes, numLams, numVaris);

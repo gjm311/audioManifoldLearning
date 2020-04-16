@@ -20,11 +20,11 @@ disp('Setting up the room');
 
 %---- load training data (check mat_trainParams for options)----
 load('mat_outputs/biMicCircle_5L300U_monoNode_2')
-micRTF_trains = RTF_train;
-micScales = scales;
-micGammaLs = gammaLs;
+% micRTF_trains = RTF_train;
+% micScales = scales;
+% micGammaLs = gammaLs;
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
-load('mat_results/vari_t60_data.mat')
+% load('mat_results/vari_t60_data.mat')
 % load('mat_outputs/movementOptParams')
 
 % simulate different noise levels
@@ -48,6 +48,12 @@ t_str = ([]);
 
 for t = 1:num_ts
     T60 = T60s(t);
+    RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
+        scales = scales_t(t,:);
+        gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
+        micRTF_train = reshape(micRTF_trains(t,:,:,:), [numArrays, nD, rtfLen, numMics]);
+        micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
+        micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
     for n = 1:num_ns
         noise = noises(n);
         RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    

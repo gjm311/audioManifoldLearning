@@ -92,8 +92,8 @@ function [mrf_res] = gtVary(thresh, sourceTrain, wavs, gammaL, T60, gt, init_var
 %                     end
 %                 end
             end
-            if radius_mic <= gt   
-                if p_fail > thresh
+            if radius_mic < gt   
+                if p_fail >= thresh
                     fp_ch_curr = fp_ch_curr + 1;
                 else
                     tn_ch_curr = tn_ch_curr + 1;
