@@ -1,5 +1,9 @@
 function [tp_ch_curr,fp_ch_curr,tn_ch_curr,fn_ch_curr] = paramThreshOpt(num_radii, thresh, sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
-
+    tp_ch_curr = 0;
+    fp_ch_curr = 0;
+    tn_ch_curr = 0;
+    fn_ch_curr = 0;
+    
     for riter = 1:num_radii
         radius_mic = radii(riter);
 
@@ -34,8 +38,8 @@ function [tp_ch_curr,fp_ch_curr,tn_ch_curr,fn_ch_curr] = paramThreshOpt(num_radi
             [~, p_fail, ~] = moveDetectorOpt(x_tst, transMat, init_var, lambda, eMax, thresh, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
                     rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ);
 
-            if radiusMic >= .075        
-                if p_fail > thresh
+            if radius_mic >= .075        
+                if p_fail >= thresh
                     tp_ch_curr = tp_ch_curr + 1;
                 else
                     fn_ch_curr = fn_ch_curr + 1;
@@ -44,7 +48,7 @@ function [tp_ch_curr,fp_ch_curr,tn_ch_curr,fn_ch_curr] = paramThreshOpt(num_radi
             end
 
 %                 if local_fail < modelMean+modelSd
-            if radiusMic < .075 
+            if radius_mic < .075 
                 if p_fail >= thresh
                     fp_ch_curr = fp_ch_curr + 1;
                 else
