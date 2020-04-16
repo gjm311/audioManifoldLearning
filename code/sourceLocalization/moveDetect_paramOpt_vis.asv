@@ -1,0 +1,72 @@
+clear
+addpath ./RIR-Generator-master
+addpath ./functions
+mex -setup c++
+mex RIR-Generator-master/rir_generator.cpp;
+addpath ./stft
+addpath ./shortSpeech
+
+% load('./mat_results/threshTestResults4')
+
+load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
+load('./paramOpt_results.mat')
+
+%--- Interpolate data and plot ROC curve for naive and mrf detectors ---
+xq = 1.5:.05:10.5;
+for nv = 1:numVaris
+    for nl = 1:numLams
+        if abs(auc(nv,nl)) > .55
+            interp_gt_tprs = sort(interp1(tprs(:,nv,nl),xq));
+            interp_gt_fprs = sort(interp1(fprs(:,nl,nv),xq));
+
+            figure(2)
+            mrf1 = plot(reshape(interp_gt_fpr(1,1,:),[1,181]), reshape(interp_gt_tpr(1,1,:),[1,181]), '-.g');
+            hold on
+            % sub = plot(sub_fpr, sub_tpr, '--b');
+            base = plot(threshes,threshes, 'black');
+            title(sprintf('ROC Curve: Array Movement Detection (T60 = .15s) \n Curves for Increasing Ground Truth (GT) Thresholds with Varying Detection Thresholds \n [GT in meters for diffrence in positional estimate before/after movement]'))
+            xlabel('FPR')
+            ylabel('TPR')
+            legend([mrf1,mrf2,mrf4,base], 'GT = 0m', 'GT =0.5m','GT=1m', 'Baseline', 'Location','southeast')
+    
+        end
+    end
+end
+
+ 
+
+
+
+figure(2)
+mrf1 = plot(reshape(interp_gt_fpr(1,1,:),[1,181]), reshape(interp_gt_tpr(1,1,:),[1,181]), '-.g');
+hold on
+mrf2 = plot(reshape(interp_gt_fpr(1,2,:),[1,181]), reshape(interp_gt_tpr(1,2,:),[1,181]), '-.r');
+% mrf3 = plot(reshape(interp_gt_fpr(2,1,:),[1,181]), reshape(interp_gt_tpr(2,1,:),[1,181]), '-.r');
+mrf4 = plot(reshape(interp_gt_fpr(2,2,:),[1,181]), reshape(interp_gt_tpr(2,2,:),[1,181]), '-.b');
+% sub = plot(sub_fpr, sub_tpr, '--b');
+base = plot(threshes,threshes, 'black');
+title(sprintf('ROC Curve: Array Movement Detection (T60 = .15s) \n Curves for Increasing Ground Truth (GT) Thresholds with Varying Detection Thresholds \n [GT in meters for diffrence in positional estimate before/after movement]'))
+xlabel('FPR')
+ylabel('TPR')
+legend([mrf1,mrf2,mrf4,base], 'GT = 0m', 'GT =0.5m','GT=1m', 'Baseline', 'Location','southeast')
+%     xlim([0 1.05])
+% hold off
+% ylim([0 1.05])
+
+
+% figure(2)
+% heatmap([sum(tp_check) tn_check; fp_check fn_check]);
+% 
+% figure(2)
+% bar(threshes, tp_check)
+% title(sprintf('True Positive Movement Detections For Different Probability Thresholds\n (70 Trials per Threshold Simulated w/Varying Array Shifts)\n[Shifts: 0 - 0.5m by 5cm increments]'))
+% xlabel('Probability Threshold')
+% ylabel('Frequency of Flags')
+% ylim([0 max(tp_check)+5])
+% 
+% figure(3)
+% bar(threshes, fp_check)
+% title(sprintf('False Positive Movement Detections For Different Probability Thresholds\n (110 Trials per Threshold Simulated w/Varying Array Shifts)\n[Shifts: 0 - 0.5m by 5cm increments]'))
+% xlabel('Probability Threshold')
+% ylabel('Frequency of Flags')
+% ylim([0 max(fp_check)+5])

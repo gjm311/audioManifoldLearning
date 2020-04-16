@@ -14,12 +14,16 @@ load('./mat_results/gt_results.mat')
 % load('mat_outputs/movementOptParams')
 
 % simulate different noise levels
-radii = 0:.03:.13;
+radii = .2:.3:.8;
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 wavs = dir('./shortSpeech/');
 
 %---- Set MRF params ----
+transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
+init_var = .2;
+lambda = .3;
+eMax = .3;
 threshes = 0:.1:1;
 num_threshes = size(threshes,2);
 num_iters = 1;
@@ -28,37 +32,41 @@ gts = 0:.15:.6;
 num_gts = size(gts,2);
 % t_str = reshape(t_str(1,:,:),[5, 11]);
 
-gt_tp = zeros(num_gts, num_threshes);
-gt_fp = zeros(num_gts, num_threshes);
-gt_tn = zeros(num_gts, num_threshes);
-gt_fn = zeros(num_gts, num_threshes);
-gt_tprs = zeros(num_gts, num_threshes);
-gt_fprs = zeros(num_gts, num_threshes);
+gt_tp = zeros(num_radii, num_threshes);
+gt_fp = zeros(num_radii, num_threshes);
+gt_tn = zeros(num_radii, num_threshes);
+gt_fn = zeros(num_radii, num_threshes);
+gt_tprs = zeros(num_radii, num_threshes);
+gt_fprs = zeros(num_radii, num_threshes);
+interp_gt_tpr = zeros(2,3,181);
+interp_gt_fpr = zeros(2,3,181);
 
-t = 2;
-for tt = 1:num_gts
-    for thr = 1:num_threshes
-        gt_tp(tt,thr) = t_str(t,tt,thr).tp;
-        gt_fp(tt,thr) = t_str(t,tt,thr).fp;
-        gt_tn(tt,thr) = t_str(t,tt,thr).tn;
-        gt_fn(tt,thr) = t_str(t,tt,thr).fn;
-        gt_tprs(tt,thr) = t_str(t,tt,thr).tpr;
-        gt_fprs(tt,thr) = t_str(t,tt,thr).fpr;
-    
-    end
-end
+ for t = 1:2
+     for gt = 1:3
+        for tt = 1:num_radii
+            for thr = 1:num_threshes
+                gt_tp(tt,thr) = t_str(t,tt,thr).tp;
+                gt_fp(tt,thr) = t_str(t,tt,thr).fp;
+                gt_tn(tt,thr) = t_str(t,tt,thr).tn;
+                gt_fn(tt,thr) = t_str(t,tt,thr).fn;
+                gt_tprs(tt,thr) = t_str(t,tt,thr).tpr;
+                gt_fprs(tt,thr) = t_str(t,tt,thr).fpr;
 
-gt = 3;
-%--- Interpolate data and plot ROC curve for naive and mrf detectors ---
-xq = 1.5:.05:10.5;
-interp_gt_tp = interp1(gt_tp(gt,:),xq);
-interp_gt_fp = interp1(gt_fp(gt,:),xq);
-interp_gt_tn = interp1(gt_tn(gt,:),xq);
-interp_gt_fn = interp1(gt_fn(gt,:),xq);
+            end
+        end
+% 
+%         gt = 2;
+        %--- Interpolate data and plot ROC curve for naive and mrf detectors ---
+        xq = 1.5:.05:10.5;
+        interp_gt_tp = interp1(gt_tp(gt,:),xq);
+        interp_gt_fp = interp1(gt_fp(gt,:),xq);
+        interp_gt_tn = interp1(gt_tn(gt,:),xq);
+        interp_gt_fn = interp1(gt_fn(gt,:),xq);
 
-interp_gt_tpr = sort(interp_gt_tp./(interp_gt_tp+interp_gt_fn+10e-6));
-interp_gt_fpr = sort(interp_gt_fp./(interp_gt_fp+interp_gt_tn+10e-6));
-
+        interp_gt_tpr(t,gt,:) = sort(interp_gt_tp./(interp_gt_tp+interp_gt_fn+10e-6));
+        interp_gt_fpr(t,gt,:) = sort(interp_gt_fp./(interp_gt_fp+interp_gt_tn+10e-6));
+     end
+ end
 % gt_tpr = sort(gt_tprs(gt,:));
 % gt_fpr = sort(gt_fprs(gt,:));
  
@@ -75,16 +83,24 @@ interp_gt_fpr = sort(interp_gt_fp./(interp_gt_fp+interp_gt_tn+10e-6));
 
 
 figure(1)
-mrf = plot(interp_gt_fpr, interp_gt_tpr, '-.g');
+mrf1 = plot(reshape(interp_gt_fpr(1,1,:),[1,181]), reshape(interp_gt_tpr(1,1,:),[1,181]), '-.g');
 hold on
+mrf2 = plot(reshape(interp_gt_fpr(1,2,:),[1,181]), reshape(interp_gt_tpr(1,2,:),[1,181]), '-.r');
+mrf3 = plot(reshape(interp_gt_fpr(1,3,:),[1,181]), reshape(interp_gt_tpr(1,3,:),[1,181]), '-.b');
 % sub = plot(sub_fpr, sub_tpr, '--b');
-base = plot(threshes,threshes, 'r');
-title(sprintf('ROC Curve: Array Movement Detection (T60 = .15s) \n (70 Trials per Threshold Simulated w/Varying Array Shifts)\n[Shifts: 0 - 1.2m by 10cm increments]'))
+mrf4 = plot(reshape(interp_gt_fpr(2,1,:),[1,181]), reshape(interp_gt_tpr(2,1,:),[1,181]), '-*g');
+mrf5 = plot(reshape(interp_gt_fpr(2,2,:),[1,181]), reshape(interp_gt_tpr(2,2,:),[1,181]), '-*r');
+mrf6 = plot(reshape(interp_gt_fpr(2,3,:),[1,181]), reshape(interp_gt_tpr(2,3,:),[1,181]), '-*b');
+% sub = plot(sub_fpr, sub_tpr, '--b');
+base = plot(threshes,threshes, 'black');
+title(sprintf('ROC Curve: Array Movement Detection (T60 = .15s, .5s) \n Curves for Increasing Ground Truth (GT) Thresholds with Varying Detection Thresholds \n [GT in meters for diffrence in positional estimate before/after movement]'))
 xlabel('FPR')
 ylabel('TPR')
-legend([mrf, base], 'MRF-Based Detector', 'Naive Detector (Single Mic vs Leave One Out SubNet estimate)', 'Baseline', 'Location','southeast')
-xlim([0 1.05])
+legend([mrf1,mrf2,mrf3,mrf4,mrf5,mrf6,base], 'GT = 0m, T60=.15s', 'GT =0.4m, T60=.15s','GT=.8m, T60=.15s','GT = 0m, T60=.5s', 'GT =0.4m, T60=.5s','GT=.8m, T60=.5s', 'Baseline', 'Location','southeast')
+%     xlim([0 1.05])
+% hold off
 % ylim([0 1.05])
+
 
 % figure(2)
 % heatmap([sum(tp_check) tn_check; fp_check fn_check]);
