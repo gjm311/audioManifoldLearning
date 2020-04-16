@@ -29,7 +29,7 @@ load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 % load('mat_outputs/movementOptParams')
 
 % simulate different noise levels
-radii = .3:.15:.6;
+radii = .15:.2:.75;
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 wavs = dir('./shortSpeech/');
@@ -44,7 +44,7 @@ num_threshes = size(threshes,2);
 num_iters = 100;
 num_ts = size(T60s,2);
 t_str = ([]);
-gts = .15:.2:.55;
+gts = .3:.15:.6;
 num_gts = size(gts,2);
 
 for t = 1:num_ts
