@@ -57,7 +57,7 @@ for t = 1:num_ts
     %     micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
     %     micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
 
-    for g = 1:num_gts
+    for g = 1:num_radii
         gt = radii(g);
         for thr = 1:num_threshes 
             thresh = threshes(thr);
