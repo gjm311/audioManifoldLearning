@@ -19,7 +19,7 @@ disp('Setting up the room');
 % ---- Initialize Parameters for training ----
 
 %---- load training data (check mat_trainParams for options)----
-% load('mat_outputs/biMicCircle_5L300U_monoNode')
+% load('mat_outputs/biMicCircle_5L300U_monoNode_2')
 % micRTF_trains = RTF_train;
 % micScales = scales;
 % micGammaLs = gammaLs;

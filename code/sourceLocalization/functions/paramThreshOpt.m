@@ -13,7 +13,7 @@ function [tp_ch_curr,fp_ch_curr,tn_ch_curr,fn_ch_curr] = paramThreshOpt(num_radi
             %microphones, and random sound file (max 4 seconds).
             sourceTest = randSourcePos(1, roomSize, radiusU, ref);
             movingArray = randi(numArrays);
-            [~, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+            [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
 
 %             wav_folder = wavs(3:27);
             try

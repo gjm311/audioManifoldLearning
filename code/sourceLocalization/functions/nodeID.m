@@ -20,7 +20,7 @@ function [mrf_res, nai_res, sub_res] =  nodeID(noise,micScales, micGammaLs, micR
             %microphones, and random sound file (max 4 seconds).
             sourceTest = randSourcePos(1, roomSize, radiusU*.35, ref);
             movingArray = randi(numArrays);
-            [~, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+            [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
 
             rand_wav = randi(25);
             try

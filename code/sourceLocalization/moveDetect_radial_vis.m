@@ -23,8 +23,8 @@ load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 % modelSd = .1;
 
 %simulate different noise levels
-radii = 0:.5:2; 
-its_per = 1;
+radii = .75; 
+its_per = 10;
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 accs = struct([]);
 wav_folder = dir('./shortSpeech/');
@@ -33,8 +33,8 @@ inits = 1;
 rotation = 0;
 
 transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
-init_var = .2;
-lambda = .3;
+init_var = .1;
+lambda = .2;
 eMax = .3;
 thresh = .3;
 
@@ -46,6 +46,7 @@ T60 = T60s(t);
 RTF_train = reshape(RTF_trains(t_curr,:,:,:), [nD, rtfLen, numArrays]);    
 scales = scales_t(t_curr,:);
 gammaL = reshape(gammaLs(t_curr,:,:), [nL, nL]);
+
 
 for riter = 1:size(radii,2)
     acc_curr = struct([]);
@@ -59,10 +60,10 @@ for riter = 1:size(radii,2)
         %randomize tst source, new position of random microphone (new
         %position is on circle based off radius_mic), random rotation to
         %microphones, and random sound file (max 4 seconds).
-        sourceTest = randSourcePos(1, roomSize, radiusU, ref);
+        sourceTest = randSourcePos(1, roomSize, radiusU*.35, ref);
         if inits > 1
             movingArray = randi(numArrays);
-            [rotation, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+            [rotation, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
 %             if radius_mic == 0
 %                 micsPosNew = micsPos;
 %             elseif movingArray == 1
@@ -104,14 +105,14 @@ for riter = 1:size(radii,2)
         [self_sub_p_hat_ts, p_fail, posteriors] = moveDetectorOpt(x_tst, transMat, init_var, lambda, eMax, thresh, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
                 rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ);
             
-    %---- estimate test positions before movement ----
-        [~,~, pre_p_hat_t] = test(x_tst, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
-                        numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
-
-%     %---- estimate test positions after movement ----
-        [~,~, p_hat_t] = test(x_tst, gammaL, RTF_train, micsPosNew, rirLen, rtfLen, numArrays,...
-                        numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
-        
+% % %     ---- estimate test positions before movement ----
+% %         [~,~, pre_p_hat_t] = test(x_tst, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
+% %                         numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
+% % 
+% %     %---- estimate test positions after movement ----
+% %         [~,~, p_hat_t] = test(x_tst, gammaL, RTF_train, micsPosNew, rirLen, rtfLen, numArrays,...
+% %                         numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
+% %         
 %         mean_naives = zeros(numArrays,1);
 %         sub_naives = zeros(numArrays,1);
 %         naive_p_hat_ts = zeros(numArrays,3);
@@ -141,20 +142,28 @@ for riter = 1:size(radii,2)
         %positional estimates and ones taken in training. If estimate sd greater than
         %standard deviation of error of static model then we predict
         %movement.
-        naive_p_fail = norm(p_hat_t - pre_p_hat_t);
-        naive2_p_fail = mean(std(self_sub_p_hat_ts- sub_p_hat_ts));
+        labels = cell(1,4);
+        labelPos = [micsPosNew(1:2:end,1), micsPosNew(1:2:end,2)];
+        for p = 1:numArrays
+            labels{1,p} = mat2str(round(posteriors(p,:),2));
+        end
+%         naive_p_fail = norm(p_hat_t - pre_p_hat_t);
+%         naive2_p_fail = mean(std(self_sub_p_hat_ts- sub_p_hat_ts));
         %PLOT
         f = plotRoom(roomSize, micsPosNew, sourceTrain, sourceTest, nL, p_hat_t);
         title(sprintf('Detecting Array Movement \n [Array Movement: %s m]', num2str(radius_mic)))
-        naiveTxt = text(.6,.5, sprintf('Network Estimate Distance:\n %s',num2str(round(naive_p_fail,2))));
-        naive2Txt = text(2.6,.5, sprintf('Std of Sub-Network Estimate Diff.:\n %s',num2str(round(naive2_p_fail,2))));
-        binTxt = text(4.6,.5, sprintf('MRF Based Probability:\n %s',num2str(round(p_fail,2))));
+%         naiveTxt = text(.6,.5, sprintf('Network Estimate Distance:\n %s',num2str(round(naive_p_fail,2))));
+%         naive2Txt = text(2.6,.5, sprintf('Std of Sub-Network Estimate Diff.:\n %s',num2str(round(naive2_p_fail,2))));
+        binTxt = text(3.6,.5, sprintf('MRF Based Probability: %s',num2str(round(p_fail,2))));
+        prbTxt = text(labelPos(:,1),labelPos(:,2), labels, 'HorizontalAlignment', 'left', 'VerticalAlignment', 'bottom');
+
         %     %Uncomment below for pauses between iterations only continued by
     %     %clicking graph  
         w = waitforbuttonpress;
         delete(binTxt);
-        delete(naiveTxt);
-        delete(naive2Txt);
+        delete(prbTxt);
+%         delete(naiveTxt);
+%         delete(naive2Txt);
         clf
          
     end

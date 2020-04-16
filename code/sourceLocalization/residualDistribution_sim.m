@@ -14,29 +14,9 @@ addpath ./shortSpeech
 % ---- Initialize Parameters ----
 
 %parameters for room
-c = 340;
-fs = 8000;
-roomSize = [6,6,3];    
-sourceTrainL = [4,4,1; 2,2,1; 4,2,1; 2,4,1; 3,3,1];
-numArrays = 4;
-numMics = 2;
-nU = 35;
-radiusU = max(pdist(sourceTrainL));
-nL = size(sourceTrainL,1);
-micsPos = [3.025,5,1;2.975,5,1; 5,2.975,1;5,3.025,1; 3.025,1,1;2.975,1,1; 1,2.975,1;1,3.025,1];
-ref = roomSize/2;
-sourceTrainU = randSourcePos(nU, roomSize, radiusU, ref);
-sourceTrain = [sourceTrainL; sourceTrainU];
-sourceTest = [3.3, 3, 1];
-nD = size(sourceTrain,1);
-T60s = .14:.005:.16;
-snrs = 0:2:40;
-rirLen = 1000;
-rtfLen = 500;
-% [x,fs_in] = audioread('f0001_us_f0001_00009.wav');
-% x = transpose(resample(x,fs,fs_in));
-kern_typ = 'gaussian';
-numMovePoints = 10;
+load('mat_outputs/monoTestSource_biMicCircle_5L300U.mat')
+T60s = .15:.15:.9;
+snrs = 0:5:40;
 align_p_hat_ts = zeros(numArrays, 3);
 misalign_p_hat_ts = zeros(numArrays, 3);
 unk_p_hat_ts = zeros(numArrays,3);
@@ -45,11 +25,8 @@ misalign_resids = zeros(numArrays,size(T60s,2)*size(snrs,2));
 unk_resids = zeros(numArrays,size(T60s,2)*size(snrs,2)*2);
 count = 1;
 unk_count = 1;
-
-load('mat_outputs/monoTestSource_biMicCircle_5L50U.mat')
 source = zeros(numArrays, size(x,2));
 unk_source = zeros(numArrays, size(x,2));
-gammaL = inv(sigmaL+rand*10e-3*eye(size(sigmaL)));
 
 
 pre_p_hat_ts = zeros(numArrays, 3);
@@ -70,7 +47,7 @@ for t = 1:size(T60s,2)
            source(arr,:) = awgn(x, snr);
            unk_source(arr,:) = awgn(unk_x, snr);
         end
-        unk_source_pos = [randi(6,[1,2]) 1];
+        unk_source_pos = randSourcePos(1, roomSize, 3, ref);
         
         %generate RIRs and estimate RTFs for aligned case (i.e. microphones
         %in same position but with noise and slightly altered T60.
@@ -80,8 +57,8 @@ for t = 1:size(T60s,2)
             [~,~,align_p_hat_ts(k1,:)] = test(source, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);
             [~,~,unk_p_hat_ts(k1,:)] = test([source;unk_source], gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain, [sourceTest;unk_source_pos], nL, nU, roomSize, T60, c, fs, kern_typ, subscales);
         end
-        align_resids(:,count) =  mean(pre_p_hat_ts - align_p_hat_ts,2);
-        unk_resids(:,unk_count) =  mean(pre_p_hat_ts - unk_p_hat_ts,2);
+        align_resids(:,count) =  abs(mean(pre_p_hat_ts - align_p_hat_ts,2));
+        unk_resids(:,unk_count) =  abs(mean(pre_p_hat_ts - unk_p_hat_ts,2));
         unk_count = unk_count+1;
         
         %generate RIRs and estimate RTFs for misaligned case (i.e. mic
@@ -100,8 +77,8 @@ for t = 1:size(T60s,2)
             [~,~,misalign_p_hat_ts(k1,:)] = test(source, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);
             [~,~,unk_p_hat_ts(k1,:)] = test([source;unk_source], gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain, [sourceTest;unk_source_pos], nL, nU, roomSize, T60, c, fs, kern_typ, subscales);        
         end
-        misalign_resids(:,count) =  mean(pre_p_hat_ts - misalign_p_hat_ts,2);
-        unk_resids(:,unk_count) =  mean(pre_p_hat_ts - unk_p_hat_ts,2);
+        misalign_resids(:,count) =  abs(mean(pre_p_hat_ts - misalign_p_hat_ts,2));
+        unk_resids(:,unk_count) =  abs(mean(pre_p_hat_ts - unk_p_hat_ts,2));
         
         unk_count = unk_count+1;
         count = count+1;

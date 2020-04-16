@@ -15,7 +15,7 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetectorOpt(x, trans
     
     %---- Set likelihoods (to be maximized during msg passing calc.) ----
     for k = 1:numArrays
-        theta1 = 2*normpdf(resids(k), 0, init_var);
+        theta1 = 2*normpdf(resids(k)*2, 0, init_var);
         theta2 = (lambda*exp(-lambda*resids(k)))/(1-exp(-lambda*eMax));
         theta3 = unifrnd(0,eMax);
         likes(k,:) = [theta1 theta2 theta3];
