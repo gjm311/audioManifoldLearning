@@ -15,5 +15,5 @@ function [tprs, fprs] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, mode
         tprs(thr) = tps/(tps+fns+10e-6);
         fprs(thr) = fps/(fps+tns+10e-6);        
    
-  
+    end
 end

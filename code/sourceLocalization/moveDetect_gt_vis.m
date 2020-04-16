@@ -12,7 +12,6 @@ load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 load('./mat_results/gt_results.mat')
 % load('mat_results/vari_t60_data.mat')
 % load('mat_outputs/movementOptParams')
-ts = [1 4 8];
 
 % simulate different noise levels
 radii = 0:.03:.13;
@@ -36,14 +35,15 @@ gt_fn = zeros(num_gts, num_threshes);
 gt_tprs = zeros(num_gts, num_threshes);
 gt_fprs = zeros(num_gts, num_threshes);
 
+t = 2;
 for tt = 1:num_gts
     for thr = 1:num_threshes
-        gt_tp(tt,thr) = t_str(tt,thr).tp;
-        gt_fp(tt,thr) = t_str(tt,thr).fp;
-        gt_tn(tt,thr) = t_str(tt,thr).tn;
-        gt_fn(tt,thr) = t_str(tt,thr).fn;
-        gt_tprs(tt,thr) = t_str(tt,thr).tpr;
-        gt_fprs(tt,thr) = t_str(tt,thr).fpr;
+        gt_tp(tt,thr) = t_str(t,tt,thr).tp;
+        gt_fp(tt,thr) = t_str(t,tt,thr).fp;
+        gt_tn(tt,thr) = t_str(t,tt,thr).tn;
+        gt_fn(tt,thr) = t_str(t,tt,thr).fn;
+        gt_tprs(tt,thr) = t_str(t,tt,thr).tpr;
+        gt_fprs(tt,thr) = t_str(t,tt,thr).fpr;
     
     end
 end
