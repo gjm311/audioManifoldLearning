@@ -68,10 +68,7 @@ function [mrf_res, nai_res, sub_res] =  nodeID(noise,micScales, micGammaLs, micR
             
             latents = round(posteriors);
             mrf_comp_arr = find(latents(:,1) == 1);
-            lg = size(mrf_comp_arr,1);
             if mrf_comp_arr == movingArray
-                mrf_t = mrf_t+1;
-            elseif lg == 0
                 mrf_t = mrf_t+1;
             else
                 mrf_f = mrf_f+1;
