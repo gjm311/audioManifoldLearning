@@ -69,17 +69,18 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetectorOpt(x, trans
     end
 
     latents = round(posteriors);
-    MIS = sum(latents(:,2))/(numArrays - sum(latents(:,3))+10e-6);
-    if MIS > .3
-        p_fail = 1;
-    else
-        p_fail = 0;
-    end
-    
+%     MIS = sum(latents(:,2))/(numArrays - sum(latents(:,3))+10e-6);
+%     if MIS > .3
+%         p_fail = 1;
+%     else
+%         p_fail = 0;
+%     end
+%     
     mis_probs = posteriors(:,2);
     if sum(latents(:,2)) > 0
-        prob_failure = (1/t)*(p_fails*(t-1)+p_fail)*(mean(mis_probs(latents(:,2) == 1)));
+%         prob_failure = mean(mis_probs(latents(:,2) == 1));
+        prob_failure = mean(mis_probs(latents(:,2) == 1));
     else
-        prob_failure = (1/t)*(p_fails*(t-1)+p_fail);
+        prob_failure = 0;
     end
 end

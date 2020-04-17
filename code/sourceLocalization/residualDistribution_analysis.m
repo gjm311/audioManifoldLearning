@@ -11,10 +11,12 @@ addpath './mat_outputs'
 
 load('resEsts.mat')
 
-aligns = abs(reshape(align_resids,[1,numArrays*size(align_resids,2)]))./sum(abs(reshape(align_resids,[1,numArrays*size(align_resids,2)])));
-misaligns = abs(reshape(misalign_resids,[1,numArrays*size(misalign_resids,2)]))./sum(abs(reshape(misalign_resids,[1,numArrays*size(misalign_resids,2)])));
-unks = abs(reshape(unk_resids,[1,numArrays*size(unk_resids,2)]))./sum(abs(reshape(unk_resids,[1,numArrays*size(unk_resids,2)])));
+% aligns = abs(reshape(align_resids,[1,numArrays*size(align_resids,2)]))./sum(abs(reshape(align_resids,[1,numArrays*size(align_resids,2)])));
+% misaligns = abs(reshape(misalign_resids,[1,numArrays*size(misalign_resids,2)]))./sum(abs(reshape(misalign_resids,[1,numArrays*size(misalign_resids,2)])));
+% unks = abs(reshape(unk_resids,[1,numArrays*size(unk_resids,2)]))./sum(abs(reshape(unk_resids,[1,numArrays*size(unk_resids,2)])));
 
+aligns = align_resids./sum(align_resids);
+misaligns = misalign_resids./sum(align_resids);
 
 % edges = zeros(1,1000);
 count = 1;
@@ -22,26 +24,26 @@ stop = 1;
 skip = .0005;
 start = skip;
 rng = start:skip:stop;
-pdfs = zeros(3,stop/skip);
+pdfs = zeros(2,stop/skip);
 
 for r = 1:size(pdfs,2)
     mnRng = rng(r)- skip;
     mxRng = rng(r);
-    for j = 1:3
+    for j = 1:2
         if j == 1
            curr = aligns;
+           for i = 1:size(aligns,2)
+                if and(curr(i) < mxRng, curr(i) >= mnRng)
+                    pdfs(j,r) = pdfs(j,r) + 1;
+                end
+            end
+  
         end
         if j == 2
            curr = misaligns;
         end
-        if j == 3
-            curr = unks;
-        end
-        for i = 1:size(aligns,2)
-            if and(curr(i) < mxRng, curr(i) >= mnRng)
-                pdfs(j,r) = pdfs(j,r) + 1;
-            end
-        end
+        
+       
         pdfs(j,r) = pdfs(j,r)/size(aligns,2); 
     end   
 end
