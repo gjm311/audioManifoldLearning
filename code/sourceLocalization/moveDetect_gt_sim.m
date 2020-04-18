@@ -66,11 +66,6 @@ for t = 1:num_ts
     %             sub_thresh = sub_threshes(thr);
 
             mrf_res = gtVary(thresh, sourceTrain, wavs, gammaL, T60, gt, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
-
-    %             t_str(t,thr).tp_check = mrf_res(1);
-    %             t_str(t,thr).fp_check = mrf_res(2);
-    %             t_str(t,thr).tn_check = mrf_res(3);
-    %             t_str(t,thr).fn_check = mrf_res(4);
             t_str(t,g,thr).tp = mrf_res(1);
             t_str(t,g,thr).fp = mrf_res(2);
             t_str(t,g,thr).tn = mrf_res(3);
