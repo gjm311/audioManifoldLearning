@@ -10,6 +10,7 @@ addpath ./shortSpeech
 
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 load('./mat_results/gt_results.mat')
+
 % load('mat_results/vari_t60_data.mat')
 % load('mat_outputs/movementOptParams')
 
@@ -53,41 +54,49 @@ end
 
 
 %--- Interpolate data and plot ROC curve for naive and mrf detectors ---
-t = 1;
-gt_tp = reshape(tp(t,:,:), [num_gts,num_threshes]);
-gt_fp = reshape(fp(t,:,:), [num_gts,num_threshes]);
-gt_tn = reshape(tn(t,:,:), [num_gts,num_threshes]);
-gt_fn = reshape(fn(t,:,:), [num_gts,num_threshes]);
-gt_tprs = reshape(tprs(t,:,:), [num_gts,num_threshes]);
-gt_fprs = reshape(fprs(t,:,:), [num_gts,num_threshes]);
-        
-xq = 1:.05:num_threshes;
-interp_gt_tprs = zeros(num_gts,size(xq,2));
-interp_gt_fprs = zeros(num_gts,size(xq,2));
+xq = 1:.001:num_threshes;
+interp_gt_tprs = zeros(num_ts*num_gts,size(xq,2));
+interp_gt_fprs = zeros(num_ts*num_gts,size(xq,2));
 
-for gt = 1:num_gts
-%     interp_gt_tp = interp1(gt_tp(gt,:),xq);
-%     interp_gt_fp = interp1(gt_fp(gt,:),xq);
-%     interp_gt_tn = interp1(gt_tn(gt,:),xq);
-%     interp_gt_fn = interp1(gt_fn(gt,:),xq);
-% 
-%     interp_gt_tprs(gt,:) = (interp_gt_tp./(interp_gt_tp+interp_gt_fn+10e-6));
-%     interp_gt_fprs(gt,:) = (interp_gt_fp./(interp_gt_fp+interp_gt_tn+10e-6));
-   
-    interp_gt_tprs(gt,:) = sort(interp1(gt_tprs(gt,:),xq));
-    interp_gt_fprs(gt,:) = sort(interp1(gt_fprs(gt,:),xq));
+for t = 1:3
+    gt_tp = reshape(tp(t,:,:), [num_gts,num_threshes]);
+    gt_fp = reshape(fp(t,:,:), [num_gts,num_threshes]);
+    gt_tn = reshape(tn(t,:,:), [num_gts,num_threshes]);
+    gt_fn = reshape(fn(t,:,:), [num_gts,num_threshes]);
+    gt_tprs = reshape(tprs(t,:,:), [num_gts,num_threshes]);
+    gt_fprs = reshape(fprs(t,:,:), [num_gts,num_threshes]);
+
+    for gt = 1:num_gts
+        interp_gt_tp = interp1(gt_tp(gt,:),xq);
+        interp_gt_fp = interp1(gt_fp(gt,:),xq);
+        interp_gt_tn = interp1(gt_tn(gt,:),xq);
+        interp_gt_fn = interp1(gt_fn(gt,:),xq);
+
+        interp_gt_tprs(gt+(t-1)*num_ts,:) = sort(interp_gt_tp./(interp_gt_tp+interp_gt_fn+10e-6));
+        interp_gt_fprs(gt+(t-1)*num_ts,:) = sort(interp_gt_fp./(interp_gt_fp+interp_gt_tn+10e-6));
+
+    %     interp_gt_tprs(gt,:) = sort(interp1(gt_tprs(gt,:),xq));
+    %     interp_gt_fprs(gt,:) = sort(interp1(gt_fprs(gt,:),xq));
+    end
 end
 
 figure(1)
-mrf1 = plot(interp_gt_fprs(1,:), interp_gt_tprs(1,:), '-.g');
+mrf1 = plot(interp_gt_fprs(1,:), interp_gt_tprs(1,:), ':g');
 hold on
-mrf2 = plot(interp_gt_fprs(2,:), interp_gt_tprs(2,:), '-.b');
-mrf3 = plot(interp_gt_fprs(3,:), interp_gt_tprs(3,:), '-.r');
+mrf2 = plot(interp_gt_fprs(2,:), interp_gt_tprs(2,:), ':b');
+mrf3 = plot(interp_gt_fprs(3,:), interp_gt_tprs(3,:), ':r');
+% mrf4 = plot(interp_gt_fprs(4,:), interp_gt_tprs(4,:), '-*g');
+% mrf5 = plot(interp_gt_fprs(5,:), interp_gt_tprs(5,:), '-*b');
+% mrf6 = plot(interp_gt_fprs(6,:), interp_gt_tprs(6,:), '-*r');
+mrf7 = plot(interp_gt_fprs(7,:), interp_gt_tprs(7,:), '--g');
+mrf8 = plot(interp_gt_fprs(8,:), interp_gt_tprs(8,:), '--b');
+mrf9 = plot(interp_gt_fprs(9,:), interp_gt_tprs(9,:), '--r');
 base = plot(threshes,threshes, 'black');
-title(sprintf('ROC Curve: Array Movement Detection (T60 = .15s, .5s) \n Curves for Increasing Ground Truth (GT) Thresholds with Varying Detection Thresholds \n [GT in meters for diffrence in positional estimate before/after movement]'))
+title(sprintf('ROC Curve: Array Movement Detection (T60 = .15s, .5s) \n Curves for Increasing Ground Truth (GT) Thresholds with Varying Detection Thresholds \n [GTs (meters) are based off shift tolerance]'))
 xlabel('FPR')
 ylabel('TPR')
-legend([mrf1,mrf2,mrf3,base], 'GT = 0.1m, T60=.15s', 'GT =0.75m, T60=.15s','GT=1.45m, T60=.15s', 'Baseline', 'Location','southeast')
+% legend([mrf1,mrf2,mrf3,mrf4,mrf5,mrf6,mrf7,mrf8,mrf9,base], 'GT = 0.1m, T60=.15s', 'GT =0.75m, T60=.15s','GT=1.45m, T60=.15s', 'GT = 0.1m, T60=.3s', 'GT =0.75m, T60=.3s','GT=1.45m, T60=.3s', 'GT = 0.1m, T60=.55s', 'GT =0.75m, T60=.55s','GT=1.45m, T60=.55s', 'Baseline', 'Location','southeast')
+legend([mrf1,mrf2,mrf3,mrf7,mrf8,mrf9,base], 'GT = 0.1m, T60=.15s', 'GT =0.75m, T60=.15s','GT=1.45m, T60=.15s', 'GT = 0.1m, T60=.5s', 'GT =0.75m, T60=.5s','GT=1.45m, T60=.5s', 'Baseline', 'Location','southeast')
 %     xlim([0 1.05])
 % hold off
 % ylim([0 1.05])

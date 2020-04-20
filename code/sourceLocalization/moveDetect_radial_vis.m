@@ -152,19 +152,24 @@ for riter = 1:size(radii,2)
         %PLOT
         f = plotRoom(roomSize, micsPosNew, sourceTrain, sourceTest, nL, p_hat_t);
         title(sprintf('Detecting Array Movement \n [Array Movement: %s m]', num2str(radius_mic)))
+     
 %         naiveTxt = text(.6,.5, sprintf('Network Estimate Distance:\n %s',num2str(round(naive_p_fail,2))));
 %         naive2Txt = text(2.6,.5, sprintf('Std of Sub-Network Estimate Diff.:\n %s',num2str(round(naive2_p_fail,2))));
-        binTxt = text(3.6,.5, sprintf('MRF Based Probability: %s',num2str(round(p_fail,2))));
-        prbTxt = text(labelPos(:,1),labelPos(:,2), labels, 'HorizontalAlignment', 'left', 'VerticalAlignment', 'bottom');
+        if it == 2
+            plot()
+            binTxt = text(3.6,.5, sprintf('MRF Based Probability: %s',num2str(round(p_fail,2))));
+            prbTxt = text(labelPos(:,1),labelPos(:,2), labels, 'HorizontalAlignment', 'left', 'VerticalAlignment', 'bottom');
 
-        %     %Uncomment below for pauses between iterations only continued by
-    %     %clicking graph  
-        w = waitforbuttonpress;
-        delete(binTxt);
-        delete(prbTxt);
-%         delete(naiveTxt);
-%         delete(naive2Txt);
-        clf
+            %     %Uncomment below for pauses between iterations only continued by
+        %     %clicking graph  
+            w = waitforbuttonpress;
+            
+        end
+    %         delete(binTxt);
+            delete(prbTxt);
+    %         delete(naiveTxt);
+    %         delete(naive2Txt);
+%         clf
          
     end
    

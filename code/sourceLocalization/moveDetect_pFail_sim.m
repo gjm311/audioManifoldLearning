@@ -1,4 +1,4 @@
-clear
+
 addpath ./RIR-Generator-master
 addpath ./functions
 mex -setup c++
@@ -22,12 +22,12 @@ disp('Setting up the room');
 load('mat_outputs/monoTestSource_biMicCircle_5L300U')
 
 %simulate different noise levels
-radii = 0:.1:2;
+radii = .05:.2:1.25;
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 
 %---- Set MRF params ----
-num_iters = 1000;
+num_iters = 100;
 
 p_fails = zeros(num_radii,num_iters);
 
@@ -42,7 +42,7 @@ for r = 1:num_radii
 
         movingArray = randi(numArrays);
 
-        [~, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+        [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
         wavs = dir('./shortSpeech/');
     %             wav_folder = wavs(3:27);
         rand_wav = randi(25);
@@ -63,7 +63,7 @@ for r = 1:num_radii
             [~,~,sub_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
                 sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
         end
-        [~, p_fails(r,num_iters), ~] = moveDetector(x_tst, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
+        [~, p_fails(r,iters), ~] = moveDetector(x_tst, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
                 rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ);
 
     end
