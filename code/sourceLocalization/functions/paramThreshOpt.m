@@ -43,8 +43,7 @@ function [tp_ch_curr,fp_ch_curr,tn_ch_curr,fn_ch_curr] = paramThreshOpt(med_radi
                             numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
 
                 
-            local_fail = mean(mean(((sourceTest-p_hat_t).^2)));
-            if local_fail >= modelMean+modelSd        
+            if radius_mic >= .075      
                 if p_fail >= thresh
                     tp_ch_curr = tp_ch_curr + 1;
                 else
@@ -54,7 +53,7 @@ function [tp_ch_curr,fp_ch_curr,tn_ch_curr,fn_ch_curr] = paramThreshOpt(med_radi
             end
 
 %                 if local_fail < modelMean+modelSd
-            if local_fail < modelMean+modelSd
+            if radius_mic < .075
                 if p_fail >= thresh
                     fp_ch_curr = fp_ch_curr + 1;
                 else

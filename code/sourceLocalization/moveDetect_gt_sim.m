@@ -24,7 +24,7 @@ disp('Setting up the room');
 % micScales = scales;
 % micGammaLs = gammaLs;
 
-load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U_3')
 % load('mat_results/vari_t60_data.mat')
 % load('mat_outputs/movementOptParams')
 
@@ -85,7 +85,7 @@ for t = 1:num_ts
 
         end
     end
-    save('mat_results/gt_results', 't_str') 
+    save('mat_results/gt_results_t60_pointEight', 't_str') 
 end   
 % end
 

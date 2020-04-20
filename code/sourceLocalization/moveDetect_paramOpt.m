@@ -18,25 +18,25 @@ the proabilities of failure of the MRF based movement detector.
 disp('Setting up the room');
 % ---- Initialize Parameters for training ----
 
-%---- load training data (check mat_trainParams for options)----
+% %---- load training data (check mat_trainParams for options)----
 % load('mat_results/vari_t60_data')
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 
 
 %simulate different noise levels
-radii = 0:.3:1.5;
+radii = [0 .65 .85 1.5];
 % num_radii = size(radii,2);
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 
 %---- Set MRF params ----
 transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
-init_vars = .05:.1:1.05;
-lambdas = .05:.1:.75;
+init_vars = .05:.1:.55;
+lambdas = .05:.1:.55;
 eMax = .3;
-threshes = 0:.1:1;
+threshes = 0:.25:1;
 num_threshes = size(threshes,2);
-num_iters = 1;
+num_iters = 5;
 numVaris = size(init_vars,2);
 numLams = size(lambdas,2);
 num_ts = size(T60s,2);
@@ -46,6 +46,7 @@ wavs = dir('./shortSpeech/');
 tprs = zeros(num_threshes, numLams, numVaris);
 fprs = zeros(num_threshes, numLams, numVaris);
 aucs = zeros(numLams, numVaris);
+
 
 for lam = 1:numLams
     lambda = lambdas(lam);
@@ -57,7 +58,7 @@ for lam = 1:numLams
         tpr_ch_curr = zeros(1,num_threshes);
         fpr_ch_curr = zeros(1,num_threshes);
             
-        for t = 1:num_ts    
+        for t = 1:num_ts  
             
             T60 = T60s(t);
             modelMean = modelMeans(t);
@@ -69,10 +70,11 @@ for lam = 1:numLams
             [tpr_out, fpr_out] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
             tpr_ch_curr = tpr_ch_curr + tpr_out;
             fpr_ch_curr = fpr_ch_curr + fpr_out;
+            auc = trapz(flip(fpr_ch_curr),flip(tpr_ch_curr));
         end
         tprs(:,lam,v) = tpr_ch_curr./(num_ts);
         fprs(:,lam,v) = fpr_ch_curr./(num_ts);
-        aucs(lam,v) = trapz(fprs(:,lam,v),tprs(:,lam,v));
+        aucs(lam,v) = trapz(flip(fpr_ch_curr./(num_ts)),flip(tpr_ch_curr./(num_ts)));
 
     end
     save('paramOpt_results', 'tprs', 'fprs', 'aucs');   
