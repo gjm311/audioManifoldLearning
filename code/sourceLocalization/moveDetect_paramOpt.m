@@ -24,19 +24,19 @@ load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 
 
 %simulate different noise levels
-radii = 0:.3:1.5;
+radii = [0 .65 .85 1.5];
 % num_radii = size(radii,2);
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 
 %---- Set MRF params ----
 transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
-init_vars = .05:.1:1.05;
-lambdas = .05:.1:.75;
+init_vars = .05:.1:.55;
+lambdas = .05:.1:.55;
 eMax = .3;
-threshes = 0:.1:1;
+threshes = 0:.25:1;
 num_threshes = size(threshes,2);
-num_iters = 1;
+num_iters = 5;
 numVaris = size(init_vars,2);
 numLams = size(lambdas,2);
 num_ts = size(T60s,2);
@@ -75,6 +75,6 @@ for lam = 1:numLams
         aucs(lam,v) = trapz(fprs(:,lam,v),tprs(:,lam,v));
 
     end
-    save('paramOpt_results', 'tprs', 'fprs', 'aucs');   
+    save('./mat_results/paramOpt_results', 'tprs', 'fprs', 'aucs');   
 end
 
