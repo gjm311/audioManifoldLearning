@@ -1,18 +1,19 @@
 clear
 addpath ./RIR-Generator-master
 addpath ./functions
-mex -setup c++
-mex RIR-Generator-master/rir_generator.cpp;
+% mex -setup c++
+% mex RIR-Generator-master/rir_generator.cpp;
 addpath ./stft
 addpath ./shortSpeech
 
 % load('./mat_results/threshTestResults4')
 
+load('./mat_results/gt_results_t60_pointEight.mat')
+t_str8 = t_str;
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 load('./mat_results/gt_results.mat')
-
-% load('mat_results/vari_t60_data.mat')
-% load('mat_outputs/movementOptParams')
+t_str(4,:,:) = t_str8;
+T60s = [T60s .8];
 
 % simulate different noise levels
 radii = [0 .65 .85 1.5];
@@ -58,7 +59,7 @@ xq = 1:.001:num_threshes;
 interp_gt_tprs = zeros(num_ts*num_gts,size(xq,2));
 interp_gt_fprs = zeros(num_ts*num_gts,size(xq,2));
 
-for t = 1:3
+for t = 1:num_ts
     gt_tp = reshape(tp(t,:,:), [num_gts,num_threshes]);
     gt_fp = reshape(fp(t,:,:), [num_gts,num_threshes]);
     gt_tn = reshape(tn(t,:,:), [num_gts,num_threshes]);
@@ -72,8 +73,8 @@ for t = 1:3
         interp_gt_tn = interp1(gt_tn(gt,:),xq);
         interp_gt_fn = interp1(gt_fn(gt,:),xq);
 
-        interp_gt_tprs(gt+(t-1)*num_ts,:) = sort(interp_gt_tp./(interp_gt_tp+interp_gt_fn+10e-6));
-        interp_gt_fprs(gt+(t-1)*num_ts,:) = sort(interp_gt_fp./(interp_gt_fp+interp_gt_tn+10e-6));
+        interp_gt_tprs(gt+(t-1)*num_gts,:) = sort(interp_gt_tp./(interp_gt_tp+interp_gt_fn+10e-6));
+        interp_gt_fprs(gt+(t-1)*num_gts,:) = sort(interp_gt_fp./(interp_gt_fp+interp_gt_tn+10e-6));
 
     %     interp_gt_tprs(gt,:) = sort(interp1(gt_tprs(gt,:),xq));
     %     interp_gt_fprs(gt,:) = sort(interp1(gt_fprs(gt,:),xq));
@@ -81,22 +82,24 @@ for t = 1:3
 end
 
 figure(1)
-mrf1 = plot(interp_gt_fprs(1,:), interp_gt_tprs(1,:), ':g');
+% mrf1 = plot(interp_gt_fprs(1,:), interp_gt_tprs(1,:), 'g');
+% hold on
+% mrf2 = plot(interp_gt_fprs(2,:), interp_gt_tprs(2,:), 'b');
+% mrf3 = plot(interp_gt_fprs(3,:), interp_gt_tprs(3,:), 'r');
+% mrf4 = plot(interp_gt_fprs(7,:), interp_gt_tprs(7,:), ':g');
+% hold on
+% mrf5 = plot(interp_gt_fprs(8,:), interp_gt_tprs(8,:), ':b');
+% mrf6 = plot(interp_gt_fprs(9,:), interp_gt_tprs(9,:), ':r');
+mrf7 = plot(interp_gt_fprs(10,:), interp_gt_tprs(10,:), '--g');
 hold on
-mrf2 = plot(interp_gt_fprs(2,:), interp_gt_tprs(2,:), ':b');
-mrf3 = plot(interp_gt_fprs(3,:), interp_gt_tprs(3,:), ':r');
-% mrf4 = plot(interp_gt_fprs(4,:), interp_gt_tprs(4,:), '-*g');
-% mrf5 = plot(interp_gt_fprs(5,:), interp_gt_tprs(5,:), '-*b');
-% mrf6 = plot(interp_gt_fprs(6,:), interp_gt_tprs(6,:), '-*r');
-mrf7 = plot(interp_gt_fprs(7,:), interp_gt_tprs(7,:), '--g');
-mrf8 = plot(interp_gt_fprs(8,:), interp_gt_tprs(8,:), '--b');
-mrf9 = plot(interp_gt_fprs(9,:), interp_gt_tprs(9,:), '--r');
+mrf8 = plot(interp_gt_fprs(11,:), interp_gt_tprs(11,:), '--b');
+mrf9 = plot(interp_gt_fprs(12,:), interp_gt_tprs(12,:), '--r');
 base = plot(threshes,threshes, 'black');
-title(sprintf('ROC Curve: Array Movement Detection (T60 = .15s, .5s) \n Curves for Increasing Ground Truth (GT) Thresholds with Varying Detection Thresholds \n [GTs (meters) are based off shift tolerance]'))
+title(sprintf('ROC Curve: Array Movement Detection (T60 = .8s) \n Curves for Increasing Ground Truth (GT) Thresholds with Varying Detection Thresholds \n [GTs (meters) are based off shift tolerance]'))
 xlabel('FPR')
 ylabel('TPR')
-% legend([mrf1,mrf2,mrf3,mrf4,mrf5,mrf6,mrf7,mrf8,mrf9,base], 'GT = 0.1m, T60=.15s', 'GT =0.75m, T60=.15s','GT=1.45m, T60=.15s', 'GT = 0.1m, T60=.3s', 'GT =0.75m, T60=.3s','GT=1.45m, T60=.3s', 'GT = 0.1m, T60=.55s', 'GT =0.75m, T60=.55s','GT=1.45m, T60=.55s', 'Baseline', 'Location','southeast')
-legend([mrf1,mrf2,mrf3,mrf7,mrf8,mrf9,base], 'GT = 0.1m, T60=.15s', 'GT =0.75m, T60=.15s','GT=1.45m, T60=.15s', 'GT = 0.1m, T60=.5s', 'GT =0.75m, T60=.5s','GT=1.45m, T60=.5s', 'Baseline', 'Location','southeast')
+% legend([mrf1,mrf2,mrf3,mrf4,mrf5,mrf6,mrf7,mrf8,mrf9,base], 'GT = 0.1m, T60=.15s', 'GT =0.75m, T60=.15s','GT=1.45m, T60=.15s', 'GT = 0.1m, T60=.5s', 'GT =0.75m, T60=.5s','GT=1.45m, T60=.5s', 'GT = 0.1m, T60=.8s', 'GT =0.75m, T60=.8s','GT=1.45m, T60=.8s', 'Baseline', 'Location','southeast')
+legend([mrf7,mrf8,mrf9, base],  'GT = 0.1m, T60=.8s', 'GT =0.75m, T60=.8s','GT=1.45m, T60=.8s', 'Baseline', 'Location','southeast')
 %     xlim([0 1.05])
 % hold off
 % ylim([0 1.05])
@@ -138,20 +141,33 @@ legend([mrf1,mrf2,mrf3,mrf7,mrf8,mrf9,base], 'GT = 0.1m, T60=.15s', 'GT =0.75m, 
 % hold off
 % ylim([0 1.05])
 
-
+% 
 % figure(2)
 % heatmap([sum(tp_check) tn_check; fp_check fn_check]);
+% tp_check = zeros(1,num_threshes);
+% fp_check = zeros(1,num_threshes);
+% tn_check = zeros(1,num_threshes);
+% fn_check = zeros(1,num_threshes);
+% 
+% t = 1;
+% gt = 1;
+% for th = 1:num_threshes
+%     tp_check(th) = t_str(t,gt,th).tp; 
+%     fp_check(th) = t_str(t,gt,th).fp; 
+%     tn_check(th) = t_str(t,gt,th).tn; 
+%     fn_check(th) = t_str(t,gt,th).fn;     
+% end
 % 
 % figure(2)
-% bar(threshes, tp_check)
-% title(sprintf('True Positive Movement Detections For Different Probability Thresholds\n (70 Trials per Threshold Simulated w/Varying Array Shifts)\n[Shifts: 0 - 0.5m by 5cm increments]'))
+% bar(threshes, fn_check)
+% title(sprintf('False Negative Movement Detections For Different Probability Thresholds\n (T60: .15s, Ground Truth: .1m)'))
 % xlabel('Probability Threshold')
 % ylabel('Frequency of Flags')
-% ylim([0 max(tp_check)+5])
+% ylim([0 80])
 % 
 % figure(3)
-% bar(threshes, fp_check)
+% bar(threshes, fn_check)
 % title(sprintf('False Positive Movement Detections For Different Probability Thresholds\n (110 Trials per Threshold Simulated w/Varying Array Shifts)\n[Shifts: 0 - 0.5m by 5cm increments]'))
 % xlabel('Probability Threshold')
 % ylabel('Frequency of Flags')
-% ylim([0 max(fp_check)+5])
+% ylim([0 max(fn_check)+5])
