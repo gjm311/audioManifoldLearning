@@ -8,8 +8,8 @@ addpath ./shortSpeech
 
 % load('./mat_results/threshTestResults4')
 
-load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
-load('./mat_results/paramOpt_results.mat')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
+load('./mat_results/paramOpt_results_4.mat')
 
 radii = [0 .65 .85 1.5];
 % num_radii = size(radii,2);
@@ -28,40 +28,42 @@ numVaris = size(init_vars,2);
 numLams = size(lambdas,2);
 num_ts = size(T60s,2);
 
-figure(1)
-h = heatmap(aucs);
-title(sprintf('AUCs for Varying MRF Hyper-Parameters'))
-xlabel('\lambda')
-ylabel('\sigma^2')
-% ax = gca;
-h.XData = round(lambdas,2);
-h.YData = round(init_vars,2);
-ax = gca;
-
-%--- Interpolate data and plot ROC curve for naive and mrf detectors ---
-xq = 1.5:.05:10.5;
-for nv = 1:numVaris
-    for nl = 1:numLams
-
-        interp_tprs = sort(tprs(:,nl,nv));
-        interp_fprs = sort(fprs(:,nl,nv));
-
-        figure(2)
-        if aucs(nl,nv) == max(max(aucs))
-            mrf_opt = plot(interp_fprs,interp_tprs, 'p');
-        else
-            mrf = plot(interp_fprs,interp_tprs, ':g');
-        end
-        hold on
-        % sub = plot(sub_fpr, sub_tpr, '--b');
-        base = plot(threshes,threshes, 'black');
-        title(sprintf('ROC Curves: Array Movement Detection\n Curves for varying hyper-paramter choices of the MRF model'))
-        xlabel('FPR')
-        ylabel('TPR')
-        if and(nv == numVaris,nl==numLams)
-            legend([mrf,mrf_opt,base], 'ROC for choice of MRF Paramters', 'ROC with Max AUC', 'Baseline', 'Location','southeast')
-        end
-       
-    end
+for t=1:num_ts
+    figure(t)
+    h = heatmap(reshape(aucs(t),[numLams,numVaris]));
+    title(sprintf('AUCs for Varying MRF Hyper-Parameters'))
+    xlabel('\lambda')
+    ylabel('\sigma^2')
+    % ax = gca;
+    h.XData = round(lambdas,2);
+    h.YData = round(init_vars,2);
+    ax = gca;
 end
 
+%--- Interpolate data and plot ROC curve for naive and mrf detectors ---
+% xq = 1.5:.05:10.5;
+% for nv = 1:numVaris
+%     for nl = 1:numLams
+% 
+%         interp_tprs = sort(tprs(:,nl,nv));
+%         interp_fprs = sort(fprs(:,nl,nv));
+% 
+%         figure(2)
+%         if aucs(nl,nv) == max(max(aucs))
+%             mrf_opt = plot(interp_fprs,interp_tprs, 'p');
+%         else
+%             mrf = plot(interp_fprs,interp_tprs, ':g');
+%         end
+%         hold on
+%         % sub = plot(sub_fpr, sub_tpr, '--b');
+%         base = plot(threshes,threshes, 'black');
+%         title(sprintf('ROC Curves: Array Movement Detection\n Curves for varying hyper-paramter choices of the MRF model'))
+%         xlabel('FPR')
+%         ylabel('TPR')
+%         if and(nv == numVaris,nl==numLams)
+%             legend([mrf,mrf_opt,base], 'ROC for choice of MRF Paramters', 'ROC with Max AUC', 'Baseline', 'Location','southeast')
+%         end
+%        
+%     end
+% end
+% 

@@ -36,7 +36,7 @@ nD = size(sourceTrain,1);
 totalMics = numMics*numArrays;
 rirLen = 1000;
 rtfLen = 500;
-T60s = [.15 .5 .8];
+T60s = .15:.05:.85;
 num_ts = size(T60s,2);
 %grad descent params
 x = randn(1,10*fs);

@@ -20,12 +20,11 @@ disp('Setting up the room');
 
 %---- load training data (check mat_trainParams for options)----
 % load('mat_results/vari_t60_data')
-load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
 
 
-%simulate different noise levels
+%set radii shifts of microphone array
 radii = [0 .65 .85 1.5];
-% num_radii = size(radii,2);
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 
@@ -43,9 +42,9 @@ num_ts = size(T60s,2);
 
 wavs = dir('./shortSpeech/');
 
-tprs = zeros(num_threshes, numLams, numVaris);
-fprs = zeros(num_threshes, numLams, numVaris);
-aucs = zeros(numLams, numVaris);
+tprs = zeros(numLams, numVaris,num_ts, num_threshes);
+fprs = zeros(numLams, numVaris, num_ts, num_threshes);
+aucs = zeros(numLams, numVaris, num_ts);
 
 for lam = 1:numLams
     lambda = lambdas(lam);
@@ -67,14 +66,17 @@ for lam = 1:numLams
             gammaL = reshape(gammaLs(t,:,:), [nL, nL]);            
 
             [tpr_out, fpr_out] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
-            tpr_ch_curr = tpr_ch_curr + tpr_out;
-            fpr_ch_curr = fpr_ch_curr + fpr_out;
+            tprs(lam,v,t,:) = tpr_out;
+            fprs(lam,v,t,:) = fpr_out;
+            aucs(lam,v,t) = trapz(fpr_out,tpr_out);
+%             tpr_ch_curr = tpr_ch_curr + tpr_out;
+%             fpr_ch_curr = fpr_ch_curr + fpr_out;
         end
-        tprs(:,lam,v) = tpr_ch_curr./(num_ts);
-        fprs(:,lam,v) = fpr_ch_curr./(num_ts);
-        aucs(lam,v) = trapz(fprs(:,lam,v),tprs(:,lam,v));
+%         tprs(:,lam,v) = tpr_ch_curr./(num_ts);
+%         fprs(:,lam,v) = fpr_ch_curr./(num_ts);
+%         aucs(lam,v) = trapz(fprs(:,lam,v),tprs(:,lam,v));
 
     end
-    save('./mat_results/paramOpt_results', 'tprs', 'fprs', 'aucs');   
+    save('./mat_results/paramOpt_results_4', 'tprs', 'fprs', 'aucs', 'init_vars', 'lambdas');   
 end
 

@@ -24,11 +24,14 @@ disp('Setting up the room');
 % micScales = scales;
 % micGammaLs = gammaLs;
 
-load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
+load('./mat_results/paramOpt_results_4.mat')
+num_lambdas = size(lambdas,2);
+num_varis = size(init_vars,2);
 % load('mat_results/vari_t60_data.mat')
 % load('mat_outputs/movementOptParams')
 
-% simulate different noise levels
+% assign radial shifts of microphone array 
 radii = [0 .65 .85 1.5];
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
@@ -36,8 +39,8 @@ wavs = dir('./shortSpeech/');
 
 %---- Set MRF params ----
 transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
-init_var = .2;
-lambda = .3;
+% init_var = .2;
+% lambda = .3;
 eMax = .3;
 threshes = 0:.05:1;
 num_threshes = size(threshes,2);
@@ -53,6 +56,10 @@ for t = 1:num_ts
     RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
     scales = scales_t(t,:);
     gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
+    [lam_pos,var_pos] = find(reshape(aucs(:,:,t),[num_lambdas,num_varis]) == max(max(reshape(aucs(:,:,t),[num_lambdas,num_varis]))));
+    lambda = lambdas(lam_pos);
+    init_var = init_vars(var_pos);
+    
     %     micRTF_train = reshape(micRTF_trains(t,:,:,:), [numArrays, nD, rtfLen, numMics]);
     %     micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
     %     micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
@@ -87,7 +94,5 @@ for t = 1:num_ts
     end
     save('mat_results/gt_results', 't_str') 
 end   
-% end
 
-% save('mat_results/thresh_res')
 
