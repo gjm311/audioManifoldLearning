@@ -85,4 +85,4 @@ for t = 1:num_ts
     gammaLs(t,:,:) = inv(sigmaL + diag(ones(1,nL).*vari));
 end
 
-save('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
+save('mat_outputs/monoTestSource_biMicCircle_5L300U_4')

@@ -23,18 +23,17 @@ load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 % modelSd = .1;
 
 %simulate different noise levels
-radii = .75; 
+radii = .85; 
 its_per = 10;
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
-accs = struct([]);
 wav_folder = dir('./shortSpeech/');
 wav_folder = wav_folder(3:27);
 inits = 1;
 rotation = 0;
 
 transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
-init_var = .1;
-lambda = .2;
+init_var = .2;
+lambda = .3;
 eMax = .3;
 thresh = .3;
 
@@ -49,51 +48,33 @@ gammaL = reshape(gammaLs(t_curr,:,:), [nL, nL]);
 
 
 for riter = 1:size(radii,2)
-    acc_curr = struct([]);
+    
     radius_mic = radii(riter);
-    if riter == 1
-        iters_per = its_per+1;
-    else 
-        iters_per = its_per;
-    end
-    for it = 1:iters_per 
+   
+    for it = 1:its_per 
         %randomize tst source, new position of random microphone (new
         %position is on circle based off radius_mic), random rotation to
         %microphones, and random sound file (max 4 seconds).
-        sourceTest = randSourcePos(1, roomSize, radiusU*.35, ref);
+        if it == 1
+            sourceTest = randSourcePos(1, roomSize, radiusU*.55, ref);
+        end
         if inits > 1
-            movingArray = randi(numArrays);
-            [rotation, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
-%             if radius_mic == 0
-%                 micsPosNew = micsPos;
-%             elseif movingArray == 1
-%                 micsPosNew = [micsPos(1:2,:)+[0 radius_mic 0]; micsPos(1+numMics:end,:)];
-%             elseif movingArray == numArrays
-%                 micsPosNew = [micsPos(1:end-numMics,:); micsPos(7:8,:)+[radius_mic 0 0]];
-%             elseif movingArray == 2
-%                 micsPosNew = [micsPos(1:numMics,:); micsPos(3:4,:)+[radius_mic 0 0]; micsPos(2*numMics+1:end,:)];
-%             else
-%                 micsPosNew = [micsPos(1:numMics*2,:); micsPos(5:6,:)+[0 radius_mic 0]; micsPos(3*numMics+1:end,:)];
-%             end
-                % randMicPos = mic_ref(1,:)+[0 radius_mic 0];
-    %             new_x1 = randMicPos(:,1)+.025;
-    %             new_y1 = randMicPos(:,2);
-    %             new_x2 = randMicPos(:,1)-.025;
-    %             new_y2 = randMicPos(:,2);
-    %             micsPosNew = [new_x1 new_y1 1;new_x2 new_y2 1; micsPos(1+numMics:end,:)];
-
+%             movingArray = randi(numArrays);
+            [rotation, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
         else
             movingArray = randi(numArrays);
             micsPosNew = micsPos;
             inits = 2;
         end
         
-        rand_wav = randi(numel(wav_folder));
-        file = wav_folder(rand_wav).name;
-        [x_tst,fs_in] = audioread(file);
-        [numer, denom] = rat(fs/fs_in);
-        x_tst = resample(x_tst,numer,denom);
-        x_tst = x_tst';
+        if it == 1
+            rand_wav = randi(numel(wav_folder));
+            file = wav_folder(rand_wav).name;
+            [x_tst,fs_in] = audioread(file);
+            [numer, denom] = rat(fs/fs_in);
+            x_tst = resample(x_tst,numer,denom);
+            x_tst = x_tst';
+        end
        
         %---- Initialize subnet estimates of training positions ----
         sub_p_hat_ts = zeros(numArrays, 3); 
@@ -102,16 +83,16 @@ for riter = 1:size(radii,2)
             [~,~,sub_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
                 sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
         end
-        [self_sub_p_hat_ts, p_fail, posteriors] = moveDetectorOpt(x_tst, transMat, init_var, lambda, eMax, thresh, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
+        [self_sub_p_hat_ts, p_fail, posteriors] = moveDetector(x_tst, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
                 rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ);
             
 % % %     ---- estimate test positions before movement ----
 % %         [~,~, pre_p_hat_t] = test(x_tst, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
 % %                         numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
 % % 
-% %     %---- estimate test positions after movement ----
-% %         [~,~, p_hat_t] = test(x_tst, gammaL, RTF_train, micsPosNew, rirLen, rtfLen, numArrays,...
-% %                         numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
+    %---- estimate test positions after movement ----
+        [~,~, p_hat_t] = test(x_tst, gammaL, RTF_train, micsPosNew, rirLen, rtfLen, numArrays,...
+                        numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
 % %         
 %         mean_naives = zeros(numArrays,1);
 %         sub_naives = zeros(numArrays,1);
@@ -150,19 +131,24 @@ for riter = 1:size(radii,2)
 %         naive_p_fail = norm(p_hat_t - pre_p_hat_t);
 %         naive2_p_fail = mean(std(self_sub_p_hat_ts- sub_p_hat_ts));
         %PLOT
+        figure(2)
         f = plotRoom(roomSize, micsPosNew, sourceTrain, sourceTest, nL, p_hat_t);
-        title(sprintf('Detecting Array Movement \n [Array Movement: %s m]', num2str(radius_mic)))
+        title(sprintf('Detecting Array Movement \n [Array Shift: %s m]', num2str(radius_mic)))
      
 %         naiveTxt = text(.6,.5, sprintf('Network Estimate Distance:\n %s',num2str(round(naive_p_fail,2))));
 %         naive2Txt = text(2.6,.5, sprintf('Std of Sub-Network Estimate Diff.:\n %s',num2str(round(naive2_p_fail,2))));
-        if it == 2
-            plot()
+        if it >1
             binTxt = text(3.6,.5, sprintf('MRF Based Probability: %s',num2str(round(p_fail,2))));
-            prbTxt = text(labelPos(:,1),labelPos(:,2), labels, 'HorizontalAlignment', 'left', 'VerticalAlignment', 'bottom');
-
+            prbTxt = text(labelPos(1:3,1),labelPos(1:3,2), labels(1:3), 'HorizontalAlignment', 'right', 'VerticalAlignment', 'bottom');
+            prbTxt = text(labelPos(4,1),labelPos(4,2), labels(4), 'HorizontalAlignment', 'left', 'VerticalAlignment', 'bottom');
+            dp = mean(micsPosNew(1:2,:))-mic_ref(1,:);
+            q = quiver(mic_ref(1),mic_ref(2)-.1,dp(1),dp(2)+.2,'linewidth',3,'color','blue');
+            dp2 = (p_hat_t - [3.2 2.79 1]);
+            q2 = quiver(3.2+.1,2.79,dp2(1)-.25,dp2(2)-.05,.9,'linewidth',2.7,'color','green');
             %     %Uncomment below for pauses between iterations only continued by
         %     %clicking graph  
             w = waitforbuttonpress;
+            delete(prbTxt);
             
         end
     %         delete(binTxt);
@@ -170,6 +156,7 @@ for riter = 1:size(radii,2)
     %         delete(naiveTxt);
     %         delete(naive2Txt);
 %         clf
+        w = waitforbuttonpress;
          
     end
    
