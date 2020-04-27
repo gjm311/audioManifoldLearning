@@ -49,8 +49,9 @@ num_ts = size(T60s,2);
 t_str = ([]);
 gts = [.1 .75 1.45];
 num_gts = size(gts,2);
+load('mat_results/gt_results_4', 't_str')
 
-for t = 1:num_ts
+for t = 3
 
     T60 = T60s(t);
     RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
