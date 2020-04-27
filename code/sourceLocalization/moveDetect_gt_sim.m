@@ -92,7 +92,7 @@ for t = 1:num_ts
 
         end
     end
-    save('mat_results/gt_results', 't_str') 
+    save('mat_results/gt_results_4', 't_str') 
 end   
 
 

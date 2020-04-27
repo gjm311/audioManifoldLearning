@@ -45,8 +45,9 @@ wavs = dir('./shortSpeech/');
 tprs = zeros(numLams, numVaris,num_ts, num_threshes);
 fprs = zeros(numLams, numVaris, num_ts, num_threshes);
 aucs = zeros(numLams, numVaris, num_ts);
+load('./mat_results/paramOpt_results_4', 'tprs', 'fprs', 'aucs', 'init_vars', 'lambdas');   
 
-for lam = 1:numLams
+for lam = 4:6
     lambda = lambdas(lam);
 
     for v = 1:numVaris
@@ -68,7 +69,7 @@ for lam = 1:numLams
             [tpr_out, fpr_out] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
             tprs(lam,v,t,:) = tpr_out;
             fprs(lam,v,t,:) = fpr_out;
-            aucs(lam,v,t) = trapz(fpr_out,tpr_out);
+            aucs(lam,v,t) = trapz(flip(fpr_out),flip(tpr_out));
 %             tpr_ch_curr = tpr_ch_curr + tpr_out;
 %             fpr_ch_curr = fpr_ch_curr + fpr_out;
         end

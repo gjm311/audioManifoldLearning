@@ -22,6 +22,7 @@ disp('Setting up the room');
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
 
 %simulate different noise levels
+num_ts = size(T60s,2);
 radii = 0.05:.2:3.05;
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];

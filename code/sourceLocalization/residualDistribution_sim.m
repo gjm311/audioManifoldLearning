@@ -21,6 +21,7 @@ load('mat_outputs/monoTestSource_biMicCircle_5L300U_4.mat')
 % scales = scales_t(t,:);
 % gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
 % T60s = .15:.15:.9;
+num_ts = 3;
 snrs = 0:5:40;
 num_snrs = size(snrs,2);
 max_movement = 6;
