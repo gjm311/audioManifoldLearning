@@ -17,7 +17,7 @@ function [tp_ch_curr,fp_ch_curr,tn_ch_curr,fn_ch_curr] = paramThreshOpt(med_radi
 
 %             wav_folder = wavs(3:27);
             try
-                rand_wav = randi(25);
+                rand_wav = randi(5);
                 file = wavs(rand_wav+2).name;
                 [x_tst,fs_in] = audioread(file);
                 [numer, denom] = rat(fs/fs_in);

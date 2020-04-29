@@ -28,12 +28,17 @@ numVaris = size(init_vars,2);
 numLams = size(lambdas,2);
 num_ts = size(T60s,2);
 
+
+
+
 for t=1:num_ts
     figure(t)
-    h = heatmap(reshape(aucs(t),[numLams,numVaris]));
-    title(sprintf('AUCs for Varying MRF Hyper-Parameters'))
-    xlabel('\lambda')
-    ylabel('\sigma^2')
+%     h = heatmap(reshape(aucs(:,:,t),[numLams,numVaris]));
+    h = heatmap(mean(aucs,3));
+%     title(sprintf('AUCs for Varying MRF Hyper-Parameters \nT-60 = %s',num2str(round(T60s(t),2))))
+    title(sprintf('AUCs for Varying MRF Hyper-Parameters \n Averaged for all T-60s'))
+    ylabel('\lambda')
+    xlabel('\sigma^2')
     % ax = gca;
     h.XData = round(lambdas,2);
     h.YData = round(init_vars,2);

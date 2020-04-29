@@ -7,33 +7,91 @@ to random position in room).
 %}
 
 addpath './mat_outputs'
-load('resEsts.mat')
+load('resEsts_4.mat')
+load('./mat_results/paramOpt_results_4.mat')
+num_lambdas = size(lambdas,2);
+num_varis = size(init_vars,2);
+num_ts = size(T60s,2);
 
-[bin_aligns,al_edges] = discretize(rmoutliers(align_resids),50);
-[bin_misaligns,mis_edges] = discretize(rmoutliers(misalign_resids,'mean'),50);
+align_resids = align_resids.*100;
+misalign_resids = misalign_resids.*100;
+% for r = 1:size(align_resids,1)
+for r = 1:num_ts
+    [bin_aligns,al_edges] = discretize(rmoutliers(align_resids(r,:)),50);
+    [bin_misaligns,mis_edges] = discretize(rmoutliers(misalign_resids(r,:),'mean'),50);
+    lam_pos = find(mean(reshape(aucs(:,:,r),[num_lambdas,num_varis]),2) == max(mean(reshape(aucs(:,:,r),[num_lambdas,num_varis]),2)));
+    var_pos = find(mean(reshape(aucs(:,:,r),[num_lambdas,num_varis]),1) == max(mean(reshape(aucs(:,:,r),[num_lambdas,num_varis]),1)));
+    [lam_pos,var_pos] = find(reshape(aucs(:,:,r),[num_lambdas,num_varis]) == max(max(reshape(aucs(:,:,r),[num_lambdas,num_varis]))));
+    lambda = lambdas(lam_pos);
+    init_var = init_vars(var_pos);
+    [avgOpt_lam_pos,avgOpt_var_pos] = find(mean(aucs,3) == max(max(mean(aucs,3))));
+    avgOpt_lambda = lambdas(avgOpt_lam_pos);
+    avgOpt_init_var = init_vars(avgOpt_var_pos);
+    
+    %Generate PDF for NORMAL distribution corresponding to actual data, and
+    %based on optimal variance for choice T60 and averaged over all T60s
+    figure()
+    h = bar(hist(bin_aligns)./sum(hist(bin_aligns)));
+    hold on
+    title(sprintf('Aligned Distribution [T60 = %s]', num2str(round(T60s(r),2))))
+    az ={round(al_edges,3)};
+    set(gca,'XTickLabel',az)
+    ylim([0,1])
+    xlabel('Min. Bin Error');
+    ylabel('Probability Density');
+    num_bins = size(h.YData,2)+1;
+%     act_pd = fitdist(transpose(h.YData),'Normal');
+    opt_pd = makedist('Normal',0,init_var);
+    avgOpt_pd = makedist('Normal',0,avgOpt_init_var);
+%     act_pdf_hist = hist(pdf(act_pd,sort(align_resids(r,:))),num_bins);
+    opt_pdf_hist = hist(pdf(opt_pd,sort(align_resids(r,:))),num_bins);
+    avgOpt_pdf_hist = hist(pdf(avgOpt_pd,sort(align_resids(r,:))),num_bins);
+%     act_scale_factor = max(act_pdf_hist)/(h.YData(1));
+    opt_scale_factor = max(opt_pdf_hist)/(h.YData(1));
+    avgOpt_scale_factor = max(avgOpt_pdf_hist)/(h.YData(1));
+%     act_pdf = act_pdf_hist./act_scale_factor;
+    opt_pdf = opt_pdf_hist./opt_scale_factor;
+    avgOpt_pdf = avgOpt_pdf_hist./avgOpt_scale_factor;
+%     pAct = plot([-1:num_bins],[act_pdf(1)+.05 act_pdf(1)+.05 act_pdf], 'LineWidth',3);
+    pOpt = plot([-1:num_bins],[opt_pdf(1)+.05 opt_pdf(1)+.05 opt_pdf], ':', 'LineWidth',2); 
+    pAvgOpt = plot([-1:num_bins],[avgOpt_pdf(1)+.05 avgOpt_pdf(1)+.05 avgOpt_pdf], '--', 'LineWidth',2);
+    legend([pOpt, pAvgOpt], sprintf('Fitted pdf with optimal variance for specified T60  (%s = %s)','\sigma^2',num2str(round(init_var,2))), sprintf('Fitted pdf based on optimal variance for all T60s (%s = %s)','\sigma^2',num2str(round(avgOpt_init_var,2))))
+%     legend([pAct, pOpt, pAvgOpt], 'Fitted pdf based on empirical data','Fitted pdf with optimal variance for specified T60', 'Fitted pdf based on optimal variance for all T60s')   
+    xlim([0,num_bins])
+    hold off
+    
+    %Generate PDFs for EXPONENTIAL distribution corresponding to actual data, and
+    %based on optimal variance for choice T60 and averaged over all T60s
+    figure()
+    h = bar(hist(bin_misaligns)./sum(hist(bin_misaligns)));
+    hold on
+    title(sprintf('Misaligned Distribution [T60 = %s]', num2str(round(T60s(r),2))))
+    mz = {round(mis_edges,3)};
+    set(gca,'XTickLabel',mz)
+    ylim([0,1])
+    xlabel('Min. Bin Error');
+    ylabel('Probability Density');
+%     act_pd = fitdist(transpose(h.YData),'Exponential');
+%     act_pdf_hist = hist(pdf(act_pd,sort(align_resids(r,:))),num_bins);
+    opt_pdf_hist = hist(exppdf(sort(align_resids(r,:)), lambda),num_bins);
+    avgOpt_pdf_hist = hist(exppdf(sort(align_resids(r,:)), avgOpt_lambda),num_bins);
+%     act_scale_factor = max(act_pdf_hist)/(h.YData(1));
+    opt_scale_factor = max(opt_pdf_hist)/(h.YData(1));
+    avgOpt_scale_factor = max(avgOpt_pdf_hist)/(h.YData(1));
+%     act_pdf = act_pdf_hist./act_scale_factor;
+    opt_pdf = opt_pdf_hist./opt_scale_factor;
+    avgOpt_pdf = avgOpt_pdf_hist./avgOpt_scale_factor;
+%     pAct = plot([-1:num_bins],[act_pdf(1)+.05 act_pdf(1)+.05 act_pdf], 'LineWidth',3);
+    pOpt = plot([-1:num_bins],[opt_pdf(1)+.05 opt_pdf(1)+.05 opt_pdf], ':', 'LineWidth',2); 
+    pAvgOpt = plot([-1:num_bins],[avgOpt_pdf(1)+.05 avgOpt_pdf(1)+.05 avgOpt_pdf], '--', 'LineWidth',2);
+    legend([pOpt, pAvgOpt], sprintf('Fitted pdf with optimal variance for specified T60  (%s = %s)','\lambda',num2str(round(lambda,2))), sprintf('Fitted pdf based on optimal variance for all T60s (%s = %s)','\lambda',num2str(round(avgOpt_lambda,2))))
+%     legend([pAct, pOpt, pAvgOpt], 'Fitted pdf based on empirical data','Fitted pdf with optimal variance for specified T60', 'Fitted pdf based on optimal variance for all T60s')   
+    xlim([0,num_bins])
+    hold off
+end
 
 
-figure(1)
-h = bar(hist(bin_aligns)./sum(hist(bin_aligns)));
-title('Aligned Distribution')
-az ={round(al_edges,3)};
-set(gca,'XTickLabel',az)
-ylim([0,1])
-xlabel('Min. Bin Error');
-ylabel('Probability Density');
-ax = gca;
-ax.TitleFontSizeMultiplier  = 2;
 
-figure(2)
-h = bar(hist(bin_misaligns)./sum(hist(bin_misaligns)));
-title({'Misaligned Distribution'})
-mz = {round(mis_edges,3)};
-set(gca,'XTickLabel',mz)
-ylim([0,1])
-xlabel('Min. Bin Error');
-ylabel('Probability Density');
-ax = gca;
-ax.TitleFontSizeMultiplier  = 2;
 
 % % edges = zeros(1,1000);
 % count = 1;
