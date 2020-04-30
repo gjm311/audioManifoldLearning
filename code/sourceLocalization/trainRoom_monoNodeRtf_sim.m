@@ -47,7 +47,7 @@ nD = size(sourceTrain,1);
 totalMics = numMics*numArrays;
 rirLen = 1000;
 rtfLen = 500;
-T60s = [0.15 0.5 0.8];
+T60s = [0.2 0.4 0.6];
 num_ts = size(T60s,2);
 x = randn(1,10*fs);
 
@@ -85,5 +85,5 @@ for t6 = 1:num_ts
     end
 end
 
-save('mat_outputs/biMicCircle_5L300U_monoNode_2', 'micRTF_trains', 'micScales', 'micGammaLs')
+save('mat_outputs/biMicCircle_5L300U_monoNode_4', 'micRTF_trains', 'micScales', 'micGammaLs')
 

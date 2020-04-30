@@ -29,7 +29,7 @@ num_ts = size(T60s,2);
 %---- Set MRF params ----
 num_iters = 100;
 
-p_fails = zeros(num_radii,num_ts);
+p_fails = zeros(num_radii,num_ts,num_iters);
 
 for r = 1:num_radii
     radius_mic = radii(r);
@@ -72,14 +72,14 @@ for r = 1:num_radii
             end
             [~, p_fail_out, ~] = moveDetector(x_tst, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
                     rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ);
-            p_fail_curr = p_fail_curr + p_fail_out;
+            p_fails(r,t,iters) =  p_fail_out;
         end
-        p_fails(r,t) = p_fail_curr/num_iters;
+       
     end
 end
     
-p_fail = mean(p_fails,2);
+p_fail = mean(mean(p_fails,2),3);
 
-save('./mat_results/pFail_res_4', 'p_fail', 'radii')
+save('./mat_results/pFail_res_4', 'p_fails', 'p_fail', 'radii')
 
 
