@@ -11,11 +11,11 @@ addpath ./shortSpeech
 % load('./mat_results/gt_results_t60_pointEight.mat')
 % t_str8 = t_str;
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
-load('./mat_results/gt_avg_results_4.mat')
-save('./mat_results/gt_indT_results_4.mat')
-save('./mat_results/gt_avgT_results_4.mat')
+load('./mat_results/gt_monoNai_results_4.mat')
 % t_str(4,:,:) = t_str8;
 % T60s = [T60s .8];
+
+t_str = mono_t_str;
 
 % simulate different noise levels
 radii = [0 .65 .85 1.5];
@@ -25,7 +25,7 @@ wavs = dir('./shortSpeech/');
 
 %---- Set MRF params ----
 threshes = 0:.05:1;
-num_threshes = size(threshes,2);
+num_threshes = size(t_str,3);
 num_iters = 20;
 num_ts = size(T60s,2);
 gts = [.1 .75 1.45];
@@ -74,8 +74,8 @@ for t = 1:num_ts
         interp_gt_tprs(gt+(t-1)*num_gts,:) = sort(interp_gt_tp./(interp_gt_tp+interp_gt_fn+10e-6));
         interp_gt_fprs(gt+(t-1)*num_gts,:) = sort(interp_gt_fp./(interp_gt_fp+interp_gt_tn+10e-6));
 
-    %     interp_gt_tprs(gt,:) = sort(interp1(gt_tprs(gt,:),xq));
-    %     interp_gt_fprs(gt,:) = sort(interp1(gt_fprs(gt,:),xq));
+%         interp_gt_tprs(gt,:) = sort(interp1(gt_tprs(gt,:),xq));
+%         interp_gt_fprs(gt,:) = sort(interp1(gt_fprs(gt,:),xq));
     end
 end
 

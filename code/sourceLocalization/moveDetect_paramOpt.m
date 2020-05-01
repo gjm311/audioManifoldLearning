@@ -29,7 +29,9 @@ num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 
 %---- Set MRF params ----
-transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
+selfs = .6:.05:.9;
+opps = .4:.05:.1;
+transMats = zeros(10,3,3);
 init_vars = .05:.1:.55;
 lambdas = .05:.1:.55;
 eMax = .3;
@@ -42,42 +44,45 @@ num_ts = size(T60s,2);
 
 wavs = dir('./shortSpeech/');
 
-tprs = zeros(numLams, numVaris,num_ts, num_threshes);
+tprs = zeros(numTrans,numLams, numVaris,num_ts, num_threshes);
 fprs = zeros(numLams, numVaris, num_ts, num_threshes);
-aucs = zeros(numLams, numVaris, num_ts);
-load('./mat_results/paramOpt_results_4', 'tprs', 'fprs', 'aucs', 'init_vars', 'lambdas');   
+aucs = zeros(numLams, numVaris, num_ts); 
 
-for lam = 4:6
-    lambda = lambdas(lam);
+for tr = 1:numTrans
+    transmats(tr,3,:) = [1/3 1/3 1/3];
+    
+    
+    for lam = 1:numLams
+        lambda = lambdas(lam);
 
-    for v = 1:numVaris
-        
-        init_var = init_vars(v);
-        
-        tpr_ch_curr = zeros(1,num_threshes);
-        fpr_ch_curr = zeros(1,num_threshes);
-            
-        for t = 1:num_ts    
-            
-            T60 = T60s(t);
-            modelMean = modelMeans(t);
-            modelSd = modelSds(t);
-            RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
-            scales = scales_t(t,:);
-            gammaL = reshape(gammaLs(t,:,:), [nL, nL]);            
+        for v = 1:numVaris
 
-            [tpr_out, fpr_out] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
-            tprs(lam,v,t,:) = tpr_out;
-            fprs(lam,v,t,:) = fpr_out;
-            aucs(lam,v,t) = trapz(flip(fpr_out),flip(tpr_out));
-%             tpr_ch_curr = tpr_ch_curr + tpr_out;
-%             fpr_ch_curr = fpr_ch_curr + fpr_out;
+            init_var = init_vars(v);
+
+            tpr_ch_curr = zeros(1,num_threshes);
+            fpr_ch_curr = zeros(1,num_threshes);
+
+            for t = 1:num_ts    
+
+                T60 = T60s(t);
+                modelMean = modelMeans(t);
+                modelSd = modelSds(t);
+                RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
+                scales = scales_t(t,:);
+                gammaL = reshape(gammaLs(t,:,:), [nL, nL]);            
+
+                [tpr_out, fpr_out] = paramOpt(sourceTrain, wavs, gammaL, T60, modelMean, modelSd, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
+                tprs(lam,v,t,:) = tpr_out;
+                fprs(lam,v,t,:) = fpr_out;
+                aucs(lam,v,t) = trapz(flip(fpr_out),flip(tpr_out));
+    %             tpr_ch_curr = tpr_ch_curr + tpr_out;
+    %             fpr_ch_curr = fpr_ch_curr + fpr_out;
+            end
+    %         tprs(:,lam,v) = tpr_ch_curr./(num_ts);
+    %         fprs(:,lam,v) = fpr_ch_curr./(num_ts);
+    %         aucs(lam,v) = trapz(fprs(:,lam,v),tprs(:,lam,v));
+
         end
-%         tprs(:,lam,v) = tpr_ch_curr./(num_ts);
-%         fprs(:,lam,v) = fpr_ch_curr./(num_ts);
-%         aucs(lam,v) = trapz(fprs(:,lam,v),tprs(:,lam,v));
-
+        save('./mat_results/paramOpt_results_4', 'tprs', 'fprs', 'aucs', 'init_vars', 'lambdas', 'transMats');   
     end
-    save('./mat_results/paramOpt_results_4', 'tprs', 'fprs', 'aucs', 'init_vars', 'lambdas');   
 end
-
