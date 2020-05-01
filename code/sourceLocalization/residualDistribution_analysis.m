@@ -34,7 +34,7 @@ for r = 1:num_ts
     h = bar(hist(bin_aligns)./sum(hist(bin_aligns)));
     hold on
     title(sprintf('Aligned Distribution [T60 = %s]', num2str(round(T60s(r),2))))
-    az ={round(al_edges,3)};
+    az ={round(al_edges(1:5:end),3)};
     set(gca,'XTickLabel',az)
     ylim([0,1])
     xlabel('Min. Bin Error');
@@ -66,7 +66,7 @@ for r = 1:num_ts
     h = bar(hist(bin_misaligns)./sum(hist(bin_misaligns)));
     hold on
     title(sprintf('Misaligned Distribution [T60 = %s]', num2str(round(T60s(r),2))))
-    mz = {round(mis_edges,3)};
+    mz = {round(mis_edges(1:5:end),3)};
     set(gca,'XTickLabel',mz)
     ylim([0,1])
     xlabel('Min. Bin Error');

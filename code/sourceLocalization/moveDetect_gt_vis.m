@@ -15,7 +15,7 @@ load('./mat_results/gt_monoNai_results_4.mat')
 % t_str(4,:,:) = t_str8;
 % T60s = [T60s .8];
 
-t_str = sub_t_str;
+t_str = mono_t_str;
 
 % simulate different noise levels
 radii = [0 .65 .85 1.5];

@@ -48,7 +48,7 @@ for t = 1:num_ts
     modStds = ones(1,size(localErrors,1))*modStd;
     
     localError = reshape(mean(localErrors(:,t,:),3),[1,16]);
-    localErrorSds = std(reshape(localErrors(:,t,:),[100,16]));
+    localError = reshape(mean(p_fails(:,t,:),3),[1,16]);
 %     semLE = localErrorSds./sqrt(num_samples);
 %     localError_ci95 = semLE*tinv(.975, num_samples-1);
 
@@ -137,6 +137,6 @@ for t = 1:num_ts
     % mz = {[0 round(radii(1:2:end),2)]};
     % xticklabels(mz)
     % set(gca,'XTickLabel',mz)
-    ylim([0 0.2])
+    ylim([0 15])
     xlim([0 3])
 end
