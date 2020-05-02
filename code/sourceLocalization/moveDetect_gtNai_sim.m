@@ -35,12 +35,13 @@ mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 wavs = dir('./shortSpeech/');
 
 %---- Set MRF params ----
-mono_threshes = 0.3:.05:.6;
-sub_threshes = 340:12:412;
+mono_threshes = [0 0.5:.25:2.5 100];
+sub_threshes = [0:1.25:11.25 10000];
 num_threshes = size(sub_threshes,2);
 num_iters = 20;
 num_ts = size(T60s,2);
-t_str = ([]);
+mono_t_str = ([]);
+sub_t_str = ([]);
 gts = [.1 .75 1.45];
 num_gts = size(gts,2);
 
@@ -63,23 +64,23 @@ for t = 1:num_ts
             sub_thresh = sub_threshes(thr);
 
             [mono_res,sub_res] = gtNaiVary(mono_thresh, sub_thresh, sourceTrain, wavs, gammaL, T60, gt, micRTF_train, micScale, micGammaL, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
-            t_str(t,g,thr).tp = mono_res(1);
-            t_str(t,g,thr).fp = mono_res(2);
-            t_str(t,g,thr).tn = mono_res(3);
-            t_str(t,g,thr).fn = mono_res(4);
-            t_str(t,g,thr).tpr = mono_res(1)/(mono_res(1)+mono_res(4)+10e-6);
-            t_str(t,g,thr).fpr = mono_res(2)/(mono_res(2)+mono_res(3)+10e-6);
+            mono_t_str(t,g,thr).tp = mono_res(1);
+            mono_t_str(t,g,thr).fp = mono_res(2);
+            mono_t_str(t,g,thr).tn = mono_res(3);
+            mono_t_str(t,g,thr).fn = mono_res(4);
+            mono_t_str(t,g,thr).tpr = mono_res(1)/(mono_res(1)+mono_res(4)+10e-6);
+            mono_t_str(t,g,thr).fpr = mono_res(2)/(mono_res(2)+mono_res(3)+10e-6);
             
-            t_str(t,g,thr).tp = sub_res(1);
-            t_str(t,g,thr).fp = sub_res(2);
-            t_str(t,g,thr).tn = sub_res(3);
-            t_str(t,g,thr).fn = sub_res(4);
-            t_str(t,g,thr).tpr = sub_res(1)/(sub_res(1)+sub_res(4)+10e-6);
-            t_str(t,g,thr).fpr = sub_res(2)/(sub_res(2)+sub_res(3)+10e-6);
+            sub_t_str(t,g,thr).tp = sub_res(1);
+            sub_t_str(t,g,thr).fp = sub_res(2);
+            sub_t_str(t,g,thr).tn = sub_res(3);
+            sub_t_str(t,g,thr).fn = sub_res(4);
+            sub_t_str(t,g,thr).tpr = sub_res(1)/(sub_res(1)+sub_res(4)+10e-6);
+            sub_t_str(t,g,thr).fpr = sub_res(2)/(sub_res(2)+sub_res(3)+10e-6);
 
         end
     end
-    save('mat_results/gt_nai_results_4', 't_str') 
+    save('mat_results/gt_nai_results_4', 'mono_t_str', 'sub_t_str') 
 end   
 
 
