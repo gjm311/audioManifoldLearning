@@ -1,4 +1,4 @@
-function [mono_res, sub_res] = gtNaiVary(mono_thresh,sub_thresh,sourceTrain, wavs, gammaL, T60, gt, micRTF_train, micScales, micGammaLs, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
+function [mono_res, sub_res] = gtNaiVary(mono_thresh,sub_thresh,sourceTrain, wavs, gammaL, T60, gt, micRTF_train, micScale, micGammaL, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
     num_radii = size(radii, 2);
     nD = size(RTF_train,1);
     mono_tp_ch_curr = 0;
@@ -40,19 +40,26 @@ function [mono_res, sub_res] = gtNaiVary(mono_thresh,sub_thresh,sourceTrain, wav
                 [~,~,sub_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
                     sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
             end
+              
+          %---- Initialize subnet estimates of training positions ----
+            sub_naives = zeros(numArrays,1);
+            for k = 1:numArrays
+                [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPosNew, RTF_train);
+                [~,~,post_sub_p_hat_ts] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
+                    sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
+                sub_naives(k) = mean((post_sub_p_hat_ts-sub_p_hat_ts(k,:)).^2);
+            end
             
             mono_naives = zeros(numArrays,1);
-            sub_naives = zeros(numArrays,1);
             naive_p_hat_ts = zeros(numArrays,3);
             for k = 1:numArrays
-        %                 [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPos, RTF_train);
                 subnet = micsPosNew((k-1)*numMics+1:k*numMics,:);
-                subscales = micScales(k,:);
-                gammaL = reshape(micGammaLs(k,:,:),[nL,nL]);
+                subscales = micScale(k,:);
+                gammaL = reshape(micGammaL(k,:,:),[nL,nL]);
                 trRTF = reshape(micRTF_train(k,:,:,:), [nD, rtfLen, numMics]);
                 [~,~,naive_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, 1, numMics, sourceTrain,...
                     sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
-                sub_naives(k) = mean((naive_p_hat_ts(k,:)-sub_p_hat_ts(k,:)).^2);
+%                 sub_naives(k) = mean((naive_p_hat_ts(k,:)-sub_p_hat_ts(k,:)).^2);
             end
 
             mono_naives(1) = mean(pdist(naive_p_hat_ts(2:4,:)));

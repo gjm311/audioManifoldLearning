@@ -37,7 +37,7 @@ for r = 1:num_ts
     az ={round(al_edges(1:5:end),3)};
     set(gca,'XTickLabel',az)
     ylim([0,1])
-    xlabel('Min. Bin Error');
+    xlabel('Min. Bin Error (m)');
     ylabel('Probability Density');
     num_bins = size(h.YData,2)+1;
 %     act_pd = fitdist(transpose(h.YData),'Normal');
@@ -69,7 +69,7 @@ for r = 1:num_ts
     mz = {round(mis_edges(1:5:end),3)};
     set(gca,'XTickLabel',mz)
     ylim([0,1])
-    xlabel('Min. Bin Error');
+    xlabel('Min. Bin Error (m)');
     ylabel('Probability Density');
 %     act_pd = fitdist(transpose(h.YData),'Exponential');
 %     act_pdf_hist = hist(pdf(act_pd,sort(align_resids(r,:))),num_bins);

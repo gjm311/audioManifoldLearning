@@ -1,4 +1,3 @@
-
 addpath ./RIR-Generator-master
 addpath ./functions
 mex -setup c++
@@ -78,23 +77,19 @@ for r = 1:num_radii
                 [~,~,sub_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
                     sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
             end
-            
-            
-            
+              
           %---- Initialize subnet estimates of training positions ----
             sub_naives = zeros(numArrays,1);
             for k = 1:numArrays
-                [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPos, RTF_train);
+                [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPosNew, RTF_train);
                 [~,~,post_sub_p_hat_ts] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
                     sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
                 sub_naives(k) = mean((post_sub_p_hat_ts-sub_p_hat_ts(k,:)).^2);
             end
             
             mono_naives = zeros(numArrays,1);
-            sub_naives = zeros(numArrays,1);
             naive_p_hat_ts = zeros(numArrays,3);
             for k = 1:numArrays
-        %                 [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPos, RTF_train);
                 subnet = micsPosNew((k-1)*numMics+1:k*numMics,:);
                 subscales = micScale(k,:);
                 gammaL = reshape(micGammaL(k,:,:),[nL,nL]);
@@ -110,7 +105,7 @@ for r = 1:num_radii
             mono_naives(4) = mean(pdist(naive_p_hat_ts(1:3,:)));
             
             monoLocalErrors(r,t,iters) = max(mono_naives);
-            subLocalErrors(r,t,iters) = min(sub_naives);
+            subLocalErrors(r,t,iters) = max(sub_naives);
         end
        
     end
