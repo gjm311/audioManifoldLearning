@@ -73,12 +73,12 @@ for t = 1:num_ts
             %Estimate error for misaligned case (i.e. mic
             %array now moved and with added noise and slightly altered T60.
             movingArray = randi(numArrays);
-            radius_mic = rand*max_movement;
+            radius_mic = 3;
             [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
             [~,~,misalign_p_hat_t] = test(unk_noisy_x, gammaL, RTF_train, micsPosNew, rirLen, rtfLen, numArrays, numMics, sourceTrain, unk_source_pos, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
 
-            align_resids(t,count) = mean(mean(((pre_p_hat_t-align_p_hat_t).^2)));
-            misalign_resids(t,count) = mean(mean(((pre_p_hat_t-misalign_p_hat_t).^2)));
+            align_resids(t,count) = mean(mean(((sourceTest-align_p_hat_t).^2)));
+            misalign_resids(t,count) = mean(mean(((sourceTest-misalign_p_hat_t).^2)));
             count = count+1;
         end
     end

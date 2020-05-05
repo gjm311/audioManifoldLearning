@@ -21,8 +21,6 @@ load('./mat_results/pFail_res_4', 'p_fail', 'p_fails', 'radii')
 num_ts = size(p_fails,2);
 num_samples = 100;
 
-
-
 pfailSds = std(reshape(p_fails(:,t,:),[100,16]));
 sem = pfailSds./sqrt(num_samples);
 pfail_ci95 = sem*tinv(.975, num_samples-1);
@@ -44,28 +42,59 @@ load('./mat_results/localErrorFull_res', 'localErrors', 'radii')
 % localError = reshape(mean(mean(localErrors,3),2),[1,16]);
 for t = 1:num_ts
     T60 = T60s(t);
-    modStd = modelMeans(t);
-    modStds = ones(1,size(localErrors,1))*modStd;
+    modMean = modelMeans(t);
+    modMeans = ones(1,size(localErrors,1))*modMean;
     
     localError = reshape(mean(localErrors(:,t,:),3),[1,16]);
-    localError = reshape(mean(p_fails(:,t,:),3),[1,16]);
+    
 %     semLE = localErrorSds./sqrt(num_samples);
 %     localError_ci95 = semLE*tinv(.975, num_samples-1);
 
     figure(2)
     if t == 1
-        noMove1 = plot([radii], [modStds], '--r');
+        noMove1 = plot([radii], [modMeans], '--r');
         hold on
         eBar1 = plot([radii], [localError], 'r');
     elseif t == 2
-        noMove2 = plot([radii], [modStds],'--b');
+        noMove2 = plot([radii], [modMeans],'--b');
         eBar2 = plot([radii], [localError],'b');
     else
-        noMove3 = plot([radii], [modStds],'--g');
+        noMove3 = plot([radii], [modMeans],'--g');
         eBar3 = plot([radii], [localError],'g');
         legend([eBar1,eBar2,eBar3,noMove1,noMove2,noMove3], 'Avg. Error (T60 = 0.2s)','Avg. Error (T60 = 0.4s)', 'Avg. Error (T60 = 0.6s)', 'Avg. Error No Movement (T60 = 0.2s)','Avg. Error No Movement (T60 = 0.4s)', 'Avg. Error No Movement (T60 = 0.6s)')
     end
     title(sprintf('Average Error in Source Estimation After Movement\n Comparison with Average Error with no Movement\n[Shifts: 0.05m - 3.05m by 20cm increments]'))
+    xlabel(sprintf('Array Shift (m) from Location Before Movement'))
+    ylabel(sprintf('Estimation Error (m) After Shift'))
+    % mz = {[0 round(radii(1:2:end),2)]};
+    % xticklabels(mz)
+    % set(gca,'XTickLabel',mz)
+    ylim([0 1])
+    xlim([0 3])
+end
+
+for t = 1:num_ts
+    T60 = T60s(t);
+    modStd = modelSds(t);
+    modStds = ones(1,size(localErrors,1))*modStd;
+    localErrorStd =std(reshape(localErrors(:,t,:),[100,16]));
+%     semLE = localErrorSds./sqrt(num_samples);
+%     localError_ci95 = semLE*tinv(.975, num_samples-1);
+
+    figure(3)
+    if t == 1
+        noMove1 = plot([radii], [modStds], '--r');
+        hold on
+        eBar1 = plot([radii], [localErrorStd], 'r');
+    elseif t == 2
+        noMove2 = plot([radii], [modStds],'--b');
+        eBar2 = plot([radii], [localErrorStd],'b');
+    else
+        noMove3 = plot([radii], [modStds],'--g');
+        eBar3 = plot([radii], [localErrorStd],'g');
+        legend([eBar1,eBar2,eBar3,noMove1,noMove2,noMove3], 'Avg. Error (T60 = 0.2s)','Avg. Error (T60 = 0.4s)', 'Avg. Error (T60 = 0.6s)', 'Avg. Error No Movement (T60 = 0.2s)','Avg. Error No Movement (T60 = 0.4s)', 'Avg. Error No Movement (T60 = 0.6s)')
+    end
+    title(sprintf('Std. of Error in Source Estimation After Movement\n Comparison with Std. of Error with no Movement\n[Shifts: 0.05m - 3.05m by 20cm increments]'))
     xlabel(sprintf('Array Shift (m) from Location Before Movement'))
     ylabel(sprintf('Estimation Error (m) After Shift'))
     % mz = {[0 round(radii(1:2:end),2)]};
@@ -88,7 +117,7 @@ for t = 1:num_ts
 %     semLE = localErrorSds./sqrt(num_samples);
 %     localError_ci95 = semLE*tinv(.975, num_samples-1);
 
-    figure(3)
+    figure(4)
     if t == 1
         eBar1 = plot([radii], [localError], 'r');
         hold on
@@ -121,7 +150,7 @@ for t = 1:num_ts
 %     semLE = localErrorSds./sqrt(num_samples);
 %     localError_ci95 = semLE*tinv(.975, num_samples-1);
 
-    figure(4)
+    figure(5)
     if t == 1
         eBar1 = plot([radii], [localError], 'r');
         hold on
@@ -137,6 +166,6 @@ for t = 1:num_ts
     % mz = {[0 round(radii(1:2:end),2)]};
     % xticklabels(mz)
     % set(gca,'XTickLabel',mz)
-    ylim([0 15])
+    ylim([0 28])
     xlim([0 3])
 end
