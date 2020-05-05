@@ -1,7 +1,7 @@
 function [p_align, p_misalign]= empProbCheck(sub_error, align_resid,misalign_resid)
     num_splits = 50;
     [bin_aligns,~] = discretize(align_resid,num_splits);
-    [~, al_edges] = discretize(rmoutliers(align_resid),num_splits);
+    [~, al_edges] = discretize((align_resid),num_splits);
     edges = [al_edges max(misalign_resid)];
     edges = sort(edges);
     bin_misaligns = discretize(misalign_resid,edges);

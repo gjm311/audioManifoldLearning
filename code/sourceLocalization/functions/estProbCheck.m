@@ -2,6 +2,7 @@ function [p_align, p_misalign] = estProbCheck(x_tst, transMat, init_var, lambda,
 
     %---- Set MRF params ----
     num_iters = 20;
+    eMax = .3;
     sub_p_hat_ts = zeros(numArrays, 3); 
     for k = 1:numArrays
         [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPosNew, RTF_train);
