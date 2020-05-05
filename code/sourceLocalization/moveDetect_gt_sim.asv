@@ -25,8 +25,7 @@ disp('Setting up the room');
 % micGammaLs = gammaLs;
 
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
-load('./mat_results/paramOpt_results_5.mat')
-load('mat_outputs/optTransMatData')
+load('./mat_results/paramOpt_results_4.mat')
 num_lambdas = size(lambdas,2);
 num_varis = size(init_vars,2);
 % load('mat_results/vari_t60_data.mat')
@@ -91,7 +90,7 @@ for t = 1:num_ts
 
         end
     end
-    save('mat_results/gt_indT_results_5', 't_str') 
+    save('mat_results/gt_indT_results_4', 't_str') 
 end   
 
 

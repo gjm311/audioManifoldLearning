@@ -20,10 +20,14 @@ disp('Setting up the room');
 
 %---- load training data (check mat_trainParams for options)----
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
+load('./mat_results/paramOpt_results_5.mat')
+load('mat_outputs/optTransMatData')
 
 %simulate different noise levels
 radii = .05:.2:3.05;
 num_radii = size(radii,2);
+num_lambdas = size(lambdas,2);
+num_varis = size(init_vars,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 num_ts = size(T60s,2);
 %---- Set MRF params ----
@@ -40,6 +44,11 @@ for r = 1:num_radii
         scales = scales_t(t,:);
         gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
         p_fail_curr = 0;
+        [lam_pos,var_pos] = find(reshape(aucs(:,:,t),[num_lambdas,num_varis]) == max(max(reshape(aucs(:,:,t),[num_lambdas,num_varis]))));
+        lambda = lambdas(lam_pos);
+        init_var = init_vars(var_pos);
+        transMat = reshape(transMats(t,:,:),[3,3]);
+        
         
         for iters = 1:num_iters      
             %randomize tst source, new position of random microphone (new
@@ -70,7 +79,7 @@ for r = 1:num_radii
                 [~,~,sub_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
                     sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
             end
-            [~, p_fail_out, ~] = moveDetector(x_tst, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
+            [~, p_fail_out, ~] = moveDetectorOpt(x_tst, transMat, init_var, lambda, eMax, 0, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
                     rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ);
             p_fails(r,t,iters) =  p_fail_out;
         end
@@ -80,6 +89,6 @@ end
     
 p_fail = mean(mean(p_fails,2),3);
 
-save('./mat_results/pFail_res_4', 'p_fails', 'p_fail', 'radii')
+save('./mat_results/pFail_res_5', 'p_fails', 'p_fail', 'radii')
 
 

@@ -41,7 +41,6 @@ function [tp_ch_curr,fp_ch_curr,tn_ch_curr,fn_ch_curr] = paramThreshOpt(med_radi
         %     %---- estimate test positions after movement ----
             [~,~, p_hat_t] = test(x_tst, gammaL, RTF_train, micsPosNew, rirLen, rtfLen, numArrays,...
                             numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
-
                 
             local_fail = mean(mean(((sourceTest-p_hat_t).^2)));
             if local_fail >= modelMean+modelSd        
