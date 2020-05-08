@@ -32,6 +32,7 @@ mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 num_ts = size(T60s,2);
 %---- Set MRF params ----
 num_iters = 100;
+eMax = .3;
 
 p_fails = zeros(num_radii,num_ts,num_iters);
 

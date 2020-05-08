@@ -17,7 +17,7 @@ error.
 
 %---- Uncomment for visualizing posterior probability results ----
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
-load('./mat_results/pFail_res_4', 'p_fail', 'p_fails', 'radii')
+load('./mat_results/pFail_res_5', 'p_fail', 'p_fails', 'radii')
 num_ts = size(p_fails,2);
 num_samples = 100;
 
@@ -39,6 +39,7 @@ ylim([0 1])
 
 % ---- Uncomment for localization results for increasing shifts.
 load('./mat_results/localErrorFull_res', 'localErrors', 'radii')
+localErrors = p_fails;
 % localError = reshape(mean(mean(localErrors,3),2),[1,16]);
 for t = 1:num_ts
     T60 = T60s(t);

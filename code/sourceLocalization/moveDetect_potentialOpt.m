@@ -93,8 +93,7 @@ for t = 1:num_ts
             
             %Get probability based on optimal choice of parameters.
             [pEst_al_curr, pEst_mis_curr] = estProbCheck(x_tst, transMat, sigma, lambda, gammaL, numMics, numArrays, micsPosNew, scales, RTF_train,rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ);
-            pEmp_mis_curr;
-            pEst_mis_curr;
+
             pEmp_al = pEmp_al + pEmp_al_curr;
             pEmp_mis = pEmp_mis + pEmp_mis_curr;
             pEst_al = pEst_al + pEst_al_curr;

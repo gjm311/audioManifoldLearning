@@ -29,8 +29,8 @@ num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 
 %---- Set MRF params ----
-init_vars = .05:.1:.55;
-lambdas = .05:.1:.55;
+init_vars = .02:.02:.2;
+lambdas = .03:.03:.3;
 eMax = .3;
 threshes = 0:.25:1;
 num_threshes = size(threshes,2);
@@ -44,6 +44,7 @@ wavs = dir('./shortSpeech/');
 tprs = zeros(numLams, numVaris,num_ts, num_threshes);
 fprs = zeros(numLams, numVaris, num_ts, num_threshes);
 aucs = zeros(numLams, numVaris, num_ts); 
+
 
 for lam = 1:numLams
     lambda = lambdas(lam);

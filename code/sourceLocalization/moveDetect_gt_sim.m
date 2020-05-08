@@ -44,11 +44,12 @@ threshes = 0:.05:1;
 num_threshes = size(threshes,2);
 num_iters = 20;
 num_ts = size(T60s,2);
-t_str = ([]);
+% t_str = ([]);
 gts = [.1 .75 1.45];
 num_gts = size(gts,2);
+load('./mat_results/gt_indT_results_5', 't_str') 
 
-for t = 1:num_ts
+for t = 2:num_ts
 
     T60 = T60s(t);
     RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
@@ -91,7 +92,7 @@ for t = 1:num_ts
 
         end
     end
-    save('mat_results/gt_indT_results_5', 't_str') 
+    save('./mat_results/gt_indT_results_5', 't_str') 
 end   
 
 

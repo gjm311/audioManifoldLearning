@@ -11,9 +11,9 @@ addpath ./shortSpeech
 % load('./mat_results/gt_results_t60_pointEight.mat')
 % t_str8 = t_str;
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
-load('./mat_results/gt_nai_results_4.mat')
+load('./mat_results/gt_results_5mat')
 % t_str(4,:,:) = t_str8;
-% T60s = [T60s .8];
+% T60s = [T60s .8];resul
 
 t_str = sub_t_str;
 

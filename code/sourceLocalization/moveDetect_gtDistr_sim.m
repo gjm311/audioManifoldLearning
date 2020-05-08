@@ -1,4 +1,4 @@
-  
+    
 clear
 addpath ./RIR-Generator-master
 addpath ./functions
@@ -26,7 +26,8 @@ disp('Setting up the room');
 % micGammaLs = gammaLs;
 
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
-load('./mat_results/paramOpt_results_4.mat')
+load('./mat_results/paramOpt_results_5.mat')
+load('mat_outputs/optTransMatData')
 num_lambdas = size(lambdas,2);
 num_varis = size(init_vars,2);
 % load('mat_results/vari_t60_data.mat')
@@ -39,7 +40,7 @@ mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 wavs = dir('./shortSpeech/');
 
 %---- Set MRF params ----
-transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
+% transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
 init_var = .05;
 lambda = .25;
 eMax = .3;
@@ -50,21 +51,20 @@ num_ts = size(T60s,2);
 t_str = ([]);
 gts = [.1 .75 1.45];
 num_gts = size(gts,2);
+load('gt_avgT_results_5', 't_str') 
 
-for t = 1:num_ts
+for t = 3
 
     T60 = T60s(t);
     RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
     scales = scales_t(t,:);
     gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
-%     [lam_pos,var_pos] = find(reshape(aucs(:,:,t),[num_lambdas,num_varis]) == max(max(reshape(aucs(:,:,t),[num_lambdas,num_varis]))));
-%     lambda = lambdas(lam_pos);
-%     init_var = init_vars(var_pos);
-    
-    %     micRTF_train = reshape(micRTF_trains(t,:,:,:), [numArrays, nD, rtfLen, numMics]);
-    %     micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
-    %     micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
+    [lam_pos,var_pos] = find(mean(aucs,3) == max(max(mean(aucs,3))));
+    lambda = lambdas(lam_pos);
+    init_var = init_vars(var_pos);
 
+    transMat = reshape(transMats(t,:,:),[3,3]);
+   
     for g = 1:num_gts
         gt = gts(g);
         
@@ -81,17 +81,7 @@ for t = 1:num_ts
             t_str(t,g,thr).tpr = mrf_res(1)/(mrf_res(1)+mrf_res(4)+10e-6);
             t_str(t,g,thr).fpr = mrf_res(2)/(mrf_res(2)+mrf_res(3)+10e-6);
 
-    %         t_str(t,thr).nai_tp_check = nai_res(1);
-    %         t_str(t,thr).nai_fp_check = nai_res(2);
-    %         t_str(t,thr).nai_tn_check = nai_res(3);
-    %         t_str(t,thr).nai_fn_check = nai_res(4);
-    % 
-    %         t_str(t,thr).subNai_tp_check = sub_res(1);
-    %         t_str(t,thr).subNai_fp_check = sub_res(2);
-    %         t_str(t,thr).subNai_tn_check = sub_res(3);
-    %         t_str(t,thr).subNai_fn_check = sub_res(4);
-
         end
     end
-    save('mat_results/gt_avgT_results_4', 't_str') 
+    save('./mat_results/gt_avgT_results_5', 't_str') 
 end   
