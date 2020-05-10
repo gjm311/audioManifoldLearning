@@ -17,7 +17,7 @@ error.
 
 %---- Uncomment for visualizing posterior probability results ----
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
-load('./mat_results/pFail_res_4', 'p_fail', 'p_fails', 'radii')
+load('./mat_results/pFail_res_5', 'p_fail', 'p_fails', 'radii')
 num_ts = size(p_fails,2);
 num_samples = 100;
 
@@ -38,7 +38,8 @@ ylim([0 1])
 
 
 % ---- Uncomment for localization results for increasing shifts.
-load('./mat_results/localErrorFull_res', 'localErrors', 'radii')
+load('./mat_results/pFail_res_5', 'p_fails', 'radii')
+localErrors = p_fails;
 % localError = reshape(mean(mean(localErrors,3),2),[1,16]);
 for t = 1:num_ts
     T60 = T60s(t);
@@ -52,20 +53,25 @@ for t = 1:num_ts
 
     figure(2)
     if t == 1
-        noMove1 = plot([radii], [modMeans], '--r');
+%         noMove1 = plot([radii], [modMeans], '--r');
         hold on
         eBar1 = plot([radii], [localError], 'r');
     elseif t == 2
-        noMove2 = plot([radii], [modMeans],'--b');
+%         noMove2 = plot([radii], [modMeans],'--b');
         eBar2 = plot([radii], [localError],'b');
     else
-        noMove3 = plot([radii], [modMeans],'--g');
+%         noMove3 = plot([radii], [modMeans],'--g');
         eBar3 = plot([radii], [localError],'g');
-        legend([eBar1,eBar2,eBar3,noMove1,noMove2,noMove3], 'Avg. Error (T60 = 0.2s)','Avg. Error (T60 = 0.4s)', 'Avg. Error (T60 = 0.6s)', 'Avg. Error No Movement (T60 = 0.2s)','Avg. Error No Movement (T60 = 0.4s)', 'Avg. Error No Movement (T60 = 0.6s)')
+%         legend([eBar1,eBar2,eBar3,noMove1,noMove2,noMove3], 'Avg. Error (T60 = 0.2s)','Avg. Error (T60 = 0.4s)', 'Avg. Error (T60 = 0.6s)', 'Avg. Error No Movement (T60 = 0.2s)','Avg. Error No Movement (T60 = 0.4s)', 'Avg. Error No Movement (T60 = 0.6s)')
+        legend([eBar1,eBar2,eBar3], 'Avg. Prob. Failure (T60 = 0.2s)','Avg. Prob. Failure (T60 = 0.4s)', 'Avg. Prob. Failure (T60 = 0.6s)')
     end
-    title(sprintf('Average Error in Source Estimation After Movement\n Comparison with Average Error with no Movement\n[Shifts: 0.05m - 3.05m by 20cm increments]'))
-    xlabel(sprintf('Array Shift (m) from Location Before Movement'))
-    ylabel(sprintf('Estimation Error (m) After Shift'))
+%     title(sprintf('Average Error in Source Estimation After Movement\n Comparison with Average Error with no Movement\n[Shifts: 0.05m - 3.05m by 20cm increments]'))
+%     xlabel(sprintf('Array Shift (m) from Location Before Movement'))
+%     ylabel(sprintf('Estimation Error (m) After Shift'))
+    title(sprintf('Average Probability of Failure for Varying Array Shifts'))
+    xlabel(sprintf('Array Shift (m) from Location During Training'))
+    ylabel(sprintf('Probability of Failure \n (via MRF Detection)'))
+
     % mz = {[0 round(radii(1:2:end),2)]};
     % xticklabels(mz)
     % set(gca,'XTickLabel',mz)
@@ -77,26 +83,30 @@ for t = 1:num_ts
     T60 = T60s(t);
     modStd = modelSds(t);
     modStds = ones(1,size(localErrors,1))*modStd;
-    localErrorStd =std(reshape(localErrors(:,t,:),[100,16]));
+    localErrorStd = std(reshape(localErrors(:,t,:),[100,16]));
 %     semLE = localErrorSds./sqrt(num_samples);
 %     localError_ci95 = semLE*tinv(.975, num_samples-1);
 
     figure(3)
     if t == 1
-        noMove1 = plot([radii], [modStds], '--r');
+%         noMove1 = plot([radii], [modStds], '--r');
         hold on
         eBar1 = plot([radii], [localErrorStd], 'r');
     elseif t == 2
-        noMove2 = plot([radii], [modStds],'--b');
+%         noMove2 = plot([radii], [modStds],'--b');
         eBar2 = plot([radii], [localErrorStd],'b');
     else
-        noMove3 = plot([radii], [modStds],'--g');
+%         noMove3 = plot([radii], [modStds],'--g');
         eBar3 = plot([radii], [localErrorStd],'g');
-        legend([eBar1,eBar2,eBar3,noMove1,noMove2,noMove3], 'Avg. Error (T60 = 0.2s)','Avg. Error (T60 = 0.4s)', 'Avg. Error (T60 = 0.6s)', 'Avg. Error No Movement (T60 = 0.2s)','Avg. Error No Movement (T60 = 0.4s)', 'Avg. Error No Movement (T60 = 0.6s)')
+        legend([eBar1,eBar2,eBar3], 'Std. Prob. Failure (T60 = 0.2s)','Std. Prob. Failure (T60 = 0.4s)', 'Std. Prob. Failure (T60 = 0.6s)')
     end
-    title(sprintf('Std. of Error in Source Estimation After Movement\n Comparison with Std. of Error with no Movement\n[Shifts: 0.05m - 3.05m by 20cm increments]'))
-    xlabel(sprintf('Array Shift (m) from Location Before Movement'))
-    ylabel(sprintf('Estimation Error (m) After Shift'))
+%     title(sprintf('Std. of Error in Source Estimation After Movement\n Comparison with Std. of Error with no Movement\n[Shifts: 0.05m - 3.05m by 20cm increments]'))
+%     xlabel(sprintf('Array Shift (m) from Location Before Movement'))
+%     ylabel(sprintf('Estimation Error (m) After Shift'))
+    title(sprintf('Std. of Probability of Failure for Varying Array Shifts'))
+    xlabel(sprintf('Array Shift (m) from Location During Training'))
+    ylabel(sprintf('Probability of Failure \n (via MRF Detection)'))
+
     % mz = {[0 round(radii(1:2:end),2)]};
     % xticklabels(mz)
     % set(gca,'XTickLabel',mz)
