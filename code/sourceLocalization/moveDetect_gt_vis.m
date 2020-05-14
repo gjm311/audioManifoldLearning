@@ -11,9 +11,9 @@ addpath ./shortSpeech
 % load('./mat_results/gt_results_t60_pointEight.mat')
 % t_str8 = t_str;
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
-load('./mat_results/gt_results_5.mat')
+load('./mat_results/gt_indT_results_5.mat')
 
-% t_str = sub_t_str;
+% t_str = mono_t_str;
 
 % simulate different noise levels
 radii = [0 .65 .85 1.5];
@@ -78,20 +78,22 @@ for t = 1:num_ts
 end
 
 figure(1)
+
+set(gcf,'color','w')
 mrf1 = plot(mean(interp_gt_fprs(1:3,:),1), mean(interp_gt_tprs(1:3,:),1), 'g');
 hold on
 mrf2 = plot(mean(interp_gt_fprs(4:6,:),1), mean(interp_gt_tprs(4:6,:),1), 'b');
 mrf3 = plot(mean(interp_gt_fprs(7:9,:),1), mean(interp_gt_tprs(7:9,:),1),  'r');
 base = plot(threshes,threshes, 'black');
-title(sprintf('MRF based Movement Detection ROC Curves\n [MRF parameters individually tuned per T60]'))
+% title(sprintf('MRF-Based Detector'))
 % title(sprintf('MRF based Movement Detection ROC Curves\n [MRF parameters chosen based on AUCs averaged per T60]'))
-% title(sprintf('MRF based Movement Detection ROC Curves'))
-% title(sprintf('Naive Movement Detection ROC Curves\n [Single Node Position Estimation Comparison]'))
-% title(sprintf('Naive Movement Detection ROC Curves\n [LONO Sub-Network Position Estimation Comparison]'))
+title(sprintf('MRF based Movement Detection ROC Curves\n [MRF parameters individually tuned per T60]'))
+% title(sprintf('Single Node Comp.'))
+% title(sprintf('LONO Sub-Net Comp.'))
 xlabel('FPR')
 ylabel('TPR')
 legend([mrf1,mrf2,mrf3,base], 'T60=.2s', 'T60=.4s', 'T60=.6s', 'Baseline', 'Location','southeast')
-
+grid on
 auc1 = trapz(mean(interp_gt_fprs(1:3,:),1), mean(interp_gt_tprs(1:3,:),1))
 auc2 = trapz(mean(interp_gt_fprs(4:6,:),1), mean(interp_gt_tprs(4:6,:),1))
 auc3 = trapz(mean(interp_gt_fprs(7:9,:),1), mean(interp_gt_tprs(7:9,:),1))

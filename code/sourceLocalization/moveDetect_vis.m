@@ -5,6 +5,7 @@ mex -setup c++
 mex RIR-Generator-master/rir_generator.cpp;
 addpath ./stft
 addpath ./shortSpeech
+addpath ./functions/src
 
 % ---- TRAINING DATA ----
 % room setup
@@ -16,14 +17,14 @@ disp('Setting up the room');
 % micScales = scales;
 % micVaris = varis;
 %---- load training data (check mat_trainParams for options)----
-load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
+load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
 % load('mat_results/vari_t60_data.mat')
 % load('mat_outputs/movementOptParams')
 
 % modelSd = .1;
 
 %simulate different noise levels
-radii = .85; 
+radii = 1; 
 its_per = 10;
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 wav_folder = dir('./shortSpeech/');
@@ -39,7 +40,7 @@ thresh = .3;
 
 t = 1;
 ts = [1 4 8];
-T60s = [.15 .3 .5];
+T60s = [.2 .4 .6];
 t_curr = ts(t);
 T60 = T60s(t);
 RTF_train = reshape(RTF_trains(t_curr,:,:,:), [nD, rtfLen, numArrays]);    
@@ -60,7 +61,9 @@ for riter = 1:size(radii,2)
         end
         if inits > 1
 %             movingArray = randi(numArrays);
-            [rotation, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+%             [rotation, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+            movingArray = 1;
+            micsPosNew = [2.556 4.729 1; 2.606 4.729 1; micsPos(3:end,:,:)];
         else
             movingArray = randi(numArrays);
             micsPosNew = micsPos;
@@ -132,27 +135,29 @@ for riter = 1:size(radii,2)
 %         naive2_p_fail = mean(std(self_sub_p_hat_ts- sub_p_hat_ts));
         %PLOT
         figure(2)
-        f = plotRoom(roomSize, micsPosNew, sourceTrain, sourceTest, nL, p_hat_t);
-        title(sprintf('Detecting Array Movement \n [Array Shift: %s m]', num2str(radius_mic)))
-     
+        if it == 1
+%             p_hat_t_1 = p_hat_t;
+            plotRoom(roomSize, micsPos, sourceTrain, sourceTest, nL, p_hat_t_1);
+            title(sprintf('Detecting Array Movement \n [Array Shift: %s m]', num2str(radius_mic)))
+        end
 %         naiveTxt = text(.6,.5, sprintf('Network Estimate Distance:\n %s',num2str(round(naive_p_fail,2))));
 %         naive2Txt = text(2.6,.5, sprintf('Std of Sub-Network Estimate Diff.:\n %s',num2str(round(naive2_p_fail,2))));
         if it >1
-            binTxt = text(3.6,.5, sprintf('MRF Based Probability: %s',num2str(round(p_fail,2))));
+            f = plotRoom(roomSize, micsPosNew, sourceTrain, sourceTest, nL, p_hat_t);
+            binTxt = text(3.6,.5, sprintf('Prob. of Movement: %s',num2str(round(p_fail,2))));
             prbTxt = text(labelPos(1:3,1),labelPos(1:3,2), labels(1:3), 'HorizontalAlignment', 'right', 'VerticalAlignment', 'bottom');
             prbTxt = text(labelPos(4,1),labelPos(4,2), labels(4), 'HorizontalAlignment', 'left', 'VerticalAlignment', 'bottom');
-            dp = mean(micsPosNew(1:2,:))-mic_ref(1,:);
-            q = quiver(mic_ref(1),mic_ref(2)-.1,dp(1),dp(2)+.2,'linewidth',3,'color','blue');
-            dp2 = (p_hat_t - [3.2 2.79 1]);
-            q2 = quiver(3.2+.1,2.79,dp2(1)-.25,dp2(2)-.05,.9,'linewidth',2.7,'color','green');
+            dp = mean(micsPosNew(1:2,:))-mic_ref(movingArray,:);
+            q = quiver(mic_ref(movingArray,1),mic_ref(movingArray,2)-.1,dp(1),dp(2)+.2,'linewidth',3,'color','blue','MaxHeadSize',1.4);
+            dp2 = (p_hat_t - p_hat_t_1);
+            q2 = quiver(p_hat_t_1(1), p_hat_t_1(2), dp2(1)+.1, dp2(2) ,'linewidth',2.7,'color','green','MaxHeadSize',2);
             %     %Uncomment below for pauses between iterations only continued by
         %     %clicking graph  
             w = waitforbuttonpress;
-            delete(prbTxt);
-            
+%             delete(prbTxt);     
         end
     %         delete(binTxt);
-            delete(prbTxt);
+%             delete(prbTxt);
     %         delete(naiveTxt);
     %         delete(naive2Txt);
 %         clf

@@ -24,7 +24,7 @@ disp('Setting up the room');
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 
 %Chosse T60 from .2, .5. or .8
-T60 = .2;
+T60 = .15;
 t = find(T60s==T60);
 RTF_train = reshape(RTF_trains(t,:,:,:),[nD,rtfLen,numArrays]);
 scales = scales_t(t,:);
@@ -59,7 +59,9 @@ nrm = norm(sourceTest-p_hat_ts);
 figure(3)
 plotRoom(roomSize, micsPos, sourceTrain, sourceTest, nL, p_hat_ts);
 
-% title('Source Localization Based Off Semi-Supervised Approach')
+title('Source Localization Based Off Semi-Supervised Approach')
+grid on
+set(gcf,'color','w')
 % mseTxt = text(.5,.55, sprintf('MSE (Test Position Estimate): %s(m)', num2str(round(nrm,3))));
 ax = gca;
 % ax.TitleFontSizeMultiplier  = 2;

@@ -1,0 +1,110 @@
+% This file was created by matlab2tikz.
+%
+%The latest updates can be retrieved from
+%  http://www.mathworks.com/matlabcentral/fileexchange/22022-matlab2tikz-matlab2tikz
+%where you can also make suggestions and rate matlab2tikz.
+%
+\begin{tikzpicture}
+
+\begin{axis}[%
+width=4.521in,
+height=3.566in,
+at={(0.758in,0.481in)},
+scale only axis,
+xmin=0,
+xmax=3,
+xlabel style={font=\color{white!15!black}},
+xlabel={Array Shift (m) from Location During Training},
+ymin=0,
+ymax=1,
+ylabel style={font=\color{white!15!black}, align=center},
+ylabel={Probability of Failure\\[1ex] (via MRF Detection)},
+axis background/.style={fill=white},
+title style={font=\bfseries},
+title={Average Probability of Failure for Varying Array Shifts},
+axis x line*=bottom,
+axis y line*=left,
+legend style={at={(0.161,0.79)}, anchor=south west, legend cell align=left, align=left, draw=white!15!black}
+]
+\addplot [color=red]
+  table[row sep=crcr]{%
+0.05	0\\
+0.25	0.144408765560636\\
+0.45	0.346866479451652\\
+0.65	0.467734600389583\\
+0.85	0.503908418598255\\
+1.05	0.583447100045334\\
+1.25	0.729626228273095\\
+1.45	0.751177806329024\\
+1.65	0.808548893409076\\
+1.85	0.805427877385362\\
+2.05	0.839448436288157\\
+2.25	0.869253097665758\\
+2.45	0.887502558779021\\
+2.65	0.82905351974393\\
+2.85	0.816439805369598\\
+3.05	0.872936088817639\\
+};
+\addlegendentry{Avg. Prob. Failure (T60 = 0.2s)}
+
+\addplot [color=blue]
+  table[row sep=crcr]{%
+0.05	0\\
+0.25	0.273686644327864\\
+0.45	0.361509473227447\\
+0.65	0.408068285401876\\
+0.85	0.47140349912231\\
+1.05	0.505510579617173\\
+1.25	0.587139552259098\\
+1.45	0.642930783931787\\
+1.65	0.686241660467996\\
+1.85	0.763727159411189\\
+2.05	0.765388827685145\\
+2.25	0.839832919064538\\
+2.45	0.818206096234744\\
+2.65	0.803933966674651\\
+2.85	0.814175789485805\\
+3.05	0.807370309172143\\
+};
+\addlegendentry{Avg. Prob. Failure (T60 = 0.4s)}
+
+\addplot [color=green]
+  table[row sep=crcr]{%
+0.05	0.0260635130177933\\
+0.25	0.250788777011261\\
+0.45	0.383130692324349\\
+0.65	0.3675907164511\\
+0.85	0.433953051283498\\
+1.05	0.493338370706371\\
+1.25	0.599561848933294\\
+1.45	0.641239212774489\\
+1.65	0.654326654205035\\
+1.85	0.724506044889337\\
+2.05	0.771921032690323\\
+2.25	0.771899667247856\\
+2.45	0.739385162287601\\
+2.65	0.708924092703634\\
+2.85	0.761521465929055\\
+3.05	0.704217173266326\\
+};
+\addlegendentry{Avg. Prob. Failure (T60 = 0.6s)}
+
+\end{axis}
+
+\begin{axis}[%
+width=5.833in,
+height=4.375in,
+at={(0in,0in)},
+scale only axis,
+xmin=0,
+xmax=1,
+ymin=0,
+ymax=1,
+axis line style={draw=none},
+ticks=none,
+axis x line*=bottom,
+axis y line*=left,
+legend style={legend cell align=left, align=left, draw=white!15!black}
+]
+\end{axis}
+\end{tikzpicture}%

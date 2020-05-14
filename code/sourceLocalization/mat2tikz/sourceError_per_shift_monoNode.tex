@@ -1,0 +1,108 @@
+% This file was created by matlab2tikz.
+%
+%The latest updates can be retrieved from
+%  http://www.mathworks.com/matlabcentral/fileexchange/22022-matlab2tikz-matlab2tikz
+%where you can also make suggestions and rate matlab2tikz.
+%
+\begin{tikzpicture}
+
+\begin{axis}[%
+width=4.521in,
+height=3.27in,
+at={(0.758in,0.481in)},
+scale only axis,
+xmin=0,
+xmax=3,
+xlabel style={font=\color{white!15!black}},
+xlabel={Array Shift (m) from Location Before Movement},
+ymin=0.3,
+ymax=3.4,
+ylabel style={font=\color{white!15!black}},
+ylabel={Single Node Estimation Differences (m)},
+axis background/.style={fill=white},
+title style={font=\bfseries, align=center},
+title={Average Difference in Source Estimation of Single Nodes\\[1ex] One Node Shifted per Iteration\\[1ex][Shifts: 0.05m - 3.05m by 20cm increments]},
+legend style={at={(0.154,0.591)}, anchor=south west, legend cell align=left, align=left, draw=white!15!black}
+]
+\addplot [color=red]
+  table[row sep=crcr]{%
+0.05	0.974374554681823\\
+0.25	0.985344539382152\\
+0.45	0.983002967351489\\
+0.65	1.00730023138029\\
+0.85	0.966898844958364\\
+1.05	1.02172708513451\\
+1.25	1.02625353982547\\
+1.45	1.02219836150378\\
+1.65	1.09609166571641\\
+1.85	1.1483041686232\\
+2.05	1.17998476414744\\
+2.25	1.15853392617816\\
+2.45	1.15539147623386\\
+2.65	1.08824372594623\\
+2.85	1.11581111673844\\
+3.05	1.08238221580145\\
+};
+\addlegendentry{Avg. Diff. (T60 = 0.2s)}
+
+\addplot [color=blue]
+  table[row sep=crcr]{%
+0.05	0.999526797490102\\
+0.25	0.963965677205128\\
+0.45	1.06516057002381\\
+0.65	0.933310984006532\\
+0.85	1.00183049711095\\
+1.05	0.99619540534618\\
+1.25	1.01564767691999\\
+1.45	1.00051253371033\\
+1.65	1.0658879241417\\
+1.85	1.10653383088002\\
+2.05	1.07951494141682\\
+2.25	1.02446280676219\\
+2.45	1.03716621296458\\
+2.65	1.0497306188809\\
+2.85	1.06006473793442\\
+3.05	1.0482540645649\\
+};
+\addlegendentry{Avg. Diff. (T60 = 0.4s)}
+
+\addplot [color=green]
+  table[row sep=crcr]{%
+0.05	2.94888206305758\\
+0.25	3.21491229020311\\
+0.45	3.10006958376239\\
+0.65	3.05362381675841\\
+0.85	3.12334252654131\\
+1.05	3.1658637210264\\
+1.25	3.09476500762028\\
+1.45	2.92512612939386\\
+1.65	3.16187911257392\\
+1.85	3.09943816802887\\
+2.05	3.07511649136364\\
+2.25	2.87345852829548\\
+2.45	3.04635884506697\\
+2.65	3.07323997058048\\
+2.85	3.07849135412409\\
+3.05	3.03350412872091\\
+};
+\addlegendentry{Avg. Diff. (T60 = 0.6s)}
+
+\end{axis}
+
+\begin{axis}[%
+width=5.833in,
+height=4.375in,
+at={(0in,0in)},
+scale only axis,
+xmin=0,
+xmax=1,
+ymin=0,
+ymax=1,
+axis line style={draw=none},
+ticks=none,
+axis x line*=bottom,
+axis y line*=left,
+legend style={legend cell align=left, align=left, draw=white!15!black}
+]
+\end{axis}
+\end{tikzpicture}%

@@ -30,13 +30,14 @@ num_ts = size(T60s,2);
 
 for t=1:num_ts+1
     figure(t)
-    
+    grid on
+    set(gcf,'color','w')
     if t==num_ts+1
         h = heatmap(mean(aucs,3));
-        title(sprintf('AUCs for Varying MRF Hyper-Parameters \n Averaged for all T-60s')) 
+        title(sprintf('AUCs for Varying MRF Hyper-Parameters \n Averaged for all T60s')) 
     else
         h = heatmap(reshape(aucs(:,:,t),[numLams,numVaris]));
-        title(sprintf('AUCs for Varying MRF Hyper-Parameters \nT-60 = %s',num2str(round(T60s(t),2))))
+        title(sprintf('AUCs for Varying MRF Hyper-Parameters \nT60 = %s',num2str(round(T60s(t),2))))
     end
     %     title(sprintf('AUCs for Varying MRF Hyper-Parameters \n Averaged for all T-60s'))
     ylabel('\sigma^2')
@@ -46,6 +47,7 @@ for t=1:num_ts+1
     h.YData = round(init_vars,2);
     ax = gca;
 end
+grid on
 
 %--- Interpolate data and plot ROC curve for naive and mrf detectors ---
 % xq = 1.5:.05:10.5;
