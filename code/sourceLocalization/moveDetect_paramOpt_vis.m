@@ -49,30 +49,3 @@ for t=1:num_ts+1
 end
 grid on
 
-%--- Interpolate data and plot ROC curve for naive and mrf detectors ---
-% xq = 1.5:.05:10.5;
-% for nv = 1:numVaris
-%     for nl = 1:numLams
-% 
-%         interp_tprs = sort(tprs(:,nl,nv));
-%         interp_fprs = sort(fprs(:,nl,nv));
-% 
-%         figure(2)
-%         if aucs(nl,nv) == max(max(aucs))
-%             mrf_opt = plot(interp_fprs,interp_tprs, 'p');
-%         else
-%             mrf = plot(interp_fprs,interp_tprs, ':g');
-%         end
-%         hold on
-%         % sub = plot(sub_fpr, sub_tpr, '--b');
-%         base = plot(threshes,threshes, 'black');
-%         title(sprintf('ROC Curves: Array Movement Detection\n Curves for varying hyper-paramter choices of the MRF model'))
-%         xlabel('FPR')
-%         ylabel('TPR')
-%         if and(nv == numVaris,nl==numLams)
-%             legend([mrf,mrf_opt,base], 'ROC for choice of MRF Paramters', 'ROC with Max AUC', 'Baseline', 'Location','southeast')
-%         end
-%        
-%     end
-% end
-% 

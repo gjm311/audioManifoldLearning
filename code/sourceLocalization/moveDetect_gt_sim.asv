@@ -1,4 +1,3 @@
-  
 clear
 addpath ./RIR-Generator-master
 addpath ./functions
@@ -39,9 +38,6 @@ mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 wavs = dir('./shortSpeech/');
 
 %---- Set MRF params ----
-transMat = [.65 0.3 0.05; .2 .75 0.05; 1/3 1/3 1/3];
-init_var = .05;
-lambda = .25;
 eMax = .3;
 threshes = 0:.05:1;
 num_threshes = size(threshes,2);
@@ -57,9 +53,10 @@ for t = 1:num_ts
     RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
     scales = scales_t(t,:);
     gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
-%     [lam_pos,var_pos] = find(reshape(aucs(:,:,t),[num_lambdas,num_varis]) == max(max(reshape(aucs(:,:,t),[num_lambdas,num_varis]))));
-%     lambda = lambdas(lam_pos);
-%     init_var = init_vars(var_pos);
+    [lam_pos,var_pos] = find(reshape(aucs(:,:,t),[num_lambdas,num_varis]) == max(max(reshape(aucs(:,:,t),[num_lambdas,num_varis]))));
+    lambda = lambdas(lam_pos);
+    init_var = init_vars(var_pos);
+    transMat = reshape(transMats(t,:,:),[3,3]);
     
     %     micRTF_train = reshape(micRTF_trains(t,:,:,:), [numArrays, nD, rtfLen, numMics]);
     %     micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
@@ -93,5 +90,7 @@ for t = 1:num_ts
 
         end
     end
-    save('mat_results/gt_avgT_results_4', 't_str') 
+    save('mat_results/gt_indT_results_4', 't_str') 
 end   
+
+
