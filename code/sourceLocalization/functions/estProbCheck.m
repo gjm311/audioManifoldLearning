@@ -1,4 +1,4 @@
-function [p_align, p_misalign, p_unc] = estProbCheck(x_tst, transMat, init_var, lambda, gammaL, numMics, numArrays, micsPos, micsPosNew, scales, RTF_train,rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ)
+function [p_align, p_misalign] = estProbCheck(x_tst, transMat, init_var, lambda, gammaL, numMics, numArrays, micsPos, micsPosNew, scales, RTF_train,rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ)
 
     %---- Set MRF params ----
     eMax = .3;

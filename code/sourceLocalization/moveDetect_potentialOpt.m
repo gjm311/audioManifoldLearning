@@ -29,10 +29,10 @@ num_ts = size(T60s,2);
 transMats = zeros(num_ts,3,3);
 
 wavs = dir('./shortSpeech/');
-radii = 0:.15:.75;
+radii = 0:.05:.25;
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
-alpha = .25;
+alpha = .01;
 
 for t = 1:num_ts    
     T60 = T60s(t);
@@ -45,11 +45,11 @@ for t = 1:num_ts
 %     init_transMat = [.65 0 0.35; .2 0 0.8; 1/3 1/3 1/3];
     init_transMat = [1 0 1; 0 1 1; 1/3 1/3 1/3];
     transMat_pre = zeros(3);
-    align_resid = align_resids(t,:);
-    misalign_resid = misalign_resids(t,:);
-    al_pdParams = fitdist(sort(transpose(align_resid)),'Normal');
+    align_resid = align_resids(2,:);
+    misalign_resid = misalign_resids(2,:);
+    al_pdParams = fitdist((transpose(align_resid)),'Normal');
     sigma = al_pdParams.sigma;
-    mis_pdParams = fitdist(transpose(sort(misalign_resid)),'Exponential');
+    mis_pdParams = fitdist(transpose((misalign_resid)),'Exponential');
     lambda = mis_pdParams.mu;   
     transMat = init_transMat;
     
@@ -99,6 +99,7 @@ for t = 1:num_ts
             pEmp_mis = pEmp_mis + pEmp_mis_curr;
             pEst_al = pEst_al + pEst_al_curr;
             pEst_mis = pEst_mis + pEst_mis_curr;
+            
         end
         p_al = transMat(1,1)*(pEmp_al/(pEst_al+10e-6));
         p_mis = transMat(1,3)*(pEmp_mis/(pEst_mis+10e-6));
