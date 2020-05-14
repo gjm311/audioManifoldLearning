@@ -32,7 +32,7 @@ wavs = dir('./shortSpeech/');
 radii = 0:.15:.75;
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
-alpha = 10e-2;
+alpha = .25;
 
 for t = 1:num_ts    
     T60 = T60s(t);
@@ -100,12 +100,14 @@ for t = 1:num_ts
             pEst_al = pEst_al + pEst_al_curr;
             pEst_mis = pEst_mis + pEst_mis_curr;
         end
-        
-        transMat(1,1) = (transMat(1,1).*(pEmp_al/(pEst_al+10e-6)).*alpha);
-        transMat(1,3) = 1-transMat(1,1);
-        transMat(2,2) = (transMat(2,2).*(pEst_mis/(pEmp_mis+10e-6)).*alpha);
-        transMat(2,3) = 1-transMat(2,2)
-        
+        p_al = transMat(1,1)*(pEmp_al/(pEst_al+10e-6));
+        p_mis = transMat(1,3)*(pEmp_mis/(pEst_mis+10e-6));
+        p1 = (p_al/(p_al+p_mis));
+        p2 = (p_mis/(p_al+p_mis));
+        transMat(1,1) = p1;
+        transMat(1,3) =  p2;
+        transMat(2,2) = p1;
+        transMat(2,3) = p2;
     end
     transMats(t,:,:) = transMat;
     save('./mat_outputs/optTransMatData','transMats'); 
