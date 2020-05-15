@@ -1,10 +1,10 @@
 function [p_align, p_misalign]= empProbCheck(sub_error, align_resid,misalign_resid)
     num_splits = 50;
     num_bins = 8;
-    [bin_aligns,al_edges] = discretize((align_resid),50);
+    [bin_aligns,al_edges] = discretize(rmoutliers((align_resid)),50);
     al_edges = [al_edges max(misalign_resid)];
     al_edges = sort(al_edges);
-    [bin_misaligns,mis_edges] = discretize((misalign_resid),al_edges);
+    [bin_misaligns,mis_edges] = discretize(rmoutliers(misalign_resid,'mean'),al_edges);
     h_al = hist(bin_aligns,num_bins)./sum(hist(bin_aligns,num_bins));
     h_mis = hist(bin_misaligns,num_bins)./sum(hist(bin_misaligns,num_bins));
     h_tot = h_al+h_mis;    
