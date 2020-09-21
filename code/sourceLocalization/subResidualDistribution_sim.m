@@ -1,9 +1,9 @@
 clear
 %{
-This program estimates the residual error for a series of different T60s
-and noise levels. This is done for both aligned arrays (i.e. in the same 
-position that was used when the ground truth was measured) and misaligned
-(random array moved to random position in room). In 
+This program estimates the residual error for subnetworks of arrays for a 
+series of different T60s and noise levels. This is done for both casess where all
+arrays are aligned (i.e. in the same position that was used when the ground 
+truth was measured) and one random array is moved to random position in room). In 
 residualDistribution_analysis one can see the distribution of the errors 
 for the different class types.
 %}

@@ -9,49 +9,49 @@ sourcesTrU = sourcesTr(nL+1:end,:,:);
 
 if isempty(sourcesTst)
     for i = 1 : size(sourcesTrL, 1)
-       p(2) = plot(sourcesTrL(i,1), sourcesTrL(i,2), 'Marker', 'o', 'MarkerSize', 10, 'MarkerEdgeColor', 'blue', 'MarkerFaceColor', 'red');
-       L{2} = 'Labelled Tr.';
+       p(4) = plot(sourcesTrL(i,1), sourcesTrL(i,2), 'Marker', 'o', 'MarkerSize', 10, 'MarkerEdgeColor', 'blue', 'MarkerFaceColor', 'red');
+       L{4} = 'Labelled Tr.';
        hold on;
     end
 
     for i = 1 : size(sourcesTrU, 1)
-       p(1) = plot(sourcesTrU(i,1), sourcesTrU(i,2), 'Marker', '.', 'MarkerSize', 15, 'MarkerEdgeColor', 'red', 'MarkerFaceColor', 'red');
-       L{1} = 'Unlabelled Tr.';
+       p(5) = plot(sourcesTrU(i,1), sourcesTrU(i,2), 'Marker', '.', 'MarkerSize', 15, 'MarkerEdgeColor', 'red', 'MarkerFaceColor', 'red');
+       L{5} = 'Unlabelled Tr.';
        hold on;
     end
     %plot all receivers
     for i = 1 : size(receivers, 1)
-       p(3) = plot(receivers(i,1), receivers(i,2), 'Marker', '+', 'MarkerSize', 10, 'MarkerEdgeColor', 'blue', 'MarkerFaceColor', 'blue');
-       L{3} = 'Mic';
+       p(1) = plot(receivers(i,1), receivers(i,2), 'Marker', '+', 'MarkerSize', 10,'Linewidth',2, 'MarkerEdgeColor', 'blue', 'MarkerFaceColor', 'blue');
+       L{1} = 'Mic';
        hold on;
     end
 else
     for i = 1 : size(sourcesTrL, 1)
-       p(2) = plot(sourcesTrL(i,1), sourcesTrL(i,2), 'Marker', 'o', 'MarkerSize', 10, 'MarkerEdgeColor', 'blue', 'MarkerFaceColor', 'red');
-       L{2} = 'Labelled Tr.';
+       p(4) = plot(sourcesTrL(i,1), sourcesTrL(i,2), 'Marker', 'o', 'MarkerSize', 10, 'MarkerEdgeColor', 'blue', 'MarkerFaceColor', 'red');
+       L{4} = 'Labelled Tr.';
        hold on;
     end
     for i = 1 : size(sourcesTrU, 1)
-       p(1) = plot(sourcesTrU(i,1), sourcesTrU(i,2), 'Marker', '.', 'MarkerSize', 15, 'MarkerEdgeColor', 'red', 'MarkerFaceColor', 'red');
-       L{1} = 'Unlabelled Tr.';
+       p(5) = plot(sourcesTrU(i,1), sourcesTrU(i,2), 'Marker', '.', 'MarkerSize', 15, 'MarkerEdgeColor', 'red', 'MarkerFaceColor', 'red');
+       L{5} = 'Unlabelled Tr.';
        hold on;
     end
     for i = 1 : size(sourcesTst, 1)
-       p(3) = plot(sourcesTst(i,1), sourcesTst(i,2), 'Marker', 's', 'MarkerSize', 10,'MarkerEdgeColor', 'blue', 'MarkerFaceColor', 'blue');
-       L{3} = 'Test';
+       p(2) = plot(sourcesTst(i,1), sourcesTst(i,2), 'Marker', 's', 'MarkerSize', 10,'MarkerEdgeColor', 'blue', 'MarkerFaceColor', 'blue');
+       L{2} = 'Test Source';
        hold on;
     end
     for i = 1 : size(sourcesTstPred, 1)
-       p(4) = plot(sourcesTstPred(i,1), sourcesTstPred(i,2), 'Marker', 's', 'MarkerSize', 10,'MarkerEdgeColor', 'blue', 'MarkerFaceColor', 'green');
-       L{4} = 'Test Prediction';
+       p(3) = plot(sourcesTstPred(i,1), sourcesTstPred(i,2), 'Marker', 's', 'MarkerSize', 10,'MarkerEdgeColor', 'blue', 'MarkerFaceColor', 'green');
+       L{3} = 'Test Prediction';
        hold on;
     end
 
     %plot all receivers
     for i = 1 : size(receivers, 1)
-       p(5) = plot(receivers(i,1), receivers(i,2), 'Marker', '+', 'MarkerSize', 10, 'MarkerEdgeColor', 'blue', 'MarkerFaceColor', 'blue');
-       L{5} = 'Mic';
-       hold on;
+       p(1) = plot(receivers(i,1), receivers(i,2), 'Marker', '+', 'MarkerSize', 10,'Linewidth',2, 'MarkerEdgeColor', 'blue', 'MarkerFaceColor', 'blue');
+       L{1} = 'Mic';
+       hold on; 
     end
 end
 %configure plot

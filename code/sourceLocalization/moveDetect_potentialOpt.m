@@ -25,11 +25,12 @@ load('mat_outputs/resEsts_4')
 
 %---- Set MRF params ----
 max_iters = 100;
+num_iters = 2;
 num_ts = size(T60s,2);
 transMats = zeros(num_ts,3,3);
 
 wavs = dir('./shortSpeech/');
-radii = 0:.02:.18;
+radii = 0:.25:1;
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 alpha = .01;
@@ -41,28 +42,14 @@ for t = 1:num_ts
     RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
     scales = scales_t(t,:);
     gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
-    curr_count = 0;
-%     init_transMat = [.65 0 0.35; .2 0 0.8; 1/3 1/3 1/3];
-    init_transMat = [1 0 1; 0 1 1; 1/3 1/3 1/3];
-    transMat_pre = zeros(3);
     align_resid = align_resids(2,:);
     misalign_resid = misalign_resids(2,:);
-    al_pdParams = fitdist((transpose(align_resid)),'Normal');
-    sigma = al_pdParams.sigma;
-    mis_pdParams = fitdist(transpose((misalign_resid)),'Exponential');
-    lambda = mis_pdParams.mu;   
-    transMat = init_transMat;
-    
-    while and(norm(transMat_pre-transMat)>=10e-3, curr_count<max_iters)
-        curr_count = curr_count + 1;
-        pEmp_al = 0;
-        pEmp_mis = 0;
-        pEst_al = 0;
-        pEst_mis = 0;
-                               
+    pEmp_al = 0;
+    pEmp_mis = 0;
+
+    for it = 1:num_iters
         for rad = 1:num_radii
             radius_mic = radii(rad);
-            transMat_pre = transMat;
 
             sourceTest = randSourcePos(1, roomSize, radiusU, ref);
             movingArray = randi(numArrays);
@@ -77,42 +64,52 @@ for t = 1:num_ts
             catch
                 continue
             end    
-            
+
             %---- estimate test positions before movement ----
             [~,~, pre_p_hat_t] = test(x_tst, gammaL, RTF_train, micsPos, rirLen, rtfLen, numArrays,...
                             numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
-            
+
               %---- estimate test positions after movement ----
             [~,~, p_hat_t] = test(x_tst, gammaL, RTF_train, micsPosNew, rirLen, rtfLen, numArrays,...
                             numMics, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, scales);
-            
+
             %Get errors associated for each LONO sub-network
             sub_error = (mean((pre_p_hat_t-p_hat_t).^2));
-            
+
             %Get probability of error according to aligned and
             %misaligned prior distributions
             [pEmp_al_curr,pEmp_mis_curr] = empProbCheck(sub_error,align_resid,misalign_resid);
-            
-            %Get probability based on optimal choice of parameters.
-            [pEst_al_curr, pEst_mis_curr] = estProbCheck(x_tst, transMat, sigma, lambda, gammaL, numMics, numArrays,micsPos, micsPosNew, scales, RTF_train,rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ);
             pEmp_al = pEmp_al + pEmp_al_curr;
-            pEmp_mis = pEmp_mis + pEmp_mis_curr;
-            pEst_al = pEst_al + pEst_al_curr;
-            pEst_mis = pEst_mis + pEst_mis_curr;
-            
+            pEmp_mis = pEmp_mis + pEmp_mis_curr;      
         end
-        
-        p_al =  transMat(1,1)*(pEmp_al/(pEst_al+10e-6));
-        p_mis =  transMat(1,3)*(pEmp_mis/(pEst_mis+10e-6));
-%         p_al = transMat(1,1)*pEmp_al;
-%         p_mis = transMat(1,3)*pEmp_mis;
-        p1 = (p_al/(p_al+p_mis));
-        p2 = (p_mis/(p_al+p_mis));
-        transMat(1,1) = p1;
-        transMat(1,3) =  p2;
-        transMat(2,2) = p1;
-        transMat(2,3) = p2
     end
-    transMats(t,:,:) = transMat;
-    save('./mat_outputs/optTransMatData','transMats'); 
+    pEmp_aa = pEmp_al/(num_iters*num_radii);
+    pEmp_am = 1-pEmp_aa;
+    pEmp_mm = pEmp_mis/(num_iters*num_radii);
+    pEmp_ma = 1-pEmp_mm;
+
+    emp_rows = [1 1];
+    emp_cols = [pEmp_aa+pEmp_mm; pEmp_ma+pEmp_am];
+    transMat = ones(2);
+    pairity = 1;
+    rows = 0;
+    cols = 0;
+    while and((isequal(emp_rows,rows)+isequal(emp_cols,cols))~=2, pairity<max_iters)
+        if pairity == 1
+            rows = emp_rows;
+            cols = emp_cols;
+        end
+        if mod(pairity,2) == 1
+            transMat = [transpose(cols); transpose(cols)].*(transMat./sum(transMat,1));
+            rows = transpose(sum(transMat,2));
+        else
+            transMat = [transpose(rows) transpose(rows)].*(transMat./sum(transMat,2));
+            cols = transpose(sum(transMat,1));
+        end
+        pairity = pairity+1;
+    end
+
+    transMat_t = [transMat(1,1) 0 transMat(1,2);0 transMat(2,1) transMat(2,2);ones(1,3).*(1/3)];
+    transMats(t,:,:) = transMat_t; 
+    save('./mat_outputs/optTransMatData2','transMats'); 
 end

@@ -1,10 +1,7 @@
 %{
-This program simulates a room that can be specified in the initialization
-parameters with a set of noise sources and microphone nodes. RTFs are
-generated (RIRs produced via Emmanuel Habet's RIR generator)and used to
-=Semi-Supervised Source Localization on Multiple Manifolds With Distributed
-Microphones for more details). Gradient descent method used to initialize
-hyper-params.
+This program visulizes the mean and standard deviation of error in
+localization of the SSGP process. To simulate said process, please see
+trainRoom_VariSim.m
 %}
  
 % % load desired scenario (scroll past commented section) or uncomment and simulate new environment RTFs 

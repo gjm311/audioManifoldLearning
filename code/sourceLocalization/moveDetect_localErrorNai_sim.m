@@ -8,9 +8,13 @@ addpath ./shortSpeech
 %{
 This program looks at the localization error (MSE) of arrays when moved 
 varying distances from where they originated (i.e. for training). The
-purpose is to see the correspondance between the localization error with
-the proabilities of failure of the MRF based movement detector.
+purpose is to see the correspondance between the localization error difference for
+single nodes and leave-one-node-out (LONO) subnetworks compared to the shift
+of a random array for the network of nodes.
+
+Visualize results in moveDetect_motive_vis.m
 %}
+
 
 % ---- TRAINING DATA ----
 % room setup

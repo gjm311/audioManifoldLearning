@@ -8,8 +8,10 @@ addpath ./shortSpeech
 %{
 This program looks at the localization error (MSE) of arrays when moved 
 varying distances from where they originated (i.e. for training). The
-purpose is to see the correspondance between the localization error with
-the proabilities of failure of the MRF based movement detector.
+purpose is to see the correspondance between the localization error compared to 
+the shift of a random array for a network of nodes.
+
+Visualize results in moveDetect_motive_vis.m
 %}
 
 % ---- TRAINING DATA ----
@@ -22,7 +24,7 @@ load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
 
 %simulate different noise levels
 num_ts = size(T60s,2);
-radii = 0.05:.2:3.05;
+radii = 0:.2:3.05;
 num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 
@@ -74,4 +76,4 @@ end
 
 localError = mean(mean(localErrors,3),2);
 
-save('./mat_results/localErrorFull_res', 'localError', 'localErrors', 'radii')
+save('./mat_results/localErrorFull_res5', 'localError', 'localErrors', 'radii')

@@ -1,11 +1,5 @@
 %{
-This program simulates a room that can be specified in the initialization
-parameters with a set of noise sources and microphone nodes. RTFs are
-generated (RIRs produced via Emmanuel Habet's RIR generator)and used to
-localize sound sources based off a set of learned manifolds (see 
-Semi-Supervised Source Localization on Multiple Manifolds With Distributed
-Microphones for more details). Gradient descent method used to initialize
-hyper-params.
+This program visualizes a room that can be specified in trainRoom_rtf_sim 
 %}
  
 % % load desired scenario (scroll past commented section) or uncomment and simulate new environment RTFs 
@@ -23,7 +17,6 @@ addpath ./shortSpeech
 disp('Setting up the room');
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_2')
 
-%Chosse T60 from .2, .5. or .8
 T60 = .15;
 t = find(T60s==T60);
 RTF_train = reshape(RTF_trains(t,:,:,:),[nD,rtfLen,numArrays]);

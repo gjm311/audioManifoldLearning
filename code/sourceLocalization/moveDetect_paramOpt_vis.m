@@ -6,7 +6,15 @@ mex RIR-Generator-master/rir_generator.cpp;
 addpath ./stft
 addpath ./shortSpeech
 
-% load('./mat_results/threshTestResults4')
+%{
+This program uses heatmaps to visualize the performance of the MRF-based detector for varying 
+parameter choicess associated with the prior latent state distributions
+(i.e. lambda for the exponential and sigma squared for the normal associated 
+with the misaligned, and aligned classes respectively).
+Parameters chosen via a maximum likelihood calculation.
+
+Results can be simulated in moveDetect_paramOpt.m.
+%}
 
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
 load('./mat_results/paramOpt_results_5.mat')
@@ -27,7 +35,6 @@ numVaris = size(init_vars,2);
 numLams = size(lambdas,2);
 num_ts = size(T60s,2);
 
-
 for t=1:num_ts+1
     figure(t)
     grid on
@@ -39,12 +46,10 @@ for t=1:num_ts+1
         h = heatmap(reshape(aucs(:,:,t),[numLams,numVaris]));
         title(sprintf('AUCs for Varying MRF Hyper-Parameters \nT60 = %s',num2str(round(T60s(t),2))))
     end
-    %     title(sprintf('AUCs for Varying MRF Hyper-Parameters \n Averaged for all T-60s'))
-    ylabel('\sigma^2')
-    xlabel('\lambda')
-    % ax = gca;
-    h.XData = round(lambdas,2);
-    h.YData = round(init_vars,2);
+    xlabel('\sigma^2')
+    ylabel('\lambda')
+    h.XData = round(init_vars,2);
+    h.YData = round(lambdas,2);
     ax = gca;
 end
 grid on

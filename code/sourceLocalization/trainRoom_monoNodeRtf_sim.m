@@ -5,7 +5,10 @@ generated (RIRs produced via Emmanuel Habet's RIR generator)and used to
 localize sound sources based off a set of learned manifolds (see 
 Semi-Supervised Source Localization on Multiple Manifolds With Distributed
 Microphones for more details). Gradient descent method used to initialize
-hyper-params.
+hyper-params. 
+
+Note, RTFs are measured here individually for each node using only the mics
+that comprise said node (used for naive estimations).
 %}
  
 % % load desired scenario (scroll past commented section) or uncomment and simulate new environment RTFs 

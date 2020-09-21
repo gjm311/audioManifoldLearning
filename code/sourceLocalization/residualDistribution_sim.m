@@ -4,8 +4,9 @@ This program estimates the residual error for a series of different T60s
 and noise levels. This is done for both aligned arrays (i.e. in the same 
 position that was used when the ground truth was measured) and misaligned
 (random array moved to random position in room). In 
-residualDistribution_analysis one can see the distribution of the errors 
-for the different class types.
+residualDistribution_vis.m one can see the distribution of the errors 
+for the different class types. Distributions generated inform the choices
+for the latent state prior distributions of the MRF.
 %}
 
 addpath ./functions
@@ -15,12 +16,7 @@ addpath ./shortSpeech
 
 %parameters for room
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4.mat')
-% load('mat_results/vari_t60_data')
 
-% RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
-% scales = scales_t(t,:);
-% gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
-% T60s = .15:.15:.9;
 num_ts = 3;
 snrs = 0:5:40;
 num_snrs = size(snrs,2);

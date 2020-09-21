@@ -7,10 +7,12 @@ addpath ./stft
 addpath ./shortSpeech
 
 %{
-This program looks at the localization error (MSE) of arrays when moved 
-varying distances from where they originated (i.e. for training). The
-purpose is to see the correspondance between the localization error with
-the proabilities of failure of the MRF based movement detector.
+This program simulates the localization error (MSE) of sound sources when arrays 
+used in training of the SSGP localizer are moved varying distances from where 
+they originated. The purpose is to see the performance of detectors via
+the ROC. Here we use the probability of failure as indicated by the MRF based movement detector.
+ 
+To visualize results, run moveDetect_gt_vis.m
 %}
 
 % ---- TRAINING DATA ----
@@ -19,11 +21,6 @@ disp('Setting up the room');
 % ---- Initialize Parameters for training ----
 
 %---- load training data (check mat_trainParams for options)----
-% load('mat_outputs/biMicCircle_5L300U_monoNode_2')
-% micRTF_trains = RTF_train;
-% micScales = scales;
-% micGammaLs = gammaLs;
-
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
 load('./mat_results/paramOpt_results_5.mat')
 load('mat_outputs/optTransMatData')
@@ -58,18 +55,12 @@ for t = 1:num_ts
     lambda = lambdas(lam_pos);
     init_var = init_vars(var_pos);
     transMat = reshape(transMats(t,:,:),[3,3]);
-    
-    %     micRTF_train = reshape(micRTF_trains(t,:,:,:), [numArrays, nD, rtfLen, numMics]);
-    %     micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
-    %     micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
 
     for g = 1:num_gts
         gt = gts(g);
         
         for thr = 1:num_threshes 
             thresh = threshes(thr);
-    %             naive_thresh = naive_threshes(thr);
-    %             sub_thresh = sub_threshes(thr);
 
             mrf_res = gtVary(thresh, sourceTrain, wavs, gammaL, T60, gt, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
             t_str(t,g,thr).tp = mrf_res(1);
@@ -78,16 +69,6 @@ for t = 1:num_ts
             t_str(t,g,thr).fn = mrf_res(4);
             t_str(t,g,thr).tpr = mrf_res(1)/(mrf_res(1)+mrf_res(4)+10e-6);
             t_str(t,g,thr).fpr = mrf_res(2)/(mrf_res(2)+mrf_res(3)+10e-6);
-
-    %         t_str(t,thr).nai_tp_check = nai_res(1);
-    %         t_str(t,thr).nai_fp_check = nai_res(2);
-    %         t_str(t,thr).nai_tn_check = nai_res(3);
-    %         t_str(t,thr).nai_fn_check = nai_res(4);
-    % 
-    %         t_str(t,thr).subNai_tp_check = sub_res(1);
-    %         t_str(t,thr).subNai_fp_check = sub_res(2);
-    %         t_str(t,thr).subNai_tn_check = sub_res(3);
-    %         t_str(t,thr).subNai_fn_check = sub_res(4);
 
         end
     end

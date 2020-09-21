@@ -7,9 +7,14 @@ addpath ./stft
 addpath ./shortSpeech
 
 %{
-This program simulates tprs and fprs for the naive case (i.e. estimation of
-movement determined by comparing single node estimates and sub networks
-with the node that was left out.
+This program simulates the localization error (MSE) of sound sources when arrays 
+used in training of the SSGP localizer are moved varying distances from where 
+they originated. The purpose is to see the performance of detectors as per
+the ROC. Here we use the probability of failure as indicated by the MRF based movement detector.
+Here we look at NAIVE estimation techniques, i.e., mono node comparisons, and LONO sub-net comparisons.
+
+ 
+To visualize results, run moveDetect_gt_vis.m
 %}
 
 % ---- TRAINING DATA ----
@@ -18,15 +23,8 @@ disp('Setting up the room');
 % ---- Initialize Parameters for training ----
 
 %---- load training data (check mat_trainParams for options)----
-% load('mat_outputs/biMicCircle_5L300U_monoNode_2')
-% micRTF_trains = RTF_train;
-% micScales = scales;
-% micGammaLs = gammaLs;
-
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
 load('mat_outputs/biMicCircle_5L300U_monoNode_4')
-% load('mat_results/vari_t60_data.mat')
-% load('mat_outputs/movementOptParams')
 
 % assign radial shifts of microphone array 
 radii = [0 .65 .85 1.5];

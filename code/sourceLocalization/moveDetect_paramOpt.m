@@ -7,10 +7,13 @@ addpath ./stft
 addpath ./shortSpeech
 
 %{
-This program looks at the localization error (MSE) of arrays when moved 
-varying distances from where they originated (i.e. for training). The
-purpose is to see the correspondance between the localization error with
-the proabilities of failure of the MRF based movement detector.
+This program looks optimizes the parameters associated with the prior
+latent state distributions (i.e. lambda for the exponential and sigma
+squared for the normal associated with the misaligned, and aligned classes
+respectively) via a maximum likelihood calculation.
+
+Results can be visualized in moveDetect_paramOpt_vis.m in the form of heat
+maps for different choices of parameters.
 %}
 
 % ---- TRAINING DATA ----
@@ -29,8 +32,8 @@ num_radii = size(radii,2);
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 
 %---- Set MRF params ----
-init_vars = .05:.1:.55;
-lambdas = .05:.1:.55;
+init_vars = .02:.03:.2;
+lambdas = .1:.04:.34;
 eMax = .3;
 threshes = 0:.25:1;
 num_threshes = size(threshes,2);

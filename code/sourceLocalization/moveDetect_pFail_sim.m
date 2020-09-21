@@ -10,7 +10,10 @@ addpath ./shortSpeech
 This program looks at the localization error (MSE) of arrays when moved 
 varying distances from where they originated (i.e. for training). The
 purpose is to see the correspondance between the localization error with
-the proabilities of failure of the MRF based movement detector.
+the proabilities of failure of the MRF based movement detector compared to shifts
+of a random array in a network of nodes.
+
+Visualize results in moveDetect_motive_vis.m (fig. 1)
 %}
 
 % ---- TRAINING DATA ----
@@ -60,7 +63,6 @@ for r = 1:num_radii
 
             [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
             wavs = dir('./shortSpeech/');
-        %             wav_folder = wavs(3:27);
             rand_wav = randi(25);
             try
                 file = wavs(rand_wav+2).name;
@@ -89,6 +91,6 @@ end
     
 p_fail = mean(mean(p_fails,2),3);
 
-save('./mat_results/pFail_res_5', 'p_fails', 'p_fail', 'radii')
+save('./mat_results/pFail_res_6', 'p_fails', 'p_fail', 'radii')
 
 
