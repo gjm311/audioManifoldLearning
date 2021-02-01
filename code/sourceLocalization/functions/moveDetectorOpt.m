@@ -78,7 +78,6 @@ function [upd_sub_p_hat_ts, prob_failure, posteriors] = moveDetectorOpt(x, trans
 %     
     mis_probs = posteriors(:,2);
     if sum(latents(:,2)) > 0
-%         prob_failure = mean(mis_probs(latents(:,2) == 1));
         prob_failure = mean(mis_probs(latents(:,2) == 1));
     else
         prob_failure = 0;

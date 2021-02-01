@@ -1,0 +1,171 @@
+% This file was created by matlab2tikz.
+%
+%The latest updates can be retrieved from
+%  http://www.mathworks.com/matlabcentral/fileexchange/22022-matlab2tikz-matlab2tikz
+%where you can also make suggestions and rate matlab2tikz.
+%
+\begin{tikzpicture}
+
+\begin{axis}[%
+width=4.521in,
+height=3.27in,
+at={(0.758in,0.481in)},
+scale only axis,
+xmin=0,
+xmax=3,
+xlabel style={font=\color{white!15!black}},
+xlabel={Array Shift (m) from Location Before Movement},
+ymin=0,
+ymax=1,
+ylabel style={font=\color{white!15!black}},
+ylabel={Estimation Error (m) After Shift},
+axis background/.style={fill=white},
+title style={font=\bfseries, align=center},
+title={Std. of Error in Source Estimation After Movement\\[1ex] Comparison with Std. of Error with no Movement\\[1ex][Shifts: 0.05m - 3.05m by 20cm increments]},
+legend style={at={(0.148,0.602)}, anchor=south west, legend cell align=left, align=left, draw=white!15!black}
+]
+\addplot [color=red, dashed]
+  table[row sep=crcr]{%
+0.05	0.122208831917682\\
+0.25	0.122208831917682\\
+0.45	0.122208831917682\\
+0.65	0.122208831917682\\
+0.85	0.122208831917682\\
+1.05	0.122208831917682\\
+1.25	0.122208831917682\\
+1.45	0.122208831917682\\
+1.65	0.122208831917682\\
+1.85	0.122208831917682\\
+2.05	0.122208831917682\\
+2.25	0.122208831917682\\
+2.45	0.122208831917682\\
+2.65	0.122208831917682\\
+2.85	0.122208831917682\\
+3.05	0.122208831917682\\
+};
+\addlegendentry{Std. of Error No Movement (T60 = 0.2s)}
+
+\addplot [color=red]
+  table[row sep=crcr]{%
+0.05	0.164084758398413\\
+0.25	0.218346566491945\\
+0.45	0.226049200071292\\
+0.65	0.207501020844664\\
+0.85	0.25989928692076\\
+1.05	0.249727020393484\\
+1.25	0.197716638542088\\
+1.45	0.242801040154546\\
+1.65	0.246612219086054\\
+1.85	0.24128306051773\\
+2.05	0.217078339601359\\
+2.25	0.244345149420538\\
+2.45	0.247474639484308\\
+2.65	0.221148331686887\\
+2.85	0.176053148614796\\
+3.05	0.261353846469145\\
+};
+\addlegendentry{Std. of Error (T60 = 0.2s)}
+
+\addplot [color=blue, dashed]
+  table[row sep=crcr]{%
+0.05	0.185028283425049\\
+0.25	0.185028283425049\\
+0.45	0.185028283425049\\
+0.65	0.185028283425049\\
+0.85	0.185028283425049\\
+1.05	0.185028283425049\\
+1.25	0.185028283425049\\
+1.45	0.185028283425049\\
+1.65	0.185028283425049\\
+1.85	0.185028283425049\\
+2.05	0.185028283425049\\
+2.25	0.185028283425049\\
+2.45	0.185028283425049\\
+2.65	0.185028283425049\\
+2.85	0.185028283425049\\
+3.05	0.185028283425049\\
+};
+\addlegendentry{Std. of Error No Movement (T60 = 0.4s)}
+
+\addplot [color=blue]
+  table[row sep=crcr]{%
+0.05	0.206853766511417\\
+0.25	0.283555954593592\\
+0.45	0.27223653185831\\
+0.65	0.273332386883113\\
+0.85	0.259101359971994\\
+1.05	0.255750920313466\\
+1.25	0.23305854876996\\
+1.45	0.270405305903257\\
+1.65	0.304904873389211\\
+1.85	0.257670578532819\\
+2.05	0.301797158843138\\
+2.25	0.295541561598736\\
+2.45	0.259034353784707\\
+2.65	0.266957242293702\\
+2.85	0.285504926847164\\
+3.05	0.281935515456733\\
+};
+\addlegendentry{Std. of Error (T60 = 0.4s)}
+
+\addplot [color=green, dashed]
+  table[row sep=crcr]{%
+0.05	0.205355597440446\\
+0.25	0.205355597440446\\
+0.45	0.205355597440446\\
+0.65	0.205355597440446\\
+0.85	0.205355597440446\\
+1.05	0.205355597440446\\
+1.25	0.205355597440446\\
+1.45	0.205355597440446\\
+1.65	0.205355597440446\\
+1.85	0.205355597440446\\
+2.05	0.205355597440446\\
+2.25	0.205355597440446\\
+2.45	0.205355597440446\\
+2.65	0.205355597440446\\
+2.85	0.205355597440446\\
+3.05	0.205355597440446\\
+};
+\addlegendentry{Std. of Error No Movement (T60 = 0.6s)}
+
+\addplot [color=green]
+  table[row sep=crcr]{%
+0.05	0.27960551715559\\
+0.25	0.249797430042392\\
+0.45	0.273909451302622\\
+0.65	0.267352673594505\\
+0.85	0.281468658300068\\
+1.05	0.267401619137807\\
+1.25	0.268585216526487\\
+1.45	0.308411371053515\\
+1.65	0.299230541395184\\
+1.85	0.257811895241553\\
+2.05	0.275729201581566\\
+2.25	0.314085847659877\\
+2.45	0.238405084125993\\
+2.65	0.238161014481284\\
+2.85	0.268865950930381\\
+3.05	0.306352962343204\\
+};
+\addlegendentry{Std. of Error (T60 = 0.6s)}
+
+\end{axis}
+
+\begin{axis}[%
+width=5.833in,
+height=4.375in,
+at={(0in,0in)},
+scale only axis,
+xmin=0,
+xmax=1,
+ymin=0,
+ymax=1,
+axis line style={draw=none},
+ticks=none,
+axis x line*=bottom,
+axis y line*=left,
+legend style={legend cell align=left, align=left, draw=white!15!black}
+]
+\end{axis}
+\end{tikzpicture}%

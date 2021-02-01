@@ -38,85 +38,105 @@ num_iters = 100;
 monoLocalErrors = zeros(num_radii,num_ts,num_iters);
 subLocalErrors = zeros(num_radii,num_ts,num_iters);
 
-for r = 1:num_radii
-    radius_mic = radii(r);
-    
-    for t = 1:num_ts
-        T60 = T60s(t);
-%         RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
-%         scales = scales_t(t,:);
-%         gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
-        mono_local_error_curr = 0;
-        sub_local_error_curr = 0;
-        micRTF_train = reshape(micRTF_trains(t,:,:,:), [numArrays, nD, rtfLen, numMics]);
-        micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
-        micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
-        
-        for iters = 1:num_iters      
-            %randomize tst source, new position of random microphone (new
-            %position is on circle based off radius_mic), random rotation to
-            %microphones, and random sound file (max 4 seconds).
-            sourceTest = randSourcePos(1, roomSize, radiusU, ref);
+for trial=1:3
+    for r = 1:num_radii
+        radius_mic = radii(r);
 
-            movingArray = randi(numArrays);
+        for t = 1:num_ts
+            T60 = T60s(t);
+    %         RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
+    %         scales = scales_t(t,:);
+    %         gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
+            mono_local_error_curr = 0;
+            sub_local_error_curr = 0;
+            micRTF_train = reshape(micRTF_trains(t,:,:,:), [numArrays, nD, rtfLen, numMics]);
+            micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
+            micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
 
-            [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
-            wavs = dir('./shortSpeech/');
-        %             wav_folder = wavs(3:27);
-            rand_wav = randi(25);
-            try
-                file = wavs(rand_wav+2).name;
-                [x_tst,fs_in] = audioread(file);
-                [numer, denom] = rat(fs/fs_in);
-                x_tst = resample(x_tst,numer,denom);
-                x_tst = x_tst';  
-            catch
-                continue
-            end       
-            
-           %---- Initialize subnet estimates of training positions ----
-            sub_p_hat_ts = zeros(numArrays, 3); 
-            for k = 1:numArrays
-                [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPos, RTF_train);
-                [~,~,sub_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
-                    sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
-            end
-              
-          %---- Initialize subnet estimates of training positions ----
-            sub_naives = zeros(numArrays,1);
-            for k = 1:numArrays
-                [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPosNew, RTF_train);
-                [~,~,post_sub_p_hat_ts] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
-                    sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
-                sub_naives(k) = mean((post_sub_p_hat_ts-sub_p_hat_ts(k,:)).^2);
-            end
-            
-            mono_naives = zeros(numArrays,1);
-            naive_p_hat_ts = zeros(numArrays,3);
-            for k = 1:numArrays
-                subnet = micsPosNew((k-1)*numMics+1:k*numMics,:);
-                subscales = micScale(k,:);
-                gammaL = reshape(micGammaL(k,:,:),[nL,nL]);
-                trRTF = reshape(micRTF_train(k,:,:,:), [nD, rtfLen, numMics]);
-                [~,~,naive_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, 1, numMics, sourceTrain,...
-                    sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
-%                 sub_naives(k) = mean((naive_p_hat_ts(k,:)-sub_p_hat_ts(k,:)).^2);
+            for iters = 1:num_iters      
+                %randomize tst source, new position of random microphone (new
+                %position is on circle based off radius_mic), random rotation to
+                %microphones, and random sound file (max 4 seconds).
+                sourceTest = randSourcePos(1, roomSize, radiusU*.55, ref);
+
+                movingArray = randi(numArrays);
+
+                if trial==1 
+                    [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+                end
+                if trial==2
+                    [~, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+                end
+                if trial==3
+                    [~, micsPosNew] = micRotate(roomSize, 0, mic_ref, movingArray, micsPos, numArrays, numMics);
+                end
+                
+                wavs = dir('./shortSpeech/');
+            %             wav_folder = wavs(3:27);
+                rand_wav = randi(25);
+                try
+                    file = wavs(rand_wav+2).name;
+                    [x_tst,fs_in] = audioread(file);
+                    [numer, denom] = rat(fs/fs_in);
+                    x_tst = resample(x_tst,numer,denom);
+                    x_tst = x_tst';  
+                catch
+                    continue
+                end       
+
+               %---- Initialize subnet estimates of training positions ----
+                sub_p_hat_ts = zeros(numArrays, 3); 
+                for k = 1:numArrays
+                    [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPos, RTF_train);
+                    [~,~,sub_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
+                        sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
+                end
+
+              %---- Initialize subnet estimates of training positions ----
+                sub_naives = zeros(numArrays,1);
+                for k = 1:numArrays
+                    [subnet, subscales, trRTF] = subNet(k, numArrays, numMics, scales, micsPosNew, RTF_train);
+                    [~,~,post_sub_p_hat_ts] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, numArrays-1, numMics, sourceTrain,...
+                        sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
+                    sub_naives(k) = mean((post_sub_p_hat_ts-sub_p_hat_ts(k,:)).^2);
+                end
+
+    %             mono_naives = zeros(numArrays,1);
+    %             naive_p_hat_ts = zeros(numArrays,3);
+    %             for k = 1:numArrays
+    %                 subnet = micsPosNew((k-1)*numMics+1:k*numMics,:);
+    %                 subscales = micScale(k,:);
+    %                 gammaL = reshape(micGammaL(k,:,:),[nL,nL]);
+    %                 trRTF = reshape(micRTF_train(k,:,:,:), [nD, rtfLen, numMics]);
+    %                 [~,~,naive_p_hat_ts(k,:)] = test(x_tst, gammaL, trRTF, subnet, rirLen, rtfLen, 1, numMics, sourceTrain,...
+    %                     sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ, subscales);  
+    % %                 sub_naives(k) = mean((naive_p_hat_ts(k,:)-sub_p_hat_ts(k,:)).^2);
+    %             end
+    % 
+    %             mono_naives(1) = mean(pdist(naive_p_hat_ts(2:4,:)));
+    %             mono_naives(2) = mean(pdist([naive_p_hat_ts(1,:); naive_p_hat_ts(3:4,:)]));
+    %             mono_naives(3) = mean(pdist([naive_p_hat_ts(1:2,:); naive_p_hat_ts(4,:)]));
+    %             mono_naives(4) = mean(pdist(naive_p_hat_ts(1:3,:)));
+    %             
+    %             monoLocalErrors(r,t,iters) = max(mono_naives);
+                subLocalErrors(r,t,iters) = max(sub_naives);
             end
 
-            mono_naives(1) = mean(pdist(naive_p_hat_ts(2:4,:)));
-            mono_naives(2) = mean(pdist([naive_p_hat_ts(1,:); naive_p_hat_ts(3:4,:)]));
-            mono_naives(3) = mean(pdist([naive_p_hat_ts(1:2,:); naive_p_hat_ts(4,:)]));
-            mono_naives(4) = mean(pdist(naive_p_hat_ts(1:3,:)));
-            
-            monoLocalErrors(r,t,iters) = max(mono_naives);
-            subLocalErrors(r,t,iters) = max(sub_naives);
         end
-       
+    end
+
+    % monoLocalError = mean(mean(monoLocalErrors,3),2);
+    subLocalError = mean(mean(subLocalErrors,3),2);
+
+
+%     save('./mat_results/localNaiError_res_noRotate', 'monoLocalError', 'monoLocalErrors', 'subLocalError', 'subLocalErrors', 'radii')
+    if trials==1
+        save('./mat_results/localNaiError_res_noRotate', 'subLocalError', 'subLocalErrors', 'radii')
+    end
+    if trials==2
+        save('./mat_results/localNaiError_res_rotate', 'subLocalError', 'subLocalErrors', 'radii')
+    end
+    if trials==3
+        save('./mat_results/localNaiError_res_onlyRotate', 'subLocalError', 'subLocalErrors', 'radii')
     end
 end
-
-monoLocalError = mean(mean(monoLocalErrors,3),2);
-subLocalError = mean(mean(subLocalErrors,3),2);
-
-
-save('./mat_results/localNaiError_res', 'monoLocalError', 'monoLocalErrors', 'subLocalError', 'subLocalErrors', 'radii')

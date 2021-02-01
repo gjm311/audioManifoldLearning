@@ -1,0 +1,108 @@
+% This file was created by matlab2tikz.
+%
+%The latest updates can be retrieved from
+%  http://www.mathworks.com/matlabcentral/fileexchange/22022-matlab2tikz-matlab2tikz
+%where you can also make suggestions and rate matlab2tikz.
+%
+\begin{tikzpicture}
+
+\begin{axis}[%
+width=4.521in,
+height=3.27in,
+at={(0.758in,0.481in)},
+scale only axis,
+xmin=0,
+xmax=3,
+xlabel style={font=\color{white!15!black}},
+xlabel={Array Shift (m) from Location Before Movement},
+ymin=0,
+ymax=28,
+ylabel style={font=\color{white!15!black}, align=center},
+ylabel={LONO Sub-network v. Left Out Node\\[1ex] Estimation Differences (m)},
+axis background/.style={fill=white},
+title style={font=\bfseries, align=center},
+title={Average Difference in Source Estimation via LONO Sub-networks\\[1ex]and Left Out Nodes (One Node Shifted per Iteration)\\[1ex][Shifts: 0.05m - 3.05m by 20cm increments]},
+legend style={at={(0.154,0.712)}, anchor=south west, legend cell align=left, align=left, draw=white!15!black}
+]
+\addplot [color=red]
+  table[row sep=crcr]{%
+0.05	0.0381809856502321\\
+0.25	0.11262819840459\\
+0.45	0.133457569360856\\
+0.65	0.240347478963867\\
+0.85	0.278901592669474\\
+1.05	0.570457269496115\\
+1.25	0.563604675647266\\
+1.45	0.722539166235795\\
+1.65	0.855696977750568\\
+1.85	1.60432397289233\\
+2.05	1.39982168617098\\
+2.25	1.61233861940033\\
+2.45	1.94340584590269\\
+2.65	2.87234499859369\\
+2.85	1.07981502352157\\
+3.05	0.734731038360379\\
+};
+\addlegendentry{Avg. Diff. (T60 = 0.2s)}
+
+\addplot [color=blue]
+  table[row sep=crcr]{%
+0.05	0.00358499841651721\\
+0.25	0.0432304072395857\\
+0.45	0.0440103441691384\\
+0.65	0.185283380765717\\
+0.85	0.0957720918417071\\
+1.05	0.256818810147205\\
+1.25	0.187573941247801\\
+1.45	0.359250289268297\\
+1.65	0.444677502481337\\
+1.85	0.520893972626514\\
+2.05	0.453909697230387\\
+2.25	0.414467717899402\\
+2.45	0.348268377079947\\
+2.65	0.279111067831247\\
+2.85	0.254027283609839\\
+3.05	0.485075699985079\\
+};
+\addlegendentry{Avg. Diff. (T60 = 0.4s)}
+
+\addplot [color=green]
+  table[row sep=crcr]{%
+0.05	0.2699345666688\\
+0.25	2.28053734948861\\
+0.45	3.4069765155569\\
+0.65	3.96630351738008\\
+0.85	3.95670301883568\\
+1.05	10.616577479997\\
+1.25	12.892582702184\\
+1.45	14.9306345662584\\
+1.65	17.4094284925075\\
+1.85	25.5714226324674\\
+2.05	19.2876226723446\\
+2.25	23.118373839219\\
+2.45	19.7588392261347\\
+2.65	14.5616990277878\\
+2.85	22.3873347786648\\
+3.05	22.7867985186328\\
+};
+\addlegendentry{Avg. Diff. (T60 = 0.6s)}
+
+\end{axis}
+
+\begin{axis}[%
+width=5.833in,
+height=4.375in,
+at={(0in,0in)},
+scale only axis,
+xmin=0,
+xmax=1,
+ymin=0,
+ymax=1,
+axis line style={draw=none},
+ticks=none,
+axis x line*=bottom,
+axis y line*=left,
+legend style={legend cell align=left, align=left, draw=white!15!black}
+]
+\end{axis}
+\end{tikzpicture}%

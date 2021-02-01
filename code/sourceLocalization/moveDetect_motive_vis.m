@@ -67,7 +67,7 @@ load('./mat_results/pFail_res_4', 'p_fail', 'p_fails', 'radii')
 num_ts = size(p_fails,2);
 num_samples = 100;
 
-load('./mat_results/pFail_res_5', 'p_fails', 'radii')
+load('./mat_results/pFail_res_5_post', 'p_fails', 'radii')
 localErrors = p_fails;
 for t = 1:num_ts
     T60 = T60s(t);    
@@ -86,7 +86,7 @@ for t = 1:num_ts
     end
 %     title(sprintf('Average Probability of Movement for Varying Array Shifts'))
     xlabel(sprintf('Shift Size (m)'))
-    ylabel(sprintf('Movement Detection Probability of Movement\n(via MRF Detection)'))
+    ylabel(sprintf('Probability of Movement\n(via MRF Detection)'))
    
     ylim([0 1])
     xlim([0 3])

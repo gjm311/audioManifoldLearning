@@ -1,0 +1,30 @@
+%Process Outline:
+%Load train data
+load('mat_outputs/singleTestSource_biMicCircle_gridL100U');
+
+% nD = size(sourceTrain,1);
+% subSigmaLts = zeros(numArrays, nL);
+% for i = 1:numArrays
+%     if i == 1
+%         subnet = micsPos(numMics+1:end,:);
+%         subscales = scales(2:end);
+%         trRTF = RTF_train(:,:,2:end);
+%     end
+%     if i == numArrays-1
+%         subnet = micsPos(1:end-numMics,:);
+%         subscales = scales(1:end-1);
+%         trRTF = RTF_train(:,:,1:end-1);
+%     end
+%     if and(i>1, i<numArrays-1)
+%        subnet = [micsPos(1:numMics*(i-1),:); micsPos(numMics*i+1:end,:)];
+%        subscales = [scales(1:i-1), scales(i+1:end)];
+%        trRTF = cat(3,RTF_train(:,:,1:i-1), RTF_train(:,:,i+1:end));
+%     end
+% 
+%     tstRTF = rtfEst(x, subnet, rtfLen, numArrays-1, numMics, sourceTrain, roomSize, T60, rirLen, c, fs);
+%     subSigmaLts(i,:) = tstCovEst(nL, nD, numArrays-1, trRTF, tstRTF, kern_typ, subscales);
+% end
+% save('mat_subNetCovs/singleTestSource_biMicCircle_gridL100U', 'subSigmaLts')
+load('mat_subNetCovs/singleTestSource_biMicCircle_gridL100U', 'subSigmaLts')
+
+g
