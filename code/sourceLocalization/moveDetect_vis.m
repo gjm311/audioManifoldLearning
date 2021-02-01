@@ -25,7 +25,7 @@ load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
 % modelSd = .1;
 
 %simulate different noise levels
-radii = .5; 
+radii = .1; 
 mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 wav_folder = dir('./shortSpeech/');
 wav_folder = wav_folder(3:27);

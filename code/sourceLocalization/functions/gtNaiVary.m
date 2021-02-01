@@ -1,4 +1,4 @@
-function [mono_res, sub_res] = gtNaiVary(mono_thresh,sub_thresh,sourceTrain, wavs, gammaL, T60, gt, micRTF_train, micScale, micGammaL, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
+function [mono_res, sub_res] = gtNaiVary(trial, mono_thresh,sub_thresh,sourceTrain, wavs, gammaL, T60, gt, micRTF_train, micScale, micGammaL, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
     num_radii = size(radii, 2);
     nD = size(RTF_train,1);
     mono_tp_ch_curr = 0;
@@ -20,8 +20,15 @@ function [mono_res, sub_res] = gtNaiVary(mono_thresh,sub_thresh,sourceTrain, wav
             %microphones, and random sound file (max 4 seconds).
             sourceTest = randSourcePos(1, roomSize, radiusU*.35, ref);
             movingArray = randi(numArrays);
-            [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
-
+            if trial==1
+                [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+            end
+            if trial==2
+                [~, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+            end
+            if trial==3
+                [~, micsPosNew] = micRotate(roomSize, 0, mic_ref, movingArray, micsPos, numArrays, numMics);
+            end
             rand_wav = randi(25);
             try
                 file = wavs(rand_wav+2).name;

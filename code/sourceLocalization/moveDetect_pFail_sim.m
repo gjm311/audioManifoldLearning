@@ -50,10 +50,22 @@ for trial=1:3
             gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
             p_fail_curr = 0;
             [lam_pos,var_pos] = find(reshape(aucs(:,:,t),[num_lambdas,num_varis]) == max(max(reshape(aucs(:,:,t),[num_lambdas,num_varis]))));
-            lambda = lambdas(lam_pos);
-            init_var = init_vars(var_pos);
+%             lambda = lambdas(lam_pos);
+            lam_sz=size(lam_pos);
+            v_sz=size(var_pos);
+            if lam_sz(1)==1
+                lambda = lambdas(lam_pos);
+            else
+                lambda = lambdas(lam_pos(1));
+            end
+            
+            if v_sz(1)==1
+                init_var = init_vars(var_pos);
+            else
+                init_var = init_vars(var_pos(1));
+            end
             transMat = reshape(transMats(t,:,:),[3,3]);
-
+            
 
             for iters = 1:num_iters      
                 %randomize tst source, new position of random microphone (new

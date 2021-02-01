@@ -43,43 +43,55 @@ sub_t_str = ([]);
 gts = [.1 .75 1.45];
 num_gts = size(gts,2);
 
-for t = 1:num_ts
 
-    T60 = T60s(t);
-    RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
-    scales = scales_t(t,:);
-    gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
-    
-    micRTF_train = reshape(micRTF_trains(t,:,:,:), [numArrays, nD, rtfLen, numMics]);
-    micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
-    micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
+for trial=1:3
+    for t = 1:num_ts
 
-    for g = 1:num_gts
-        gt = gts(g);
-        
-        for thr = 1:num_threshes 
-            mono_thresh = mono_threshes(thr);
-            sub_thresh = sub_threshes(thr);
+        T60 = T60s(t);
+        RTF_train = reshape(RTF_trains(t,:,:,:), [nD, rtfLen, numArrays]);    
+        scales = scales_t(t,:);
+        gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
 
-            [mono_res,sub_res] = gtNaiVary(mono_thresh, sub_thresh, sourceTrain, wavs, gammaL, T60, gt, micRTF_train, micScale, micGammaL, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
-            mono_t_str(t,g,thr).tp = mono_res(1);
-            mono_t_str(t,g,thr).fp = mono_res(2);
-            mono_t_str(t,g,thr).tn = mono_res(3);
-            mono_t_str(t,g,thr).fn = mono_res(4);
-            mono_t_str(t,g,thr).tpr = mono_res(1)/(mono_res(1)+mono_res(4)+10e-6);
-            mono_t_str(t,g,thr).fpr = mono_res(2)/(mono_res(2)+mono_res(3)+10e-6);
-            
-            sub_t_str(t,g,thr).tp = sub_res(1);
-            sub_t_str(t,g,thr).fp = sub_res(2);
-            sub_t_str(t,g,thr).tn = sub_res(3);
-            sub_t_str(t,g,thr).fn = sub_res(4);
-            sub_t_str(t,g,thr).tpr = sub_res(1)/(sub_res(1)+sub_res(4)+10e-6);
-            sub_t_str(t,g,thr).fpr = sub_res(2)/(sub_res(2)+sub_res(3)+10e-6);
+        micRTF_train = reshape(micRTF_trains(t,:,:,:), [numArrays, nD, rtfLen, numMics]);
+        micScale = reshape(micScales(t,:,:), [numArrays,numMics]);
+        micGammaL = reshape(micGammaLs(t,:,:,:), [numArrays,nL,nL]);
 
+        for g = 1:num_gts
+            gt = gts(g);
+
+            for thr = 1:num_threshes 
+                mono_thresh = mono_threshes(thr);
+                sub_thresh = sub_threshes(thr);
+
+                
+                [mono_res,sub_res] = gtNaiVary(trial, mono_thresh, sub_thresh, sourceTrain, wavs, gammaL, T60, gt, micRTF_train, micScale, micGammaL, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs);
+
+                mono_t_str(t,g,thr).tp = mono_res(1);
+                mono_t_str(t,g,thr).fp = mono_res(2);
+                mono_t_str(t,g,thr).tn = mono_res(3);
+                mono_t_str(t,g,thr).fn = mono_res(4);
+                mono_t_str(t,g,thr).tpr = mono_res(1)/(mono_res(1)+mono_res(4)+10e-6);
+                mono_t_str(t,g,thr).fpr = mono_res(2)/(mono_res(2)+mono_res(3)+10e-6);
+
+                sub_t_str(t,g,thr).tp = sub_res(1);
+                sub_t_str(t,g,thr).fp = sub_res(2);
+                sub_t_str(t,g,thr).tn = sub_res(3);
+                sub_t_str(t,g,thr).fn = sub_res(4);
+                sub_t_str(t,g,thr).tpr = sub_res(1)/(sub_res(1)+sub_res(4)+10e-6);
+                sub_t_str(t,g,thr).fpr = sub_res(2)/(sub_res(2)+sub_res(3)+10e-6);
+
+            end
         end
-    end
-    save('mat_results/gt_nai_results_4', 'mono_t_str', 'sub_t_str') 
-end   
-
+        if trial==1
+            save('mat_results/gt_nai_results_noRotation', 'mono_t_str', 'sub_t_str') 
+        end
+        if trial==2
+            save('mat_results/gt_nai_results_rotation', 'mono_t_str', 'sub_t_str') 
+        end
+        if trial==3
+            save('mat_results/gt_nai_results_onlyRotation', 'mono_t_str', 'sub_t_str') 
+        end
+    end   
+end
 
 

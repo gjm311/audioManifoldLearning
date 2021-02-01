@@ -1,4 +1,4 @@
-function [mrf_res] = gtVary(thresh, sourceTrain, wavs, gammaL, T60, gt, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
+function [mrf_res] = gtVary(trial, thresh, sourceTrain, wavs, gammaL, T60, gt, init_var, lambda, eMax, transMat, RTF_train, nL, nU,rirLen, rtfLen,c, kern_typ, scales, radii,threshes,num_iters, roomSize, radiusU, ref, numArrays, mic_ref, micsPos, numMics, fs)
     num_radii = size(radii, 2);
     
     tp_ch_curr = 0;
@@ -15,8 +15,15 @@ function [mrf_res] = gtVary(thresh, sourceTrain, wavs, gammaL, T60, gt, init_var
             %microphones, and random sound file (max 4 seconds).
             sourceTest = randSourcePos(1, roomSize, radiusU*.35, ref);
             movingArray = randi(numArrays);
-            [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
-
+            if trial==1
+                [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+            end
+            if trial==2
+                [~, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+            end
+            if trial==3
+                [~, micsPosNew] = micRotate(roomSize, 0, mic_ref, movingArray, micsPos, numArrays, numMics);
+            end
             rand_wav = randi(25);
             try
                 file = wavs(rand_wav+2).name;
