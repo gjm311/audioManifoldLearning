@@ -71,7 +71,16 @@ for trial=1:3
                 t_str(t,g,thr).fpr = mrf_res(2)/(mrf_res(2)+mrf_res(3)+10e-6);
             end
         end
-        save('mat_results/gt_indT_results_5', 't_str') 
+%         save('mat_results/gt_indT_results_5', 't_str') 
+        if trial==1
+            save('mat_results/gt_indT_results_rotation', 't_str')
+        end
+        if trial==2
+            save('mat_results/gt_indT_results_noRotation', 't_str') 
+        end
+        if trial==3
+            save('mat_results/gt_indT_results_onlyRotation', 't_str')
+        end
     end   
 
 end
