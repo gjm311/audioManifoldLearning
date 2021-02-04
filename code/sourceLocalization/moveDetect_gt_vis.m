@@ -22,7 +22,7 @@ for r=1:3
         load('./mat_results/gt_nai_results_rotation.mat')
         t_str = mono_t_str;
     else
-        load('./mat_results/gt_nai_results_rotation.mat')       
+        load('./mat_results/gt_nai_results_noRotation.mat')       
         t_str = sub_t_str;
     end
 
