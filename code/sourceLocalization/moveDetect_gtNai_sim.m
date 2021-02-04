@@ -33,8 +33,8 @@ mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 wavs = dir('./shortSpeech/');
 
 %---- Set MRF params ----
-mono_threshes = [0 0.5:.25:2.5 100];
-sub_threshes = [0:1.25:11.25 10000];
+mono_threshes = [0 0.5:.125:2.75 100];
+sub_threshes = [0:.625:11.875 10000];
 num_threshes = size(sub_threshes,2);
 num_iters = 20;
 num_ts = size(T60s,2);
@@ -44,7 +44,7 @@ gts = [.1 .75 1.45];
 num_gts = size(gts,2);
 
 
-for trial=1:3
+for trial=3
     for t = 1:num_ts
 
         T60 = T60s(t);
@@ -83,13 +83,13 @@ for trial=1:3
             end
         end
         if trial==1
-            save('mat_results/gt_nai_results_noRotation', 'mono_t_str', 'sub_t_str') 
+            save('mat_results/gt_nai_results_noRotation_ms', 'mono_t_str', 'sub_t_str') 
         end
         if trial==2
-            save('mat_results/gt_nai_results_rotation', 'mono_t_str', 'sub_t_str') 
+            save('mat_results/gt_nai_results_rotation_ms', 'mono_t_str', 'sub_t_str') 
         end
         if trial==3
-            save('mat_results/gt_nai_results_onlyRotation', 'mono_t_str', 'sub_t_str') 
+            save('mat_results/gt_nai_results_onlyRotation_ms', 'mono_t_str', 'sub_t_str') 
         end
     end   
 end

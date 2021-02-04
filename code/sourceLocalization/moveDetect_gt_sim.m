@@ -53,8 +53,20 @@ for trial=1:3
         scales = scales_t(t,:);
         gammaL = reshape(gammaLs(t,:,:), [nL, nL]);
         [lam_pos,var_pos] = find(reshape(aucs(:,:,t),[num_lambdas,num_varis]) == max(max(reshape(aucs(:,:,t),[num_lambdas,num_varis]))));
-        lambda = lambdas(lam_pos);
-        init_var = init_vars(var_pos);
+        %lambda = lambdas(lam_pos);
+        lam_sz=size(lam_pos);
+        v_sz=size(var_pos);
+        if lam_sz(1)==1
+            lambda = lambdas(lam_pos);
+        else
+            lambda = lambdas(lam_pos(1));
+        end
+            
+        if v_sz(1)==1
+            init_var = init_vars(var_pos);
+        else
+            init_var = init_vars(var_pos(1));
+        end
         transMat = reshape(transMats(t,:,:),[3,3]);
 
         for g = 1:num_gts
