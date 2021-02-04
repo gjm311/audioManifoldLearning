@@ -33,8 +33,8 @@ mic_ref = [3 5.75 1; 5.75 3 1; 3 .25 1; .25 3 1];
 wavs = dir('./shortSpeech/');
 
 %---- Set MRF params ----
-mono_threshes = [0 0.5:.25:2.5 100];
-sub_threshes = [0:1.25:11.25 10000];
+mono_threshes = [0 0.5:.125:2.75 100];
+sub_threshes = [0:.625:11.875 10000];
 num_threshes = size(sub_threshes,2);
 num_iters = 20;
 num_ts = size(T60s,2);
