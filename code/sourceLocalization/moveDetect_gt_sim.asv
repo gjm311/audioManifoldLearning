@@ -37,16 +37,15 @@ wavs = dir('./shortSpeech/');
 
 %---- Set MRF params ----
 eMax = .3;
-threshes = 0:.05:1;
+threshes = 0:.1:1;
 num_threshes = size(threshes,2);
 num_iters = 20;
 num_ts = size(T60s,2);
 t_str = ([]);
-
 gts = [.1 .75 1.45];
 radii=[0 135 200 360];
-gts=[90 180 270];
-num_gts = size(gts,2);
+rgts=[90 180 270];
+num_gts = size(rgts,2);
 
 T60s=[0.2];
 num_ts=1;
@@ -63,8 +62,8 @@ for trial=2
         init_var = init_vars(var_pos);
         transMat = reshape(transMats(t,:,:),[3,3]);
 
-        for g = 1:num_gts
-            gt = gts(g);
+        for g = 1:num_rgts
+            gt = rgts(g);
 
             for thr = 1:num_threshes 
                 thresh = threshes(thr);
@@ -83,7 +82,7 @@ for trial=2
 %         end
         if trial==2
             save('mat_results/gt_indT_results_rotation', 't_str') 
-        end
+%         end
 %         if trial==3
 %             save('mat_results/gt_indT_results_onlyRotation', 't_str')
 %         end

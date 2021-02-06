@@ -17,9 +17,9 @@ load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
 
 for r=1:3
     if r==1
-        load('./mat_results/gt_indT_results_rotation.mat')
+        load('./mat_results/gt_indT_results_onlyRotation.mat')
     elseif r==2
-        load('./mat_results/gt_nai_results_rotation.mat')
+        load('./mat_results/gt_nai_results_onlyRotation.mat')
         t_str = mono_t_str;
     else
         load('./mat_results/gt_nai_results_noRotation.mat')       

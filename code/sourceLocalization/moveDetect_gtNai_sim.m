@@ -43,8 +43,14 @@ sub_t_str = ([]);
 gts = [.1 .75 1.45];
 num_gts = size(gts,2);
 
+radii=[0 135 200 360];
+gts=[90 180 270];
+num_gts = size(gts,2);
 
-for trial=1:3
+T60s=[0.2];
+num_ts=1;
+
+for trial=2
     for t = 1:num_ts
 
         T60 = T60s(t);
@@ -82,15 +88,15 @@ for trial=1:3
 
             end
         end
-        if trial==1
-            save('mat_results/gt_nai_results_noRotation', 'mono_t_str', 'sub_t_str') 
-        end
+%         if trial==1
+%             save('mat_results/gt_nai_results_noRotation', 'mono_t_str', 'sub_t_str') 
+%         end
         if trial==2
             save('mat_results/gt_nai_results_rotation', 'mono_t_str', 'sub_t_str') 
         end
-        if trial==3
-            save('mat_results/gt_nai_results_onlyRotation', 'mono_t_str', 'sub_t_str') 
-        end
+%         if trial==3
+%             save('mat_results/gt_nai_results_onlyRotation', 'mono_t_str', 'sub_t_str') 
+%         end
     end   
 end
 

@@ -19,10 +19,10 @@ function [mrf_res] = gtVary(trial, thresh, sourceTrain, wavs, gammaL, T60, gt, i
                 [~, micsPosNew] = micNoRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
             end
             if trial==2
-                [~, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
+                [rotation, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
             end
             if trial==3
-                [~, micsPosNew] = micRotate(roomSize, 0, mic_ref, movingArray, micsPos, numArrays, numMics);
+                [rotation, micsPosNew] = micRotate(roomSize, 0, mic_ref, movingArray, micsPos, numArrays, numMics);
             end
             rand_wav = randi(25);
             try
@@ -45,14 +45,14 @@ function [mrf_res] = gtVary(trial, thresh, sourceTrain, wavs, gammaL, T60, gt, i
             [~, p_fail, ~] = moveDetectorOpt(x_tst, transMat, init_var, lambda, eMax, thresh, gammaL, numMics, numArrays, micsPosNew, 1, 0, sub_p_hat_ts, scales, RTF_train,...
                     rirLen, rtfLen, sourceTrain, sourceTest, nL, nU, roomSize, T60, c, fs, kern_typ);
             
-            if radius_mic >= gt             
+            if rotation >= gt             
                 if p_fail >= thresh
                     tp_ch_curr = tp_ch_curr + 1;
                 else
                     fn_ch_curr = fn_ch_curr + 1;
                 end
             end
-            if radius_mic < gt   
+            if rotation < gt   
                 if p_fail >= thresh
                     fp_ch_curr = fp_ch_curr + 1;
                 else

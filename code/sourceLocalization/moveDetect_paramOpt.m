@@ -80,5 +80,5 @@ for lam = 1:numLams
 %         aucs(lam,v) = trapz(fprs(:,lam,v),tprs(:,lam,v));
 
     end
-    save('./mat_results/paramOpt_results_5', 'tprs', 'fprs', 'aucs', 'init_vars', 'lambdas', 'transMats');   
+    save('./mat_results/paramOpt_results_rotate', 'tprs', 'fprs', 'aucs', 'init_vars', 'lambdas', 'transMats');   
 end

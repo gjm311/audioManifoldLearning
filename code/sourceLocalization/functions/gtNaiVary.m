@@ -27,7 +27,7 @@ function [mono_res, sub_res] = gtNaiVary(trial, mono_thresh,sub_thresh,sourceTra
                 [~, micsPosNew] = micRotate(roomSize, radius_mic, mic_ref, movingArray, micsPos, numArrays, numMics);
             end
             if trial==3
-                [~, micsPosNew] = micRotate(roomSize, 0, mic_ref, movingArray, micsPos, numArrays, numMics);
+                [rotation, micsPosNew] = micRotate(roomSize, 0, mic_ref, movingArray, micsPos, numArrays, numMics);
             end
             rand_wav = randi(25);
             try
