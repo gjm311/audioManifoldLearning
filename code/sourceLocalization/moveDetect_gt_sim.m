@@ -22,7 +22,7 @@ disp('Setting up the room');
 
 %---- load training data (check mat_trainParams for options)----
 load('mat_outputs/monoTestSource_biMicCircle_5L300U_4')
-load('./mat_results/paramOpt_results_5.mat')
+load('./mat_results/paramOpt_results_rotate.mat')
 load('mat_outputs/optTransMatData')
 num_lambdas = size(lambdas,2);
 num_varis = size(init_vars,2);
